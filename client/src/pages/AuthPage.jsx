@@ -8,12 +8,12 @@ export default function AuthPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-6 font-inter animate-gradient-green-pink-shift bg-[length:400%_400%]">
-      
+
       {/* Heading */}
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-800 mb-8 md:mb-10 text-center leading-tight">
         CALMANA
       </h1>
-      
+
       {/* Subheading */}
       <p className="text-lg md:text-xl lg:text-2xl text-gray-700 mb-10 md:mb-12 text-center max-w-xl leading-relaxed">
         Your personal oasis for wellness and calm. Join us to start your journey.
@@ -21,7 +21,7 @@ export default function AuthPage() {
 
       {/* Auth Box */}
       <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 shadow-lg rounded-xl p-8 lg:p-10 w-full max-w-md border border-white/20 animate-fade-in-up bg-[length:400%_400%] animate-gradient-green-pink-shift hover:brightness-110 hover:shadow-2xl hover:scale-[1.005] transition-all duration-300" style={{ animationDelay: '0.2s' }}>
-        
+
         <h2 className="text-2xl md:text-3xl font-bold text-emerald-800 mb-6 text-center">Get Started</h2>
 
         <div className="space-y-4">

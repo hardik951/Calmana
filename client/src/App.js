@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
@@ -14,23 +15,13 @@ import AIChatPage from './pages/AIChatPage';
 import Navbar from './components/navbar';
 import BookTherapy from './pages/booktherapy';
 import FindDoctors from './pages/finddoctors';
-import FAQ from './pages/FAQ';
+import FAQ from './pages/FAQ'; // ✅ ADD THIS LINE
 
 function App() {
-  // ✅ Persist login state using localStorage
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem("isAuthenticated") === "true";
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    localStorage.setItem("isAuthenticated", "true"); // ✅ Save to localStorage
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem("isAuthenticated"); // ✅ Remove on logout
-  };
+  const handleLogin = () => setIsAuthenticated(true);
+  const handleLogout = () => setIsAuthenticated(false);
 
   const LayoutWrapper = ({ children }) => {
     const location = useLocation();
@@ -157,6 +148,8 @@ function App() {
             )
           }
         />
+
+        {/* ✅ NEW FAQ ROUTE */}
         <Route
           path="/faq"
           element={

@@ -1,17 +1,22 @@
 // src/components/Navbar.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import Announcement from './announcement'; // import Announcement component
+import Announcement from './announcement';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const isLoggedIn = localStorage.getItem('token');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const auth = localStorage.getItem('isAuthenticated');
+    setIsLoggedIn(auth === 'true');
+  }, []);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('isAuthenticated');
     navigate('/auth');
     window.location.reload();
   };
@@ -21,8 +26,8 @@ const Navbar = () => {
       <Announcement />
 
       <nav className="bg-gradient-to-r from-green-100 via-green-200 to-green-300 shadow-md py-4 px-6 flex items-center justify-between font-inter z-50 relative">
-        
-        {/* Logo - Redirect to dashboard */}
+
+        {/* Logo */}
         <div
           className="text-3xl font-extrabold tracking-tight text-emerald-700 flex items-center gap-1 cursor-pointer"
           onClick={() => navigate('/dashboard')}
@@ -32,7 +37,7 @@ const Navbar = () => {
           <span className="text-green-800">mana</span>
         </div>
 
-        {/* Mobile menu button */}
+        {/* Mobile Menu Button */}
         <div className="md:hidden">
           <button onClick={toggleMobileMenu} className="text-emerald-700 focus:outline-none">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +52,7 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-6">
-          {/* Desktop Nav */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-6 text-base font-medium text-gray-700">
             {isLoggedIn && (
               <>
@@ -67,7 +72,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Desktop Auth */}
+          {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
             {!isLoggedIn ? (
               <>
@@ -119,7 +124,7 @@ const Navbar = () => {
                 <Link to="/ai-chat" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">AI Chat</Link>
                 <Link to="/faq" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">FAQ</Link>
                 <Link to="/book-therapy" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Book Therapy</Link>
-                <div className="border-t border-gray-200 my-2"></div>
+                <div className="border-t border-gray-200 my-2 opacity-0 animate-fade-in"style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}></div>
                 <Link to="/profile" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Profile</Link>
                 <Link to="/settings" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Settings</Link>
                 <button onClick={() => { handleLogout(); toggleMobileMenu(); }} className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">Logout</button>
