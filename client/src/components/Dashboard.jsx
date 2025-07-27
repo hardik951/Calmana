@@ -1,13 +1,9 @@
-// src/components/Dashboard.jsx
-
 import React from 'react';
 import MoodTracker from './MoodTracker';
-
 import CommunityFeed from './CommunityFeed';
 import Sidebar from './Sidebar';
 import AnnouncementBar from './AnnouncementBar';
 import { useNavigate } from 'react-router-dom';
-
 
 export default function Dashboard() {
   const navigate = useNavigate(); // Initialize navigate hook
@@ -40,8 +36,7 @@ export default function Dashboard() {
       {/* Main Content Area: Grid for Sidebar + Dashboard Modules */}
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8 xl:gap-10 flex-grow max-w-screen-2xl">
         {/* Sidebar Component - Animated */}
-        {/* Sidebar's background and text colors are handled in Sidebar.jsx */}
-        <Sidebar />
+        <Sidebar navigate={navigate} /> {/* Pass navigate function to Sidebar */}
 
         {/* Dashboard Modules (occupies remaining 3 columns on large screens) */}
         <main className="lg:col-span-3 space-y-7 lg:space-y-10 xl:space-y-12">
@@ -73,7 +68,6 @@ export default function Dashboard() {
 
           {/* Grid for Mood Tracker, Journal Entries, AI Chat, Community Feed (2x2 structure) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 xl:gap-10">
-
             {/* Mood Tracker Card: Now with full animated gradient background */}
             <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 transform animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
               <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-emerald-800 mb-4 lg:mb-5 flex items-center leading-snug">
@@ -104,54 +98,48 @@ export default function Dashboard() {
             </div>
 
             {/* AI Chat Card: Now with full animated gradient background */}
-            {/* AI Chat Preview Card */}
-{/* AI Chat Preview Card */}
-{/* AI Chat Preview Card */}
-{/* AI Chat Preview Card */}
-<div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
-  <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-emerald-800 mb-4 lg:mb-5 flex items-center gap-2 leading-snug">
-    <span className="text-2xl lg:text-3xl">🧠</span> Calmana AI Assistant
-  </h3>
+            <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+              <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-emerald-800 mb-4 lg:mb-5 flex items-center gap-2 leading-snug">
+                <span className="text-2xl lg:text-3xl">🧠</span> Calmana AI Assistant
+              </h3>
 
-  {/* Chat Bubble Preview - No Scroll */}
-  <div className="bg-white/40 backdrop-blur-md rounded-xl p-4 mb-4 space-y-3 text-sm text-emerald-900 border border-white/20 shadow-inner">
-    <div className="flex items-start gap-2">
-      <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">C</div>
-      <div className="bg-white/60 rounded-xl px-4 py-2 w-fit shadow-sm">
-        Hey there 👋 I'm Calmana, your listening companion. How are you feeling today?
-      </div>
-    </div>
-    <div className="flex items-start justify-end gap-2">
-      <div className="bg-white/70 rounded-xl px-4 py-2 w-fit shadow-sm">
-        Feeling a bit lost and anxious lately...
-      </div>
-      <div className="w-6 h-6 rounded-full bg-emerald-400 text-white flex items-center justify-center text-xs font-bold">U</div>
-    </div>
-    <div className="flex items-start gap-2">
-      <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">C</div>
-      <div className="bg-white/60 rounded-xl px-4 py-2 w-fit shadow-sm">
-        You're not alone 🌱 Let's take a breath together. I'm here for you.
-      </div>
-    </div>
-  </div>
+              {/* Chat Bubble Preview - No Scroll */}
+              <div className="bg-white/40 backdrop-blur-md rounded-xl p-4 mb-4 space-y-3 text-sm text-emerald-900 border border-white/20 shadow-inner">
+                <div className="flex items-start gap-2">
+                  <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">C</div>
+                  <div className="bg-white/60 rounded-xl px-4 py-2 w-fit shadow-sm">
+                    Hey there 👋 I'm Calmana, your listening companion. How are you feeling today?
+                  </div>
+                </div>
+                <div className="flex items-start justify-end gap-2">
+                  <div className="bg-white/70 rounded-xl px-4 py-2 w-fit shadow-sm">
+                    Feeling a bit lost and anxious lately...
+                  </div>
+                  <div className="w-6 h-6 rounded-full bg-emerald-400 text-white flex items-center justify-center text-xs font-bold">U</div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">C</div>
+                  <div className="bg-white/60 rounded-xl px-4 py-2 w-fit shadow-sm">
+                    You're not alone 🌱 Let's take a breath together. I'm here for you.
+                  </div>
+                </div>
+              </div>
 
-  {/* Calmana AI Features */}
-  <ul className="text-emerald-800 list-disc pl-5 space-y-1 mb-4 text-sm lg:text-base">
-    <li>Empathetic AI that listens 24/7</li>
-    <li>Supports emotional awareness gently</li>
-    <li>Private, safe, and soothing space</li>
-  </ul>
+              {/* Calmana AI Features */}
+              <ul className="text-emerald-800 list-disc pl-5 space-y-1 mb-4 text-sm lg:text-base">
+                <li>Empathetic AI that listens 24/7</li>
+                <li>Supports emotional awareness gently</li>
+                <li>Private, safe, and soothing space</li>
+              </ul>
 
-  {/* CTA Button */}
-  <button
-    onClick={() => navigate('/ai-chat')}
-    className="bg-emerald-600 text-white py-2.5 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 text-base lg:text-lg"
-  >
-    Launch AI Chat →
-  </button>
-</div>
-
-
+              {/* CTA Button */}
+              <button
+                onClick={() => navigate('/ai-chat')}
+                className="bg-emerald-600 text-white py-2.5 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 text-base lg:text-lg"
+              >
+                Launch AI Chat →
+              </button>
+            </div>
 
             {/* Community Feed Card: Now with full animated gradient background */}
             <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 transform animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
@@ -163,7 +151,6 @@ export default function Dashboard() {
               </div>
             </div>
           </div> {/* End of the 2x2 grid */}
-
 
           {/* NEW: Share Your Feedback Section (Full Width, now with full animated gradient) */}
           <section className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 shadow-xl rounded-xl p-8 lg:p-12 xl:p-16 border border-white/20 mt-10 lg:mt-16 xl:mt-20 animate-fade-in-slow" style={{ animationDelay: '1.0s' }}>
@@ -207,13 +194,12 @@ export default function Dashboard() {
                 type="submit"
                 className="w-full bg-emerald-600 text-white font-semibold py-2.5 lg:py-3 xl:py-4 px-5 lg:px-6 xl:px-7 rounded-md shadow-md hover:shadow-lg transition-all duration-300 text-base lg:text-lg xl:text-xl hover:brightness-110">
                 <span>Send Feedback</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </button>
             </form>
           </section> {/* End of Share Your Feedback Section */}
-
         </main>
       </div>
 

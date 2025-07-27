@@ -1,17 +1,25 @@
-// src/pages/LoginPage.jsx
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function LoginPage() {
+export default function LoginPage({ onLogin }) { // Accept onLogin prop
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login form submitted!");
-    // In a real app, this would be where you call your authentication API.
-    // On success, you'd then navigate to the dashboard.
-    // navigate('/dashboard');
+    console.log("Login form submitted! Attempting to navigate to /dashboard");
+    // Simulate successful login
+    if (onLogin) {
+      onLogin(); // Call the parent function to update authentication state
+    }
+    navigate('/dashboard'); // Navigate after state update
+  };
+
+  const handleDashboardClick = () => {
+    console.log("Test button clicked! Navigating to /dashboard");
+    if (onLogin) {
+      onLogin(); // Update authentication state for testing
+    }
+    navigate('/dashboard');
   };
 
   return (
@@ -45,7 +53,7 @@ export default function LoginPage() {
           <button
             type="submit"
             className="w-full bg-emerald-600 text-white py-3 px-6 rounded-full text-lg md:text-xl lg:text-2xl font-semibold shadow-md
-                       hover:from-emerald-700 hover:to-green-700 hover:shadow-lg transition-all duration-300 hover:brightness-110"
+                      hover:from-emerald-700 hover:to-green-700 hover:shadow-lg transition-all duration-300 hover:brightness-110"
           >
             Login
           </button>
@@ -59,11 +67,11 @@ export default function LoginPage() {
         </p>
 
         {/* NEW: Button to redirect to Dashboard for testing */}
-        <div className="mt-6 md:mt-8 pt-6 border-t border-gray-200"> {/* Added border-t for visual separation */}
+        <div className="mt-6 md:mt-8 pt-6 border-t border-gray-200">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={handleDashboardClick}
             className="w-full bg-gray-200 text-gray-800 py-3 px-6 rounded-full text-lg md:text-xl lg:text-2xl font-semibold shadow-md
-                       hover:bg-gray-300 hover:shadow-lg transition-all duration-300 hover:brightness-105"
+                      hover:bg-gray-300 hover:shadow-lg transition-all duration-300 hover:brightness-105"
           >
             Go to Dashboard (for testing)
           </button>
