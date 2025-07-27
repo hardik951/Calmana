@@ -3,15 +3,18 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-from openai import OpenAI
+import openai
 from dotenv import load_dotenv
 
 # Load environment variables from .env
 load_dotenv()
 api_key = os.getenv("OPENROUTER_API_KEY")
 
-# Initialize OpenAI client
-client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")  # Adjust base_url if needed
+# Initialize OpenAI client (using OpenRouter endpoint)
+client = openai.OpenAI(
+    api_key=api_key,
+    base_url="https://openrouter.ai/api/v1"
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -41,9 +44,9 @@ def chat():
         # Emotion detection
         emotion = detect_emotion(user_message)
 
-        # AI Response using new openai>=1.0.0 method
+        # AI Response using OpenAI SDK >=1.0.0 with OpenRouter
         response = client.chat.completions.create(
-            model="openai/gpt-3.5-turbo",  # You can change this to the specific model OpenRouter supports
+            model="openai/gpt-3.5-turbo",  # Adjust model if needed
             messages=[
                 {"role": "system", "content": "You are Calmna, a kind and supportive mental health assistant."},
                 {"role": "user", "content": user_message}
