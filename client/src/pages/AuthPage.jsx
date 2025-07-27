@@ -11,7 +11,7 @@ export default function AuthPage() {
       
       {/* Heading */}
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-800 mb-8 md:mb-10 text-center leading-tight">
-        Welcome to Calmana
+        CALMANA
       </h1>
       
       {/* Subheading */}

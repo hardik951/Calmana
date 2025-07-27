@@ -1,9 +1,12 @@
+// src/components/Dashboard.jsx
+
 import React from 'react';
 import MoodTracker from './MoodTracker';
 import CommunityFeed from './CommunityFeed';
 import Sidebar from './Sidebar';
-import AnnouncementBar from './AnnouncementBar';
+// import AnnouncementBar from './AnnouncementBar'; // Removed as per your request
 import { useNavigate } from 'react-router-dom';
+
 
 export default function Dashboard() {
   const navigate = useNavigate(); // Initialize navigate hook
@@ -12,31 +15,20 @@ export default function Dashboard() {
     // Dashboard Background: Animated Green and Pink Gradient (consistent with auth pages)
     <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-6 sm:p-8 lg:p-10 xl:p-12 font-inter flex flex-col
                     animate-gradient-green-pink-shift bg-[length:400%_400%]">
-      {/* Announcement Bar - Adjusted colors for professionalism */}
-      <AnnouncementBar
-        message="✨ Daily Dose of Calm: 'The mind is everything. What you think you become.'"
-        bgColor="bg-gray-100"
-        textColor="text-gray-700"
-        borderColor="border-gray-200"
-      />
-
+      {/* Announcement Bar JSX removed as per your request */}
       {/* Header Section - Fades in slightly */}
       <header className="flex items-center justify-between mb-8 md:mb-12 lg:mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
         <div className="flex items-center">
           <span className="text-4xl lg:text-5xl xl:text-6xl mr-3 lg:mr-4 text-emerald-600">🌿</span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-gray-800 tracking-wide leading-tight">Calmana Dashboard</h2>
-        </div>
-        {/* User profile or settings icon */}
-        <div className="flex items-center space-x-3 lg:space-x-4">
-          <span className="text-lg lg:text-xl xl:text-2xl text-gray-700 hidden sm:block font-medium">Hi, User!</span>
-          <div className="w-10 h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-800 font-semibold text-lg lg:text-xl xl:text-2xl shadow-md">U</div>
+          <h2 className="text-3xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-700 tracking-wide leading-tight">Hi again! Lets focus on you today </h2>
         </div>
       </header>
 
       {/* Main Content Area: Grid for Sidebar + Dashboard Modules */}
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8 xl:gap-10 flex-grow max-w-screen-2xl">
         {/* Sidebar Component - Animated */}
-        <Sidebar navigate={navigate} /> {/* Pass navigate function to Sidebar */}
+        {/* Sidebar's background and text colors are handled in Sidebar.jsx */}
+        <Sidebar />
 
         {/* Dashboard Modules (occupies remaining 3 columns on large screens) */}
         <main className="lg:col-span-3 space-y-7 lg:space-y-10 xl:space-y-12">
@@ -68,6 +60,7 @@ export default function Dashboard() {
 
           {/* Grid for Mood Tracker, Journal Entries, AI Chat, Community Feed (2x2 structure) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 xl:gap-10">
+
             {/* Mood Tracker Card: Now with full animated gradient background */}
             <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 transform animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
               <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-emerald-800 mb-4 lg:mb-5 flex items-center leading-snug">
@@ -104,22 +97,22 @@ export default function Dashboard() {
               </h3>
 
               {/* Chat Bubble Preview - No Scroll */}
-              <div className="bg-white/40 backdrop-blur-md rounded-xl p-4 mb-4 space-y-3 text-sm text-emerald-900 border border-white/20 shadow-inner">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4 space-y-3 text-sm text-emerald-900 max-h-44 overflow-y-auto border border-white/20 shadow-inner">
                 <div className="flex items-start gap-2">
                   <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">C</div>
-                  <div className="bg-white/60 rounded-xl px-4 py-2 w-fit shadow-sm">
+                  <div className="bg-white/20 rounded-xl px-4 py-2 w-fit shadow-sm text-emerald-900">
                     Hey there 👋 I'm Calmana, your listening companion. How are you feeling today?
                   </div>
                 </div>
                 <div className="flex items-start justify-end gap-2">
-                  <div className="bg-white/70 rounded-xl px-4 py-2 w-fit shadow-sm">
+                  <div className="bg-white/30 rounded-xl px-4 py-2 w-fit shadow-sm text-emerald-900">
                     Feeling a bit lost and anxious lately...
                   </div>
                   <div className="w-6 h-6 rounded-full bg-emerald-400 text-white flex items-center justify-center text-xs font-bold">U</div>
                 </div>
                 <div className="flex items-start gap-2">
                   <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">C</div>
-                  <div className="bg-white/60 rounded-xl px-4 py-2 w-fit shadow-sm">
+                  <div className="bg-white/20 rounded-xl px-4 py-2 w-fit shadow-sm text-emerald-900">
                     You're not alone 🌱 Let's take a breath together. I'm here for you.
                   </div>
                 </div>
@@ -132,17 +125,16 @@ export default function Dashboard() {
                 <li>Private, safe, and soothing space</li>
               </ul>
 
-              {/* CTA Button */}
+              {/* Redirect to new AI chat page */}
               <button
                 onClick={() => navigate('/ai-chat')}
-                className="bg-emerald-600 text-white py-2.5 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 text-base lg:text-lg"
-              >
-                Launch AI Chat →
+                className="w-full bg-emerald-600 text-white font-semibold py-2.5 lg:py-3 xl:py-4 px-5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-base lg:text-lg xl:text-xl hover:brightness-110">
+                <span className="mr-2">🚀</span> Start AI Chat
               </button>
             </div>
 
             {/* Community Feed Card: Now with full animated gradient background */}
-            <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 transform animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
+            <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
               <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-emerald-800 mb-4 lg:mb-5 flex items-center leading-snug">
                 <span className="text-2xl lg:text-3xl xl:text-4xl mr-2 text-emerald-600">🌍</span> Full Community Feed
               </h3>
@@ -151,6 +143,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div> {/* End of the 2x2 grid */}
+
 
           {/* NEW: Share Your Feedback Section (Full Width, now with full animated gradient) */}
           <section className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 shadow-xl rounded-xl p-8 lg:p-12 xl:p-16 border border-white/20 mt-10 lg:mt-16 xl:mt-20 animate-fade-in-slow" style={{ animationDelay: '1.0s' }}>
@@ -200,6 +193,7 @@ export default function Dashboard() {
               </button>
             </form>
           </section> {/* End of Share Your Feedback Section */}
+
         </main>
       </div>
 

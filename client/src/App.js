@@ -1,6 +1,6 @@
 // src/App.js
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import Home from './pages/Home';
 import Dashboard from './components/Dashboard';
@@ -13,68 +13,159 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AIChatPage from './pages/AIChatPage';
 import Navbar from './components/navbar';
-import AnnouncementBar from './components/AnnouncementBar';
-import BookTherapy from './pages/booktherapy'; // ✅ Imported correctly
+import BookTherapy from './pages/booktherapy';
+import FindDoctors from './pages/finddoctors';
+import FAQ from './pages/FAQ'; // ✅ ADD THIS LINE
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    localStorage.setItem('token', 'dummy-token');
-  };
+  const handleLogin = () => setIsAuthenticated(true);
+  const handleLogout = () => setIsAuthenticated(false);
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('token');
+  const LayoutWrapper = ({ children }) => {
+    const location = useLocation();
+    const noHeaderPaths = ['/', '/auth', '/login', '/signup'];
+    const shouldShowHeader = !noHeaderPaths.includes(location.pathname);
+
+    return (
+      <>
+        {shouldShowHeader && <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />}
+        {children}
+      </>
+    );
   };
 
   return (
     <Router>
-      <div>
-        <AnnouncementBar />
-        <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-        <Routes>
-          <Route path="/" element={<Navigate to="/auth" />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route
-            path="/login"
-            element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage onLogin={handleLogin} />}
-          />
-          <Route
-            path="/signup"
-            element={isAuthenticated ? <Navigate to="/dashboard" /> : <SignupPage />}
-          />
-          <Route
-            path="/dashboard"
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/mood-tracker"
-            element={isAuthenticated ? <MoodTracker /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/feedback"
-            element={isAuthenticated ? <Feedback /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/mood-sender"
-            element={isAuthenticated ? <MoodSender /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/community-feed"
-            element={isAuthenticated ? <CommunityFeed /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/ai-chat"
-            element={isAuthenticated ? <AIChatPage /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/book-therapy"
-            element={isAuthenticated ? <BookTherapy /> : <Navigate to="/login" />}
-          />
-        </Routes>
-      </div>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route
+          path="/login"
+          element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage onLogin={handleLogin} />}
+        />
+        <Route
+          path="/signup"
+          element={isAuthenticated ? <Navigate to="/dashboard" /> : <SignupPage onLogin={handleLogin} />}
+        />
+
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <Dashboard />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/mood-tracker"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <MoodTracker />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/feedback"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <Feedback />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/mood-sender"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <MoodSender />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/community-feed"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <CommunityFeed />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/ai-chat"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <AIChatPage />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/book-therapy"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <BookTherapy />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/find-doctors"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <FindDoctors />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* ✅ NEW FAQ ROUTE */}
+        <Route
+          path="/faq"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <FAQ />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* Catch-All Route */}
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+      </Routes>
     </Router>
   );
 }
