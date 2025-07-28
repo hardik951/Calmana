@@ -1,78 +1,87 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage({ onLogin }) {
   const navigate = useNavigate();
+  const [userType, setUserType] = useState('patient');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login form submitted! Attempting to navigate to /dashboard");
-
-    // ✅ Persist login state
     localStorage.setItem("isAuthenticated", "true");
     if (onLogin) onLogin();
-
-    navigate('/dashboard');
-  };
-
-  const handleDashboardClick = () => {
-    console.log("Test button clicked! Navigating to /dashboard");
-
-    // ✅ Persist login state
-    localStorage.setItem("isAuthenticated", "true");
-    if (onLogin) onLogin();
-
     navigate('/dashboard');
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-100 via-emerald-100 to-lime-100 p-6 sm:p-8 lg:p-10 xl:p-12 font-inter">
-      <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 shadow-xl rounded-2xl p-8 md:p-10 lg:p-12 xl:p-16 w-full max-w-md md:max-w-lg lg:max-w-xl border border-white/20 animate-fade-in-up bg-[length:400%_400%]">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-emerald-800 mb-6 md:mb-8 text-center leading-snug">Login to Calmana</h2>
-
-        <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
-          <div>
-            <label htmlFor="login-email" className="block text-emerald-700 text-base md:text-lg lg:text-xl font-medium mb-2">Email</label>
+      <div className="relative bg-white/60 backdrop-blur-xl shadow-2xl rounded-3xl p-8 md:p-10 lg:p-12 xl:p-16 w-full max-w-md md:max-w-lg lg:max-w-xl border border-emerald-200 animate-fade-in-up bg-[length:400%_400%] transition-all duration-500 hover:scale-[1.01] hover:shadow-emerald-200 before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-r before:from-emerald-200 before:via-pink-100 before:to-green-200 before:opacity-40 before:-z-10">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-emerald-800 mb-8 text-center leading-snug tracking-tight drop-shadow">Login to Calmana</h2>
+        {/* User Type Selection */}
+        <div className="flex justify-center mb-8 gap-6">
+          <button
+            type="button"
+            className={`flex flex-col items-center px-6 py-3 rounded-2xl font-semibold border-2 transition-all duration-200 shadow-sm text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 hover:scale-105 hover:shadow-lg ${userType === 'patient' ? 'bg-emerald-600 text-white border-emerald-600 scale-105 shadow-lg' : 'bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-50'}`}
+            onClick={() => setUserType('patient')}
+            aria-pressed={userType === 'patient'}
+          >
+            <span className="text-2xl mb-1">🧑‍🦰</span>
+            <span className="transition-all duration-200">Patient</span>
+          </button>
+          <button
+            type="button"
+            className={`flex flex-col items-center px-6 py-3 rounded-2xl font-semibold border-2 transition-all duration-200 shadow-sm text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 hover:scale-105 hover:shadow-lg ${userType === 'doctor' ? 'bg-emerald-600 text-white border-emerald-600 scale-105 shadow-lg' : 'bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-50'}`}
+            onClick={() => setUserType('doctor')}
+            aria-pressed={userType === 'doctor'}
+          >
+            <span className="text-2xl mb-1">🩺</span>
+            <span className="transition-all duration-200">Doctor</span>
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <div className="relative">
             <input
               type="email"
               id="login-email"
               name="email"
-              className="w-full p-3 md:p-4 lg:p-5 border border-emerald-300 rounded-lg bg-emerald-50 text-emerald-800 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm hover:shadow-md"
               placeholder="name@example.com"
               required
             />
+            <label htmlFor="login-email" className="absolute left-3 top-2 text-emerald-700 text-base md:text-lg font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-emerald-700">Email</label>
           </div>
-          <div>
-            <label htmlFor="login-password" className="block text-emerald-700 text-base md:text-lg lg:text-xl font-medium mb-2">Password</label>
+          <div className="relative">
             <input
               type="password"
               id="login-password"
               name="password"
-              className="w-full p-3 md:p-4 lg:p-5 border border-emerald-300 rounded-lg bg-emerald-50 text-emerald-800 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm hover:shadow-md"
               placeholder="••••••••"
               required
             />
+            <label htmlFor="login-password" className="absolute left-3 top-2 text-emerald-700 text-base md:text-lg font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-emerald-700">Password</label>
           </div>
           <button
             type="submit"
-            className="w-full bg-emerald-600 text-white py-3 px-6 rounded-full text-lg md:text-xl font-semibold shadow-md hover:bg-emerald-700 hover:shadow-lg transition-all duration-300"
+            className="w-full bg-gradient-to-r from-emerald-500 to-green-400 text-white py-3 px-6 rounded-full text-base md:text-lg font-semibold shadow-md hover:from-emerald-600 hover:to-green-500 hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
           >
-            Login
+            <span className="text-xl">🔒</span> Login
           </button>
         </form>
-
-        <p className="mt-6 md:mt-8 text-center text-emerald-700 text-base md:text-lg">
+        <p className="mt-8 text-center text-emerald-700 text-base md:text-lg">
           Don't have an account?{' '}
           <button onClick={() => navigate('/signup')} className="text-emerald-600 hover:underline font-medium">
             Sign Up
           </button>
         </p>
-
         {/* Test Button (optional) */}
-        <div className="mt-6 md:mt-8 pt-6 border-t border-gray-200">
+        <div className="mt-8 pt-6 border-t border-gray-200">
           <button
-            onClick={handleDashboardClick}
-            className="w-full bg-gray-200 text-gray-800 py-3 px-6 rounded-full text-lg font-semibold shadow-md hover:bg-gray-300 hover:shadow-lg transition-all duration-300"
+            onClick={() => {
+              localStorage.setItem('isAuthenticated', 'true');
+              if (onLogin) onLogin();
+              navigate('/dashboard');
+            }}
+            className="w-full bg-gray-200 text-gray-800 py-3 px-6 rounded-full text-base font-semibold shadow-md hover:bg-gray-300 hover:shadow-lg transition-all duration-300 mt-2"
           >
             Go to Dashboard (for testing)
           </button>
@@ -80,7 +89,4 @@ export default function LoginPage({ onLogin }) {
       </div>
     </div>
   );
-}
-// cursor 
-// lovable 
-// supabase 
+} 

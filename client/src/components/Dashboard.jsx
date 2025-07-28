@@ -1,44 +1,31 @@
-// src/components/Dashboard.jsx
+// src/components/Dashboard.tsx
 
 import React from 'react';
 import MoodTracker from './MoodTracker';
 import CommunityFeed from './CommunityFeed';
 import Sidebar from './Sidebar';
-// import AnnouncementBar from './AnnouncementBar'; // Removed as per your request
 import { useNavigate } from 'react-router-dom';
 
-
-export default function Dashboard() {
-  const navigate = useNavigate(); // Initialize navigate hook
+const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
 
   return (
-    // Dashboard Background: Animated Green and Pink Gradient (consistent with auth pages)
-    <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-6 sm:p-8 lg:p-10 xl:p-12 font-inter flex flex-col
-                    animate-gradient-green-pink-shift bg-[length:400%_400%]">
-      {/* Announcement Bar JSX removed as per your request */}
-      {/* Main Content Area: Grid for Sidebar + Dashboard Modules */}
+    <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-4 sm:p-6 lg:p-8 xl:p-10 font-inter flex flex-col animate-gradient-green-pink-shift bg-[length:400%_400%]">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8 xl:gap-10 flex-grow max-w-screen-2xl">
-        {/* Sidebar Component - Animated */}
-        {/* Sidebar's background and text colors are handled in Sidebar.jsx */}
         <Sidebar />
-
-        {/* Dashboard Modules (occupies remaining 3 columns on large screens) */}
-        <main className="lg:col-span-3 space-y-7 lg:space-y-10 xl:space-y-12">
-          {/* Welcome Back Section: Subtle gradient background, crisper shadow, enhanced hover */}
-          <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 shadow-lg rounded-xl p-8 lg:p-10 xl:p-12 flex flex-col md:flex-row items-center justify-between overflow-hidden relative border border-white/20
-                      hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+        <main className="lg:col-span-3 space-y-6 lg:space-y-8 xl:space-y-10">
+          <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 shadow-lg rounded-xl p-6 lg:p-8 xl:p-10 flex flex-col md:flex-row items-center justify-between overflow-hidden relative border border-white/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-emerald-200 rounded-full opacity-30 blur-xl pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-32 h-32 bg-green-200 rounded-full opacity-30 blur-xl pointer-events-none"></div>
-
             <div className="text-center md:text-left z-10">
-              {/* Text colors adjusted for visibility on animated background */}
               <h1 className="text-lg md:text-xl lg:text-2xl xl:text-3xl font-extrabold text-emerald-800 mb-2 lg:mb-3 xl:mb-4 leading-snug tracking-wide">Welcome back to your calm space!</h1>
               <p className="text-xs md:text-sm lg:text-base xl:text-lg text-emerald-700 mb-4 lg:mb-6 xl:mb-8 max-w-xl leading-relaxed">
                 Your personalized AI-powered mental health dashboard. Take a deep breath and explore your journey towards greater well-being.
               </p>
-              <button className="bg-emerald-600 text-white px-4 py-1.5 lg:px-6 lg:py-2 xl:px-8 xl:py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-xs lg:text-sm xl:text-base font-semibold flex items-center justify-center
-                              hover:brightness-110 hover:-translate-y-0.5"
+              <button
+                className="bg-emerald-600 text-white px-4 py-1.5 lg:px-6 lg:py-2 xl:px-8 xl:py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-xs lg:text-sm xl:text-base font-semibold flex items-center justify-center hover:brightness-110 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 onClick={() => navigate('/start-session')}
+                aria-label="Start a Session"
               >
                 <span className="mr-2">🍃</span> Start a Session
               </button>
@@ -47,7 +34,7 @@ export default function Dashboard() {
               <img
                 src="https://via.placeholder.com/250x180/D1FAE5/10B981?text=Calm+Illustration"
                 alt="Calm illustration"
-                className="rounded-lg shadow-md max-h-36 lg:max-h-48 xl:max-h-64"
+                className="rounded-lg shadow-md max-h-36 lg:max-h-48 xl:max-h-64 hover:scale-105 transition-transform duration-300"
               />
             </div>
           </div>
@@ -198,3 +185,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+export default Dashboard;
