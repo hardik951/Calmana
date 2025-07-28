@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import Home from './pages/Home';
@@ -16,12 +16,22 @@ import Navbar from './components/navbar';
 import BookTherapy from './pages/booktherapy';
 import FindDoctors from './pages/finddoctors';
 import FAQ from './pages/FAQ'; // ✅ ADD THIS LINE
+import StartSession from './pages/StartSession';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const stored = localStorage.getItem('isAuthenticated');
+    return stored === 'true';
+  });
 
-  const handleLogin = () => setIsAuthenticated(true);
-  const handleLogout = () => setIsAuthenticated(false);
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem('isAuthenticated', 'true');
+  };
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.setItem('isAuthenticated', 'false');
+  };
 
   const LayoutWrapper = ({ children }) => {
     const location = useLocation();
@@ -148,6 +158,18 @@ function App() {
             )
           }
         />
+        <Route
+          path="/start-session"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <StartSession />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
 
         {/* ✅ NEW FAQ ROUTE */}
         <Route
@@ -164,7 +186,7 @@ function App() {
         />
 
         {/* Catch-All Route */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />} />
       </Routes>
     </Router>
   );

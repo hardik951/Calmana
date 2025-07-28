@@ -16,14 +16,6 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-6 sm:p-8 lg:p-10 xl:p-12 font-inter flex flex-col
                     animate-gradient-green-pink-shift bg-[length:400%_400%]">
       {/* Announcement Bar JSX removed as per your request */}
-      {/* Header Section - Fades in slightly */}
-      <header className="flex items-center justify-between mb-8 md:mb-12 lg:mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-        <div className="flex items-center">
-          <span className="text-4xl lg:text-5xl xl:text-6xl mr-3 lg:mr-4 text-emerald-600">🌿</span>
-          <h2 className="text-3xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-700 tracking-wide leading-tight">Hi again! Lets focus on you today </h2>
-        </div>
-      </header>
-
       {/* Main Content Area: Grid for Sidebar + Dashboard Modules */}
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8 xl:gap-10 flex-grow max-w-screen-2xl">
         {/* Sidebar Component - Animated */}
@@ -40,12 +32,14 @@ export default function Dashboard() {
 
             <div className="text-center md:text-left z-10">
               {/* Text colors adjusted for visibility on animated background */}
-              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-emerald-800 mb-3 lg:mb-4 xl:mb-5 leading-snug tracking-wide">Welcome back to your calm space!</h1>
-              <p className="text-lg md:text-xl lg:text-2xl xl:text-3xl text-emerald-700 mb-6 lg:mb-8 xl:mb-10 max-w-xl leading-relaxed">
+              <h1 className="text-lg md:text-xl lg:text-2xl xl:text-3xl font-extrabold text-emerald-800 mb-2 lg:mb-3 xl:mb-4 leading-snug tracking-wide">Welcome back to your calm space!</h1>
+              <p className="text-xs md:text-sm lg:text-base xl:text-lg text-emerald-700 mb-4 lg:mb-6 xl:mb-8 max-w-xl leading-relaxed">
                 Your personalized AI-powered mental health dashboard. Take a deep breath and explore your journey towards greater well-being.
               </p>
-              <button className="bg-emerald-600 text-white px-8 py-3 lg:px-10 lg:py-4 xl:px-12 xl:py-5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-lg lg:text-xl xl:text-2xl font-semibold flex items-center justify-center
-                              hover:brightness-110 hover:-translate-y-0.5">
+              <button className="bg-emerald-600 text-white px-4 py-1.5 lg:px-6 lg:py-2 xl:px-8 xl:py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-xs lg:text-sm xl:text-base font-semibold flex items-center justify-center
+                              hover:brightness-110 hover:-translate-y-0.5"
+                onClick={() => navigate('/start-session')}
+              >
                 <span className="mr-2">🍃</span> Start a Session
               </button>
             </div>
