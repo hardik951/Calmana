@@ -81,3 +81,6 @@ export default function LoginPage({ onLogin }) {
     </div>
   );
 }
+// cursor 
+// lovable 
+// supabase 
