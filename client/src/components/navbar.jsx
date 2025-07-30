@@ -1,7 +1,7 @@
 // src/components/Navbar.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import Announcement from './announcement';
+import Announcement from './announcement'; // If your file is 'Announcement.jsx', change to './Announcement'
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -62,6 +62,9 @@ const Navbar = () => {
                 <Link to="/ai-chat" className="hover:text-emerald-700 transition duration-200">
                   AI Chat
                 </Link>
+                <Link to="/resources" className="hover:text-emerald-700 transition duration-200">
+                  Resources
+                </Link>
                 <Link to="/faq" className="hover:text-emerald-700 transition duration-200">
                   FAQ's
                 </Link>
@@ -77,13 +80,13 @@ const Navbar = () => {
             {!isLoggedIn ? (
               <>
                 <button
-                  onClick={() => navigate('/auth')}
+                  onClick={() => navigate('/login')}
                   className="bg-white text-emerald-600 font-semibold px-5 py-2 rounded-full border border-emerald-400 shadow-md hover:bg-emerald-50 hover:scale-105 transition-all duration-200"
                 >
                   Log In
                 </button>
                 <button
-                  onClick={() => navigate('/signin')}
+                  onClick={() => navigate('/signup')}
                   className="bg-emerald-500 text-white font-semibold px-5 py-2 rounded-full shadow-md hover:bg-emerald-600 hover:scale-105 transition-all duration-200"
                 >
                   Sign Up
@@ -111,10 +114,16 @@ const Navbar = () => {
           >
             {!isLoggedIn ? (
               <div className="flex flex-col p-2">
-                <button onClick={() => { navigate('/auth'); toggleMobileMenu(); }} className="bg-white text-emerald-600 font-semibold px-4 py-2 rounded-full border border-emerald-400 shadow-md hover:bg-emerald-50 mb-2">
+                <button
+                  onClick={() => { navigate('/login'); toggleMobileMenu(); }}
+                  className="bg-white text-emerald-600 font-semibold px-4 py-2 rounded-full border border-emerald-400 shadow-md hover:bg-emerald-50 mb-2"
+                >
                   Log In
                 </button>
-                <button onClick={() => { navigate('/signin'); toggleMobileMenu(); }} className="bg-emerald-500 text-white font-semibold px-4 py-2 rounded-full shadow-md hover:bg-emerald-600">
+                <button
+                  onClick={() => { navigate('/signup'); toggleMobileMenu(); }}
+                  className="bg-emerald-500 text-white font-semibold px-4 py-2 rounded-full shadow-md hover:bg-emerald-600"
+                >
                   Sign Up
                 </button>
               </div>
@@ -122,9 +131,10 @@ const Navbar = () => {
               <div className="flex flex-col p-2">
                 <Link to="/find-doctors" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Find Doctors</Link>
                 <Link to="/ai-chat" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">AI Chat</Link>
+                <Link to="/resources" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Resources</Link>
                 <Link to="/faq" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">FAQ</Link>
                 <Link to="/book-therapy" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Book Therapy</Link>
-                <div className="border-t border-gray-200 my-2 opacity-0 animate-fade-in"style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}></div>
+                <div className="border-t border-gray-200 my-2 opacity-0 animate-fade-in" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}></div>
                 <Link to="/profile" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Profile</Link>
                 <Link to="/settings" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Settings</Link>
                 <button onClick={() => { handleLogout(); toggleMobileMenu(); }} className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">Logout</button>

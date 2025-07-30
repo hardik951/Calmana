@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
             {/* Recent Journal Entries: Now with full animated gradient background */}
             <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 transform animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
               <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-emerald-800 mb-4 lg:mb-5 flex items-center leading-snug">
-                <span className="text-2xl lg:text-3xl xl:text-4xl mr-2 text-emerald-600">✍️</span> Recent Journal Entries
+                <span className="text-2xl lg:text-3xl xl:text-4xl mr-2 text-emerald-600">✍️</span> Personal Diary 
               </h3>
               <ul className="space-y-3 lg:space-y-4 xl:space-y-5 text-emerald-700 text-base lg:text-lg xl:text-xl min-h-[150px] lg:min-h-[180px] xl:min-h-[220px] leading-relaxed">
                 <li className="bg-white/10 p-3 lg:p-4 xl:p-5 rounded-md border-l-4 border-emerald-400 cursor-pointer hover:bg-white/20 transition duration-200 shadow-sm">

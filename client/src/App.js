@@ -13,14 +13,15 @@ import AuthPage from './pages/AuthPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AIChatPage from './pages/AIChatPage';
-import Navbar from './components/navbar';
+import Navbar from './components/navbar';           // <-- small 'n' as requested
 import BookTherapy from './pages/booktherapy';
 import FindDoctors from './pages/finddoctors';
 import FAQ from './pages/FAQ';
 import StartSession from './pages/StartSession';
-
-// Developers page (adjust the path if your file lives elsewhere)
 import Developers from './pages/developers';
+
+// NEW: Resources page
+import Resources from './pages/Resources';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -59,11 +60,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
-
-        {/* SHOW the Auth chooser page (no redirect) */}
         <Route path="/auth" element={<AuthPage />} />
-
-        {/* Always render login/signup pages (even if already authed) */}
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/signup" element={<SignupPage onLogin={handleLogin} />} />
 
@@ -198,13 +195,27 @@ function App() {
           }
         />
 
-        {/* Protected Developers page */}
+        {/* Developers page */}
         <Route
           path="/developers"
           element={
             isAuthenticated ? (
               <LayoutWrapper>
                 <Developers />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* NEW: Resources page */}
+        <Route
+          path="/resources"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <Resources />
               </LayoutWrapper>
             ) : (
               <Navigate to="/login" replace />
