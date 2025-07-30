@@ -172,6 +172,17 @@ const Dashboard: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </button>
+
+              {/* NEW: Meet the Developers Button */}
+              <button
+                type="button" // Use type="button" to prevent form submission
+                onClick={() => navigate('/developers')}
+                className="w-full bg-pink-600 text-white font-semibold py-2.5 lg:py-3 xl:py-4 px-5 lg:px-6 xl:px-7 rounded-md shadow-md hover:shadow-lg transition-all duration-300 text-base lg:text-lg xl:text-xl hover:brightness-110 mt-4"> {/* Added mt-4 for spacing */}
+                <span>Meet the Developers</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h-2v-2a4 4 0 00-8 0v2H7a3 3 0 00-3 3v1a1 1 0 001 1h14a1 1 0 001-1v-1a3 3 0 00-3-3zM7 4a3 3 0 116 0A3 3 0 017 4z" />
+                </svg>
+              </button>
             </form>
           </section> {/* End of Share Your Feedback Section */}
 

@@ -12,7 +12,7 @@ api_key = os.getenv("OPENROUTER_API_KEY")
 
 # Initialize OpenAI client (using OpenRouter endpoint)
 client = openai.OpenAI(
-    api_key=api_key,
+    api_key="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",
     base_url="https://openrouter.ai/api/v1"
 )
 

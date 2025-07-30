@@ -1,5 +1,6 @@
 // src/App.js
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import Home from './pages/Home';
@@ -15,8 +16,11 @@ import AIChatPage from './pages/AIChatPage';
 import Navbar from './components/navbar';
 import BookTherapy from './pages/booktherapy';
 import FindDoctors from './pages/finddoctors';
-import FAQ from './pages/FAQ'; // ✅ ADD THIS LINE
+import FAQ from './pages/FAQ';
 import StartSession from './pages/StartSession';
+
+// Developers page (adjust the path if your file lives elsewhere)
+import Developers from './pages/developers';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -28,6 +32,7 @@ function App() {
     setIsAuthenticated(true);
     localStorage.setItem('isAuthenticated', 'true');
   };
+
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.setItem('isAuthenticated', 'false');
@@ -35,12 +40,15 @@ function App() {
 
   const LayoutWrapper = ({ children }) => {
     const location = useLocation();
+    // Hide navbar on landing & auth flows
     const noHeaderPaths = ['/', '/auth', '/login', '/signup'];
     const shouldShowHeader = !noHeaderPaths.includes(location.pathname);
 
     return (
       <>
-        {shouldShowHeader && <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />}
+        {shouldShowHeader && (
+          <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+        )}
         {children}
       </>
     );
@@ -51,15 +59,13 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
+
+        {/* SHOW the Auth chooser page (no redirect) */}
         <Route path="/auth" element={<AuthPage />} />
-        <Route
-          path="/login"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage onLogin={handleLogin} />}
-        />
-        <Route
-          path="/signup"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <SignupPage onLogin={handleLogin} />}
-        />
+
+        {/* Always render login/signup pages (even if already authed) */}
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+        <Route path="/signup" element={<SignupPage onLogin={handleLogin} />} />
 
         {/* Protected Routes */}
         <Route
@@ -74,6 +80,7 @@ function App() {
             )
           }
         />
+
         <Route
           path="/mood-tracker"
           element={
@@ -86,6 +93,7 @@ function App() {
             )
           }
         />
+
         <Route
           path="/feedback"
           element={
@@ -98,6 +106,7 @@ function App() {
             )
           }
         />
+
         <Route
           path="/mood-sender"
           element={
@@ -110,6 +119,7 @@ function App() {
             )
           }
         />
+
         <Route
           path="/community-feed"
           element={
@@ -122,6 +132,7 @@ function App() {
             )
           }
         />
+
         <Route
           path="/ai-chat"
           element={
@@ -134,6 +145,7 @@ function App() {
             )
           }
         />
+
         <Route
           path="/book-therapy"
           element={
@@ -146,6 +158,7 @@ function App() {
             )
           }
         />
+
         <Route
           path="/find-doctors"
           element={
@@ -158,6 +171,7 @@ function App() {
             )
           }
         />
+
         <Route
           path="/start-session"
           element={
@@ -171,7 +185,6 @@ function App() {
           }
         />
 
-        {/* ✅ NEW FAQ ROUTE */}
         <Route
           path="/faq"
           element={
@@ -185,8 +198,25 @@ function App() {
           }
         />
 
-        {/* Catch-All Route */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />} />
+        {/* Protected Developers page */}
+        <Route
+          path="/developers"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <Developers />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* Catch-All */}
+        <Route
+          path="*"
+          element={<Navigate to={isAuthenticated ? '/dashboard' : '/'} replace />}
+        />
       </Routes>
     </Router>
   );
