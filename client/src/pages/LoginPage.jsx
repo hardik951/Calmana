@@ -1,17 +1,51 @@
-// src/pages/LoginPage.jsx
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage({ onLogin }) {
-  const navigate = useNavigate();
+  // State to manage form inputs
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [userType, setUserType] = useState('patient');
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem("isAuthenticated", "true");
-    if (onLogin) onLogin();
-    navigate('/dashboard');
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5001/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle server-side errors (e.g., invalid credentials)
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // On successful login, store the token and user ID
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.userId);
+
+      // Perform any additional login actions (e.g., updating a global state)
+      if (onLogin) onLogin();
+      
+      // Navigate to the dashboard
+      navigate('/dashboard');
+
+    } catch (err) {
+      console.error('Login error:', err.message);
+      setError(err.message || 'Failed to connect to the server.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,14 +87,16 @@ export default function LoginPage({ onLogin }) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-          {/* Email (floating label fixed) */}
+          {/* Email */}
           <div className="relative">
             <input
               type="email"
               id="login-email"
               name="email"
               autoComplete="email"
-              placeholder=" " /* IMPORTANT: single space for :placeholder-shown */
+              placeholder=" "
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm hover:shadow-md"
               required
             />
@@ -82,7 +118,7 @@ export default function LoginPage({ onLogin }) {
             </label>
           </div>
 
-          {/* Password (floating label fixed) */}
+          {/* Password */}
           <div className="relative">
             <input
               type="password"
@@ -90,6 +126,8 @@ export default function LoginPage({ onLogin }) {
               name="password"
               autoComplete="current-password"
               placeholder=" "
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm hover:shadow-md"
               required
             />
@@ -110,12 +148,29 @@ export default function LoginPage({ onLogin }) {
               Password
             </label>
           </div>
+          
+          {error && (
+            <p className="text-red-500 text-sm text-center font-medium mt-4">{error}</p>
+          )}
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-emerald-500 to-green-400 text-white py-3 px-6 rounded-full text-base md:text-lg font-semibold shadow-md hover:from-emerald-600 hover:to-green-500 hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-emerald-500 to-green-400 text-white py-3 px-6 rounded-full text-base md:text-lg font-semibold shadow-md hover:from-emerald-600 hover:to-green-500 hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed"
+            disabled={loading}
           >
-            <span className="text-xl">🔒</span> Login
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Logging in...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <span className="text-xl">🔒</span> Login
+              </span>
+            )}
           </button>
         </form>
 
@@ -125,20 +180,6 @@ export default function LoginPage({ onLogin }) {
             Sign Up
           </button>
         </p>
-
-        {/* Test Button (optional) */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <button
-            onClick={() => {
-              localStorage.setItem('isAuthenticated', 'true');
-              if (onLogin) onLogin();
-              navigate('/dashboard');
-            }}
-            className="w-full bg-gray-200 text-gray-800 py-3 px-6 rounded-full text-base font-semibold shadow-md hover:bg-gray-300 hover:shadow-lg transition-all duration-300 mt-2"
-          >
-            Go to Dashboard (for testing)
-          </button>
-        </div>
       </div>
     </div>
   );

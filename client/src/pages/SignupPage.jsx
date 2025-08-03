@@ -1,16 +1,58 @@
-// src/pages/SignupPage.jsx
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function SignupPage() {
   const navigate = useNavigate();
   const [userType, setUserType] = useState('patient');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [license, setLicense] = useState('');
+  const [specialization, setSpecialization] = useState('');
+  const [dob, setDob] = useState('');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Signup form submitted!");
-    // navigate('/dashboard'); // Uncomment after successful signup logic
+    setError(null);
+    setLoading(true);
+
+    const signupData = {
+      username: fullName,
+      email,
+      password,
+      userType, // To handle different user types on the backend
+      // Conditionally add doctor-specific fields
+      ...(userType === 'doctor' && { license, specialization }),
+      // Conditionally add patient-specific fields
+      ...(userType === 'patient' && { dob }),
+    };
+
+    try {
+      const response = await fetch('http://localhost:5001/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(signupData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Signup failed');
+      }
+
+      // On successful signup, store the token and user ID
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.userId); // Ensure backend sends userId on signup
+      
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Signup error:', err.message);
+      setError(err.message || 'Failed to connect to the server.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,14 +94,16 @@ export default function SignupPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-          {/* Full Name (floating label fixed) */}
+          {/* Full Name */}
           <div className="relative">
             <input
               type="text"
               id="signup-name"
               name="name"
               autoComplete="name"
-              placeholder=" " /* IMPORTANT: single space for :placeholder-shown */
+              placeholder=" "
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md"
               required
             />
@@ -69,14 +113,11 @@ export default function SignupPage() {
                 pointer-events-none absolute left-3
                 text-emerald-700 font-medium
                 transition-all duration-200
-                /* Default: floated (small, top) */
                 -top-2 text-xs bg-white/80 px-1 rounded
-                /* When empty (placeholder visible): drop down to field */
                 peer-placeholder-shown:top-3.5
                 peer-placeholder-shown:text-base
                 peer-placeholder-shown:bg-transparent
                 peer-placeholder-shown:px-0
-                /* On focus, ensure floated */
                 peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white/80 peer-focus:px-1
               "
             >
@@ -84,7 +125,7 @@ export default function SignupPage() {
             </label>
           </div>
 
-          {/* Email (floating label fixed) */}
+          {/* Email */}
           <div className="relative">
             <input
               type="email"
@@ -92,6 +133,8 @@ export default function SignupPage() {
               name="email"
               autoComplete="email"
               placeholder=" "
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md"
               required
             />
@@ -113,7 +156,7 @@ export default function SignupPage() {
             </label>
           </div>
 
-          {/* Password (floating label fixed) */}
+          {/* Password */}
           <div className="relative">
             <input
               type="password"
@@ -121,6 +164,8 @@ export default function SignupPage() {
               name="password"
               autoComplete="new-password"
               placeholder=" "
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md"
               required
             />
@@ -145,13 +190,15 @@ export default function SignupPage() {
           {/* Additional fields for Doctor or Patient */}
           {userType === 'doctor' ? (
             <>
-              {/* License (floating label fixed) */}
+              {/* License */}
               <div className="relative">
                 <input
                   type="text"
                   id="signup-license"
                   name="license"
                   placeholder=" "
+                  value={license}
+                  onChange={(e) => setLicense(e.target.value)}
                   className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md"
                   required
                 />
@@ -173,13 +220,15 @@ export default function SignupPage() {
                 </label>
               </div>
 
-              {/* Specialization (floating label fixed) */}
+              {/* Specialization */}
               <div className="relative">
                 <input
                   type="text"
                   id="signup-specialization"
                   name="specialization"
                   placeholder=" "
+                  value={specialization}
+                  onChange={(e) => setSpecialization(e.target.value)}
                   className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md"
                   required
                 />
@@ -202,7 +251,7 @@ export default function SignupPage() {
               </div>
             </>
           ) : (
-            // Date of Birth (chip label above; no overlap)
+            // Date of Birth
             <div className="relative">
               <label
                 htmlFor="signup-dob"
@@ -214,10 +263,11 @@ export default function SignupPage() {
                 type="date"
                 id="signup-dob"
                 name="dob"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
                 className="w-full p-3 md:p-4 pt-3 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md appearance-none pr-10"
                 required
               />
-              {/* Calendar icon */}
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400 pointer-events-none">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -234,11 +284,28 @@ export default function SignupPage() {
             </div>
           )}
 
+          {error && (
+            <p className="text-red-500 text-sm text-center font-medium mt-4">{error}</p>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-green-500 to-lime-500 text-white py-3 px-6 rounded-full text-base md:text-lg font-semibold shadow-md hover:from-green-600 hover:to-lime-600 hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-green-500 to-lime-500 text-white py-3 px-6 rounded-full text-base md:text-lg font-semibold shadow-md hover:from-green-600 hover:to-lime-600 hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed"
+            disabled={loading}
           >
-            <span className="text-xl">📝</span> Sign Up
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing up...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <span className="text-xl">📝</span> Sign Up
+              </span>
+            )}
           </button>
         </form>
 
