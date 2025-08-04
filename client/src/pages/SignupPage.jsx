@@ -22,10 +22,8 @@ export default function SignupPage() {
       username: fullName,
       email,
       password,
-      userType, // To handle different user types on the backend
-      // Conditionally add doctor-specific fields
+      userType,
       ...(userType === 'doctor' && { license, specialization }),
-      // Conditionally add patient-specific fields
       ...(userType === 'patient' && { dob }),
     };
 
@@ -42,11 +40,10 @@ export default function SignupPage() {
         throw new Error(data.message || 'Signup failed');
       }
 
-      // On successful signup, store the token and user ID
       localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.userId); // Ensure backend sends userId on signup
-      
-      navigate('/dashboard');
+      localStorage.setItem('userId', data.userId);
+
+      navigate('/dashboard'); // redirected to mood page after signup
     } catch (err) {
       console.error('Signup error:', err.message);
       setError(err.message || 'Failed to connect to the server.');
@@ -75,7 +72,7 @@ export default function SignupPage() {
             aria-pressed={userType === 'patient'}
           >
             <span className="text-2xl mb-1">🧑‍🦰</span>
-            <span className="transition-all duration-200">Patient</span>
+            <span>Patient</span>
           </button>
 
           <button
@@ -89,7 +86,7 @@ export default function SignupPage() {
             aria-pressed={userType === 'doctor'}
           >
             <span className="text-2xl mb-1">🩺</span>
-            <span className="transition-all duration-200">Doctor</span>
+            <span>Doctor</span>
           </button>
         </div>
 
@@ -100,27 +97,13 @@ export default function SignupPage() {
               type="text"
               id="signup-name"
               name="name"
-              autoComplete="name"
               placeholder=" "
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md"
+              className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               required
             />
-            <label
-              htmlFor="signup-name"
-              className="
-                pointer-events-none absolute left-3
-                text-emerald-700 font-medium
-                transition-all duration-200
-                -top-2 text-xs bg-white/80 px-1 rounded
-                peer-placeholder-shown:top-3.5
-                peer-placeholder-shown:text-base
-                peer-placeholder-shown:bg-transparent
-                peer-placeholder-shown:px-0
-                peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white/80 peer-focus:px-1
-              "
-            >
+            <label htmlFor="signup-name" className="absolute text-xs left-3 top-2 text-emerald-700 bg-white/80 px-1">
               Full Name
             </label>
           </div>
@@ -131,27 +114,13 @@ export default function SignupPage() {
               type="email"
               id="signup-email"
               name="email"
-              autoComplete="email"
               placeholder=" "
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md"
+              className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               required
             />
-            <label
-              htmlFor="signup-email"
-              className="
-                pointer-events-none absolute left-3
-                text-emerald-700 font-medium
-                transition-all duration-200
-                -top-2 text-xs bg-white/80 px-1 rounded
-                peer-placeholder-shown:top-3.5
-                peer-placeholder-shown:text-base
-                peer-placeholder-shown:bg-transparent
-                peer-placeholder-shown:px-0
-                peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white/80 peer-focus:px-1
-              "
-            >
+            <label htmlFor="signup-email" className="absolute text-xs left-3 top-2 text-emerald-700 bg-white/80 px-1">
               Email
             </label>
           </div>
@@ -162,35 +131,20 @@ export default function SignupPage() {
               type="password"
               id="signup-password"
               name="password"
-              autoComplete="new-password"
               placeholder=" "
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md"
+              className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               required
             />
-            <label
-              htmlFor="signup-password"
-              className="
-                pointer-events-none absolute left-3
-                text-emerald-700 font-medium
-                transition-all duration-200
-                -top-2 text-xs bg-white/80 px-1 rounded
-                peer-placeholder-shown:top-3.5
-                peer-placeholder-shown:text-base
-                peer-placeholder-shown:bg-transparent
-                peer-placeholder-shown:px-0
-                peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white/80 peer-focus:px-1
-              "
-            >
+            <label htmlFor="signup-password" className="absolute text-xs left-3 top-2 text-emerald-700 bg-white/80 px-1">
               Password
             </label>
           </div>
 
-          {/* Additional fields for Doctor or Patient */}
+          {/* Conditional Fields */}
           {userType === 'doctor' ? (
             <>
-              {/* License */}
               <div className="relative">
                 <input
                   type="text"
@@ -199,28 +153,13 @@ export default function SignupPage() {
                   placeholder=" "
                   value={license}
                   onChange={(e) => setLicense(e.target.value)}
-                  className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                  className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   required
                 />
-                <label
-                  htmlFor="signup-license"
-                  className="
-                    pointer-events-none absolute left-3
-                    text-emerald-700 font-medium
-                    transition-all duration-200
-                    -top-2 text-xs bg-white/80 px-1 rounded
-                    peer-placeholder-shown:top-3.5
-                    peer-placeholder-shown:text-base
-                    peer-placeholder-shown:bg-transparent
-                    peer-placeholder-shown:px-0
-                    peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white/80 peer-focus:px-1
-                  "
-                >
+                <label htmlFor="signup-license" className="absolute text-xs left-3 top-2 text-emerald-700 bg-white/80 px-1">
                   Medical License Number
                 </label>
               </div>
-
-              {/* Specialization */}
               <div className="relative">
                 <input
                   type="text"
@@ -229,34 +168,17 @@ export default function SignupPage() {
                   placeholder=" "
                   value={specialization}
                   onChange={(e) => setSpecialization(e.target.value)}
-                  className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                  className="peer w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   required
                 />
-                <label
-                  htmlFor="signup-specialization"
-                  className="
-                    pointer-events-none absolute left-3
-                    text-emerald-700 font-medium
-                    transition-all duration-200
-                    -top-2 text-xs bg-white/80 px-1 rounded
-                    peer-placeholder-shown:top-3.5
-                    peer-placeholder-shown:text-base
-                    peer-placeholder-shown:bg-transparent
-                    peer-placeholder-shown:px-0
-                    peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white/80 peer-focus:px-1
-                  "
-                >
+                <label htmlFor="signup-specialization" className="absolute text-xs left-3 top-2 text-emerald-700 bg-white/80 px-1">
                   Specialization
                 </label>
               </div>
             </>
           ) : (
-            // Date of Birth
             <div className="relative">
-              <label
-                htmlFor="signup-dob"
-                className="absolute -top-3 left-3 bg-white/80 px-2 rounded text-emerald-700 text-xs md:text-sm font-medium"
-              >
+              <label htmlFor="signup-dob" className="absolute text-xs left-3 top-2 text-emerald-700 bg-white/80 px-1">
                 Date of Birth
               </label>
               <input
@@ -265,51 +187,24 @@ export default function SignupPage() {
                 name="dob"
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
-                className="w-full p-3 md:p-4 pt-3 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-all duration-200 shadow-sm hover:shadow-md appearance-none pr-10"
+                className="w-full p-3 md:p-4 border border-emerald-300 rounded-xl bg-white/80 text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 required
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400 pointer-events-none">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="4" className="fill-none" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 2v4m8-4v4M3 10h18" />
-                </svg>
-              </span>
             </div>
           )}
 
-          {error && (
-            <p className="text-red-500 text-sm text-center font-medium mt-4">{error}</p>
-          )}
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-green-500 to-lime-500 text-white py-3 px-6 rounded-full text-base md:text-lg font-semibold shadow-md hover:from-green-600 hover:to-lime-600 hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed"
             disabled={loading}
+            className="w-full bg-gradient-to-r from-green-500 to-lime-500 text-white py-3 rounded-full font-semibold hover:scale-105 transition-all"
           >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Signing up...
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">
-                <span className="text-xl">📝</span> Sign Up
-              </span>
-            )}
+            {loading ? 'Signing up...' : 'Sign Up'}
           </button>
         </form>
 
-        <p className="mt-8 text-center text-emerald-700 text-base md:text-lg">
+        <p className="mt-6 text-center text-emerald-700">
           Already have an account?{' '}
           <button
             onClick={() => navigate('/login')}

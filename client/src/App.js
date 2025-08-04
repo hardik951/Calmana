@@ -13,16 +13,17 @@ import AuthPage from './pages/AuthPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AIChatPage from './pages/AIChatPage';
-import Navbar from './components/navbar';          
+import Navbar from './components/navbar';
 import BookTherapy from './pages/booktherapy';
 import FindDoctors from './pages/finddoctors';
 import FAQ from './pages/FAQ';
 import StartSession from './pages/StartSession';
 import Developers from './pages/developers';
-import SOSPage from './pages/SOSPage'; // ✅ Already imported
-
-// NEW: Resources page
+import SOSPage from './pages/SOSPage';
 import Resources from './pages/Resources';
+
+// ✅ NEW: Mood Page that displays mood chart and MoodTracker
+import Mood from './pages/mood';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -92,11 +93,11 @@ function App() {
         />
 
         <Route
-          path="/feedback"
+          path="/mood-sender"
           element={
             isAuthenticated ? (
               <LayoutWrapper>
-                <Feedback />
+                <MoodSender />
               </LayoutWrapper>
             ) : (
               <Navigate to="/login" replace />
@@ -105,11 +106,11 @@ function App() {
         />
 
         <Route
-          path="/mood-sender"
+          path="/feedback"
           element={
             isAuthenticated ? (
               <LayoutWrapper>
-                <MoodSender />
+                <Feedback />
               </LayoutWrapper>
             ) : (
               <Navigate to="/login" replace />
@@ -195,7 +196,6 @@ function App() {
           }
         />
 
-        {/* Developers page */}
         <Route
           path="/developers"
           element={
@@ -209,7 +209,6 @@ function App() {
           }
         />
 
-        {/* NEW: Resources page */}
         <Route
           path="/resources"
           element={
@@ -223,13 +222,26 @@ function App() {
           }
         />
 
-        {/* ✅ NEW: SOS Page route added here */}
         <Route
           path="/sos"
           element={
             isAuthenticated ? (
               <LayoutWrapper>
                 <SOSPage />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* ✅ NEW MOOD PAGE */}
+        <Route
+          path="/mood"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <Mood />
               </LayoutWrapper>
             ) : (
               <Navigate to="/login" replace />

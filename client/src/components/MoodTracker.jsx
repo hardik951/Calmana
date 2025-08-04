@@ -1,90 +1,160 @@
-// src/components/MoodTracker.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer,
+} from 'recharts';
 
-export default function MoodTracker() {
-  const [mood, setMood] = useState('');
-  const [notes, setNotes] = useState('');
+const moodMap = {
+  '😊 Happy': 3,
+  '😐 Neutral': 2,
+  '☹️ Sad': 1,
+  '😟 Anxious': 0,
+};
+
+export default function MoodTracker({ onMoodSubmit }) {
+  const [moodHistory, setMoodHistory] = useState([]);
+  const [detailedHistory, setDetailedHistory] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [responseMsg, setResponseMsg] = useState('');
-  const [submitted, setSubmitted] = useState(false);
 
-  const moods = ['😊 Happy', '😐 Neutral', '☹️ Sad', '😟 Anxious'];
+  const [selectedMood, setSelectedMood] = useState('');
+  const [note, setNote] = useState('');
+  const [submitStatus, setSubmitStatus] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!mood) return;
-
+  const fetchMoodHistory = async () => {
     setLoading(true);
-    setResponseMsg('');
-    setSubmitted(false);
-
     try {
-      const res = await fetch("http://localhost:5001/api/mood", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          mood,
-          notes,
-          timestamp: new Date(),
-        }),
-      });
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        console.error('User ID not found in localStorage');
+        return;
+      }
 
+      const res = await fetch(`http://localhost:5001/api/moods/${userId}`);
       const data = await res.json();
-      setResponseMsg(data.message || "Mood sent successfully!");
-      setSubmitted(true);
-      setMood('');
-      setNotes('');
-    } catch (err) {
-      console.error("Error:", err);
-      setResponseMsg("Failed to send mood. Please try again.");
-    }
 
+      const chartData = data.map((entry) => ({
+        date: new Date(entry.timestamp).toLocaleDateString(),
+        mood: moodMap[entry.mood],
+      }));
+
+      setMoodHistory(chartData);
+      setDetailedHistory(data.reverse());
+    } catch (err) {
+      console.error('Error fetching mood history:', err);
+    }
     setLoading(false);
   };
 
+  useEffect(() => {
+    fetchMoodHistory();
+  }, []);
+
+  const handleMoodSubmit = async (e) => {
+    e.preventDefault();
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      setSubmitStatus('User not logged in.');
+      return;
+    }
+
+    if (!selectedMood) {
+      setSubmitStatus('Please select a mood.');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:5001/api/moods/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mood: selectedMood, userId, notes: note }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Error submitting mood');
+      }
+
+      setSubmitStatus('Mood submitted successfully!');
+      setSelectedMood('');
+      setNote('');
+      onMoodSubmit && onMoodSubmit(); // Call parent updater
+    } catch (err) {
+      console.error(err);
+      setSubmitStatus('Failed to submit mood.');
+    }
+  };
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto">
-      <h3 className="text-xl font-semibold text-green-800 mb-4">How are you feeling today?</h3>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4 flex justify-between">
-          {moods.map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setMood(m)}
-              className={`px-4 py-2 rounded-full border ${
-                mood === m ? 'bg-green-500 text-white' : 'bg-green-50 text-green-700'
-              } hover:bg-green-400 hover:text-white transition`}
-            >
-              {m}
-            </button>
-          ))}
-        </div>
+    <div className="bg-white p-6 rounded-lg shadow-md max-w-3xl mx-auto space-y-8">
+      {/* Mood Submission */}
+      <form onSubmit={handleMoodSubmit} className="space-y-4">
+        <h2 className="text-xl font-semibold text-green-800">How are you feeling today?</h2>
+
+        <select
+          className="w-full p-3 border border-emerald-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500"
+          value={selectedMood}
+          onChange={(e) => setSelectedMood(e.target.value)}
+          required
+        >
+          <option value="">Select a mood</option>
+          <option value="😊 Happy">😊 Happy</option>
+          <option value="😐 Neutral">😐 Neutral</option>
+          <option value="☹️ Sad">☹️ Sad</option>
+          <option value="😟 Anxious">😟 Anxious</option>
+        </select>
+
         <textarea
-          className="w-full p-2 border rounded resize-none mb-4"
-          placeholder="Additional notes (optional)"
+          className="w-full p-3 border border-emerald-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500"
+          placeholder="Optional note..."
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
           rows={3}
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
         />
+
         <button
           type="submit"
-          disabled={!mood || loading}
-          className={`w-full py-2 rounded bg-green-600 text-white font-semibold ${
-            !mood || loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'
-          } transition`}
+          className="w-full bg-gradient-to-r from-emerald-500 to-green-400 text-white py-3 rounded-full font-semibold hover:scale-105 transition-all"
         >
-          {loading ? 'Sending...' : 'Submit'}
+          Submit Mood
         </button>
+
+        {submitStatus && (
+          <p className="text-center text-sm text-emerald-700 mt-2">{submitStatus}</p>
+        )}
       </form>
-      {responseMsg && (
-        <p className={`mt-4 font-medium ${submitted ? 'text-green-700' : 'text-red-600'}`}>
-          {responseMsg} 🌿
-        </p>
+
+      {/* Mood Graph */}
+      <div>
+        <h4 className="text-lg font-semibold text-gray-700 mb-2">Mood Trend (Last 21 Days)</h4>
+        {moodHistory.length > 0 ? (
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={moodHistory}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis domain={[0, 3]} tickFormatter={(v) => Object.keys(moodMap).find(k => moodMap[k] === v)} />
+              <Tooltip formatter={(value) => Object.keys(moodMap).find(k => moodMap[k] === value)} />
+              <Line type="monotone" dataKey="mood" stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <p className="text-sm text-gray-500">No mood entries yet. Log your mood to get started!</p>
+        )}
+      </div>
+
+      {/* Mood History */}
+      {detailedHistory.length > 0 && (
+        <div>
+          <h4 className="text-lg font-semibold text-gray-700 mb-2">Mood Journal</h4>
+          <ul className="space-y-2 max-h-64 overflow-y-auto">
+            {detailedHistory.map((entry, index) => (
+              <li key={index} className="bg-gray-100 p-3 rounded">
+                <div className="text-sm text-gray-700"><strong>Date:</strong> {new Date(entry.timestamp).toLocaleString()}</div>
+                <div className="text-sm text-gray-700"><strong>Mood:</strong> {entry.mood}</div>
+                {entry.notes && <div className="text-sm text-gray-700"><strong>Note:</strong> {entry.notes}</div>}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
 }
-
