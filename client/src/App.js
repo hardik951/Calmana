@@ -13,12 +13,13 @@ import AuthPage from './pages/AuthPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AIChatPage from './pages/AIChatPage';
-import Navbar from './components/navbar';           // <-- small 'n' as requested
+import Navbar from './components/navbar';          
 import BookTherapy from './pages/booktherapy';
 import FindDoctors from './pages/finddoctors';
 import FAQ from './pages/FAQ';
 import StartSession from './pages/StartSession';
 import Developers from './pages/developers';
+import SOSPage from './pages/SOSPage'; // ✅ Already imported
 
 // NEW: Resources page
 import Resources from './pages/Resources';
@@ -41,7 +42,6 @@ function App() {
 
   const LayoutWrapper = ({ children }) => {
     const location = useLocation();
-    // Hide navbar on landing & auth flows
     const noHeaderPaths = ['/', '/auth', '/login', '/signup'];
     const shouldShowHeader = !noHeaderPaths.includes(location.pathname);
 
@@ -216,6 +216,20 @@ function App() {
             isAuthenticated ? (
               <LayoutWrapper>
                 <Resources />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* ✅ NEW: SOS Page route added here */}
+        <Route
+          path="/sos"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <SOSPage />
               </LayoutWrapper>
             ) : (
               <Navigate to="/login" replace />

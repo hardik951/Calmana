@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function Sidebar({ navigate }) {
+export default function Sidebar() {
+  const navigate = useNavigate(); // ✅ Use useNavigate here directly
+
   const [isOpen, setIsOpen] = useState({
     chatrooms: false,
     directMessages: false,
@@ -40,26 +43,23 @@ export default function Sidebar({ navigate }) {
   };
 
   const renderDropdown = (section, children) => (
-    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen[section] ? 'max-h-[500px]' : 'max-h-0'}`}>{children}</div>
+    <div
+      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+        isOpen[section] ? 'max-h-[500px]' : 'max-h-0'
+      }`}
+    >
+      {children}
+    </div>
   );
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
-    if (!isMobileMenuOpen) {
-      setIsOpen({
-        chatrooms: false,
-        directMessages: false,
-        communitySnapshot: false,
-        notifications: false,
-      });
-    } else {
-      setIsOpen({
-        chatrooms: false,
-        directMessages: false,
-        communitySnapshot: false,
-        notifications: false,
-      });
-    }
+    setIsOpen({
+      chatrooms: false,
+      directMessages: false,
+      communitySnapshot: false,
+      notifications: false,
+    });
   };
 
   return (
@@ -181,6 +181,16 @@ export default function Sidebar({ navigate }) {
             </>
           ))}
         </div>
+      </div>
+
+      {/* ✅ SOS BUTTON */}
+      <div className="mt-6">
+        <button
+          onClick={() => navigate('/sos')}
+          className="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-red-600 transition-all duration-200"
+        >
+          🚨 SOS
+        </button>
       </div>
     </aside>
   );
