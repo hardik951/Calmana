@@ -1,15 +1,16 @@
-// server.js
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const axios = require("axios"); // Add axios for HTTP requests
 require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 const MONGO_URI = process.env.MONGO_URI || "your-default-mongo-uri";
 const JWT_SECRET = process.env.JWT_SECRET || "your-default-secret";
+const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || "your-default-google-api-key"; // Match .env key name
 
 // Middleware
 app.use(cors());
@@ -95,6 +96,39 @@ app.post("/api/login", async (req, res) => {
 const moodRoutes = require("./routes/mood.routes");
 app.use("/api/moods", moodRoutes);
 
+// --- Doctors Search Route ---
+app.get("/api/doctors", async (req, res) => {
+  try {
+    const { lat, lng } = req.query;
+
+    if (!lat || !lng) {
+      return res.status(400).json({ message: "Latitude and longitude are required." });
+    }
+
+    const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+    const params = {
+      location: `${lat},${lng}`,
+      radius: 5000,
+      type: 'doctor',
+      keyword: 'mental health',
+      key: GOOGLE_API_KEY
+    };
+
+    const response = await axios.get(url, { params });
+    const doctors = response.data.results.map(result => ({
+      name: result.name,
+      address: result.vicinity,
+      rating: result.rating || 'N/A',
+      place_id: result.place_id
+    }));
+
+    res.json(doctors);
+  } catch (error) {
+    console.error("Doctors search error:", error.response ? error.response.data : error.message);
+    res.status(500).json({ message: "Error fetching doctors", error: error.response ? error.response.data : error.message });
+  }
+});
+
 // --- Start Server ---
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
@@ -102,3 +136,4 @@ app.listen(PORT, () => {
 
 console.log("🔑 MONGO_URI:", process.env.MONGO_URI);
 console.log("🔐 JWT_SECRET:", process.env.JWT_SECRET);
+console.log("🌐 GOOGLE_MAPS_API_KEY:", process.env.GOOGLE_MAPS_API_KEY); // Log the correct env variable name
