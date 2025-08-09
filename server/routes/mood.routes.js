@@ -1,35 +1,62 @@
-// routes/mood.routes.js
 const express = require("express");
+const mongoose = require("mongoose");
+const Mood = require("../models/mood.model");
+const { authenticateToken } = require("../middleware/auth");
+
 const router = express.Router();
-const Mood = require("../models/mood.models"); // ✅ Import ONLY
 
-// --- POST Mood Entry ---
-router.post("/", async (req, res) => {
+// Get moods for a user (must match JWT userId)
+router.get("/:userId", authenticateToken, async (req, res) => {
   try {
-    const { userId, mood, notes } = req.body;
+    const { userId } = req.params;
 
-    if (!userId || !mood) {
-      return res.status(400).json({ message: "userId and mood are required" });
+    if (req.user.userId !== userId) {
+      return res.status(403).json({ message: "Access denied" });
     }
 
-    const newMood = new Mood({ userId, mood, notes });
-    await newMood.save();
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid userId" });
+    }
 
-    res.status(201).json({ message: "Mood saved successfully", mood: newMood });
+    const moods = await Mood.find({ userId }).sort({ timestamp: -1 });
+    res.json({ success: true, moods });
   } catch (err) {
-    console.error("Error saving mood:", err.message);
-    res.status(500).json({ message: "Failed to save mood", error: err.message });
+    console.error("Error fetching moods:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// --- GET Mood History by User ID ---
-router.get("/:userId", async (req, res) => {
+// Submit a new mood
+router.post("/", authenticateToken, async (req, res) => {
   try {
-    const moods = await Mood.find({ userId: req.params.userId }).sort({ timestamp: -1 });
-    res.json(moods);
+    const { userId, mood, notes } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid userId" });
+    }
+
+    // Optional: Check if mood is one of your allowed values
+    const allowedMoods = ['😊 Happy', '😐 Neutral', '☹️ Sad', '😟 Anxious'];
+    if (!allowedMoods.includes(mood)) {
+      return res.status(400).json({ message: "Invalid mood value" });
+    }
+
+    if (req.user.userId !== userId) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const newMood = new Mood({
+      userId: mongoose.Types.ObjectId(userId),
+      mood,
+      notes,
+      timestamp: new Date(),
+    });
+
+    const savedMood = await newMood.save();
+    res.status(201).json({ success: true, mood: savedMood });
   } catch (err) {
-    console.error("Error fetching moods:", err.message);
-    res.status(500).json({ message: "Failed to fetch moods", error: err.message });
+    console.error("Mood save error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

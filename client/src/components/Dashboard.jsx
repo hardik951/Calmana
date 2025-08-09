@@ -1,200 +1,203 @@
-// src/components/Dashboard.tsx
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import MoodTracker from './MoodTracker';
 import CommunityFeed from './CommunityFeed';
 import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   const navigate = useNavigate();
+  const [diaryEntries, setDiaryEntries] = useState([]);
+  const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (!userId || !token) return;
+
+    const fetchDiary = async () => {
+      try {
+        const res = await axios.get(`/api/diary/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setDiaryEntries(res.data.diaries || []);
+      } catch (err) {
+        console.error('Error fetching diary entries:', err);
+      }
+    };
+
+    fetchDiary();
+  }, [userId, token]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-4 sm:p-6 lg:p-8 xl:p-10 font-inter flex flex-col animate-gradient-green-pink-shift bg-[length:400%_400%]">
-      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8 xl:gap-10 flex-grow max-w-screen-2xl">
+    <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-8 font-inter flex flex-col animate-gradient-green-pink-shift bg-[length:400%_400%]">
+      <div className="container mx-auto max-w-screen-xl grid grid-cols-1 lg:grid-cols-4 gap-10 flex-grow">
         <Sidebar />
-        <main className="lg:col-span-3 space-y-6 lg:space-y-8 xl:space-y-10">
-          <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 shadow-lg rounded-xl p-6 lg:p-8 xl:p-10 flex flex-col md:flex-row items-center justify-between overflow-hidden relative border border-white/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-emerald-200 rounded-full opacity-30 blur-xl pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-32 h-32 bg-green-200 rounded-full opacity-30 blur-xl pointer-events-none"></div>
-            <div className="text-center md:text-left z-10">
-              <h1 className="text-lg md:text-xl lg:text-2xl xl:text-3xl font-extrabold text-emerald-800 mb-2 lg:mb-3 xl:mb-4 leading-snug tracking-wide">Welcome back to your calm space!</h1>
-              <p className="text-xs md:text-sm lg:text-base xl:text-lg text-emerald-700 mb-4 lg:mb-6 xl:mb-8 max-w-xl leading-relaxed">
+
+        <main className="lg:col-span-3 space-y-10">
+          {/* Welcome Section */}
+          <section
+            className="relative bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 shadow-lg rounded-xl p-10 flex flex-col md:flex-row items-center justify-between border border-white/20 hover:shadow-2xl hover:-translate-y-1 transition-transform duration-300 animate-fade-in-up max-h-56"
+            style={{ animationDelay: '0.4s' }}
+          >
+            {/* Decorative circles */}
+            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-36 h-36 bg-emerald-200 rounded-full opacity-25 blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-36 h-36 bg-green-200 rounded-full opacity-25 blur-3xl pointer-events-none"></div>
+
+            <div className="text-center md:text-left z-10 flex-1 max-w-2xl">
+              <h1 className="text-3xl font-extrabold text-emerald-800 mb-3 leading-tight tracking-wide">
+                Welcome back to your calm space!
+              </h1>
+              <p className="text-lg text-emerald-700 mb-6 leading-relaxed">
                 Your personalized AI-powered mental health dashboard. Take a deep breath and explore your journey towards greater well-being.
               </p>
               <button
-                className="bg-emerald-600 text-white px-4 py-1.5 lg:px-6 lg:py-2 xl:px-8 xl:py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-xs lg:text-sm xl:text-base font-semibold flex items-center justify-center hover:brightness-110 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                className="bg-emerald-600 text-white px-8 py-3 rounded-full shadow-md hover:shadow-lg transition duration-300 font-semibold flex items-center justify-center hover:brightness-110 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-emerald-400"
                 onClick={() => navigate('/start-session')}
-                aria-label="Start a Session"
               >
-                <span className="mr-2">🍃</span> Start a Session
+                <span className="mr-3 text-2xl">🍃</span> Start a Session
               </button>
             </div>
-            <div className="mt-8 md:mt-0 md:ml-10 flex-shrink-0 z-10">
+
+            <div className="mt-8 md:mt-0 md:ml-12 flex-shrink-0 z-10">
               <img
-                src="https://via.placeholder.com/250x180/D1FAE5/10B981?text=Calm+Illustration"
+                src="https://via.placeholder.com/240x160/D1FAE5/10B981?text=Calm+Illustration"
                 alt="Calm illustration"
-                className="rounded-lg shadow-md max-h-36 lg:max-h-48 xl:max-h-64 hover:scale-105 transition-transform duration-300"
+                className="rounded-lg shadow-md max-w-[240px] max-h-40 object-cover hover:scale-105 transition-transform duration-300"
               />
             </div>
-          </div>
+          </section>
 
-          {/* Grid for Mood Tracker, Journal Entries, AI Chat, Community Feed (2x2 structure) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 xl:gap-10">
-
-            {/* Mood Tracker Card: Now with full animated gradient background */}
-            <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 transform animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-              <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-emerald-800 mb-4 lg:mb-5 flex items-center leading-snug">
-                <span className="text-2xl lg:text-3xl xl:text-4xl mr-2 text-emerald-600">😊</span> Mood Tracker
+          {/* Grid for Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {/* Mood Tracker */}
+            <section
+              className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-transform duration-300 p-8 flex flex-col justify-between border border-white/20 animate-fade-in-up min-h-[280px]"
+              style={{ animationDelay: '0.6s' }}
+            >
+              <h3 className="text-3xl font-bold text-emerald-800 mb-2 flex items-center leading-snug">
+                <span className="text-5xl mr-3 text-emerald-600">😊</span> Mood Tracker
               </h3>
-              <div className="min-h-[150px] lg:min-h-[180px] xl:min-h-[220px] flex items-center justify-center">
-                <MoodTracker />
+              <p className="text-emerald-700 mb-6 max-w-lg leading-relaxed">
+                Track your moods daily and watch your emotional journey unfold with intuitive visualizations and thoughtful insights.
+              </p>
+              <div className="flex-1 flex items-center justify-center">
+                <MoodTracker userId={userId} token={token} />
               </div>
-            </div>
+            </section>
 
-            {/* Recent Journal Entries: Now with full animated gradient background */}
-            <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 transform animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
-              <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-emerald-800 mb-4 lg:mb-5 flex items-center leading-snug">
-                <span className="text-2xl lg:text-3xl xl:text-4xl mr-2 text-emerald-600">✍️</span> Personal Diary 
+            {/* Personal Diary */}
+            <section
+              className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-transform duration-300 p-8 flex flex-col justify-between border border-white/20 animate-fade-in-up cursor-pointer min-h-[280px]"
+              style={{ animationDelay: '0.7s' }}
+              onClick={() => navigate('/diary')}
+            >
+              <h3 className="text-3xl font-bold text-emerald-800 mb-2 flex items-center leading-snug">
+                <span className="text-5xl mr-3 text-emerald-600">✍️</span> Personal Diary
               </h3>
-              <ul className="space-y-3 lg:space-y-4 xl:space-y-5 text-emerald-700 text-base lg:text-lg xl:text-xl min-h-[150px] lg:min-h-[180px] xl:min-h-[220px] leading-relaxed">
-                <li className="bg-white/10 p-3 lg:p-4 xl:p-5 rounded-md border-l-4 border-emerald-400 cursor-pointer hover:bg-white/20 transition duration-200 shadow-sm">
-                  <span className="font-semibold text-emerald-800">Mar 25:</span> <span className="text-emerald-700">Reflected on managing daily stress.</span>
-                </li>
-                <li className="bg-white/10 p-3 lg:p-4 xl:p-5 rounded-md border-l-4 border-pink-400 cursor-pointer hover:bg-white/20 transition duration-200 shadow-sm">
-                  <span className="font-semibold text-emerald-800">Mar 24:</span> <span className="text-emerald-700">Explored gratitude for small joys.</span>
-                </li>
-                <li className="bg-white/10 p-3 lg:p-4 xl:p-5 rounded-md border-l-4 border-green-400 cursor-pointer hover:bg-white/20 transition duration-200 shadow-sm">
-                  <span className="font-semibold text-emerald-800">Mar 23:</span> <span className="text-emerald-700">Acknowledged progress in mindfulness.</span>
-                </li>
+              <p className="text-emerald-700 mb-6 max-w-lg leading-relaxed">
+                Reflect on your thoughts, feelings, and experiences. Your diary is your private sanctuary.
+              </p>
+              <ul className="space-y-3 text-emerald-700 text-base leading-relaxed overflow-y-auto max-h-[140px] pr-2">
+                {diaryEntries.length > 0 ? (
+                  diaryEntries.slice(0, 3).map((entry, index) => (
+                    <li
+                      key={index}
+                      className="bg-white/10 p-3 rounded-md border-l-4 border-emerald-400 break-words"
+                    >
+                      <span className="font-semibold text-emerald-800">
+                        {new Date(entry.date).toLocaleDateString()}:
+                      </span>{' '}
+                      {entry.content.length > 80
+                        ? entry.content.substring(0, 80) + '...'
+                        : entry.content}
+                    </li>
+                  ))
+                ) : (
+                  <li className="bg-white/10 p-3 rounded-md border-l-4 border-gray-300">
+                    No diary entries yet.
+                  </li>
+                )}
               </ul>
-              <button className="mt-4 lg:mt-5 xl:mt-6 text-emerald-600 hover:underline text-sm lg:text-base xl:text-lg font-semibold self-start hover:text-emerald-700 transition-colors duration-200">View all entries</button>
-            </div>
+              <span className="mt-4 text-emerald-600 hover:underline text-sm font-semibold self-start">
+                View all entries
+              </span>
+            </section>
 
-            {/* AI Chat Card: Now with full animated gradient background */}
-            <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
-              <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-emerald-800 mb-4 lg:mb-5 flex items-center gap-2 leading-snug">
-                <span className="text-2xl lg:text-3xl">🧠</span> Calmana AI Assistant
+            {/* AI Chat */}
+            <section
+              className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-transform duration-300 p-8 flex flex-col justify-between border border-white/20 animate-fade-in-up min-h-[200px]"
+              style={{ animationDelay: '0.8s' }}
+            >
+              <h3 className="text-3xl font-bold text-emerald-800 mb-3 flex items-center gap-3 leading-snug">
+                <span className="text-4xl">🧠</span> Calmana AI Assistant
               </h3>
-
-              {/* Chat Bubble Preview - No Scroll */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4 space-y-3 text-sm text-emerald-900 max-h-44 overflow-y-auto border border-white/20 shadow-inner">
-                <div className="flex items-start gap-2">
-                  <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">C</div>
-                  <div className="bg-white/20 rounded-xl px-4 py-2 w-fit shadow-sm text-emerald-900">
-                    Hey there 👋 I'm Calmana, your listening companion. How are you feeling today?
-                  </div>
-                </div>
-                <div className="flex items-start justify-end gap-2">
-                  <div className="bg-white/30 rounded-xl px-4 py-2 w-fit shadow-sm text-emerald-900">
-                    Feeling a bit lost and anxious lately...
-                  </div>
-                  <div className="w-6 h-6 rounded-full bg-emerald-400 text-white flex items-center justify-center text-xs font-bold">U</div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">C</div>
-                  <div className="bg-white/20 rounded-xl px-4 py-2 w-fit shadow-sm text-emerald-900">
-                    You're not alone 🌱 Let's take a breath together. I'm here for you.
-                  </div>
-                </div>
-              </div>
-
-              {/* Calmana AI Features */}
-              <ul className="text-emerald-800 list-disc pl-5 space-y-1 mb-4 text-sm lg:text-base">
-                <li>Empathetic AI that listens 24/7</li>
-                <li>Supports emotional awareness gently</li>
-                <li>Private, safe, and soothing space</li>
-              </ul>
-
-              {/* Redirect to new AI chat page */}
+              <p className="text-emerald-700 mb-6 max-w-lg leading-relaxed">
+                Your personal AI companion, ready to listen, guide, and support you anytime, anywhere.
+              </p>
               <button
                 onClick={() => navigate('/ai-chat')}
-                className="w-full bg-emerald-600 text-white font-semibold py-2.5 lg:py-3 xl:py-4 px-5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 text-base lg:text-lg xl:text-xl hover:brightness-110">
-                <span className="mr-2">🚀</span> Start AI Chat
+                className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 hover:brightness-110"
+              >
+                <span className="mr-3 text-xl">🚀</span> Start AI Chat
               </button>
-            </div>
+            </section>
 
-            {/* Community Feed Card: Now with full animated gradient background */}
-            <div className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 lg:p-8 flex flex-col justify-between border border-white/20 animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
-              <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-emerald-800 mb-4 lg:mb-5 flex items-center leading-snug">
-                <span className="text-2xl lg:text-3xl xl:text-4xl mr-2 text-emerald-600">🌍</span> Full Community Feed
+            {/* Community Feed */}
+            <section
+              className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-transform duration-300 p-8 flex flex-col justify-between border border-white/20 animate-fade-in-up min-h-[280px]"
+              style={{ animationDelay: '0.9s' }}
+            >
+              <h3 className="text-3xl font-bold text-emerald-800 mb-4 flex items-center leading-snug">
+                <span className="text-4xl mr-3 text-emerald-600">🌍</span> Full Community Feed
               </h3>
-              <div className="min-h-[200px] lg:min-h-[250px] xl:min-h-[300px] overflow-y-auto">
+              <p className="text-emerald-700 mb-6 max-w-lg leading-relaxed">
+                Connect with a supportive community. Share, learn, and grow together in your mental health journey.
+              </p>
+              <div className="overflow-y-auto max-h-[150px] pr-2">
                 <CommunityFeed />
               </div>
-            </div>
-          </div> {/* End of the 2x2 grid */}
+            </section>
 
+            {/* Feedback Section */}
+            <section
+              className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-transform duration-300 p-8 flex flex-col justify-center items-center border border-white/20 cursor-pointer animate-fade-in-up min-h-[160px]"
+              style={{ animationDelay: '1.0s' }}
+              onClick={() => navigate('/feedback')}
+            >
+              <h3 className="text-3xl font-bold text-emerald-800 mb-3 flex items-center justify-center leading-snug">
+                <span className="text-4xl mr-3 text-emerald-600">💬</span> Feedback
+              </h3>
+              <p className="text-emerald-700 text-center text-lg leading-relaxed max-w-sm">
+                Help us improve Calmana by sharing your thoughts and ideas.
+              </p>
+            </section>
 
-          {/* NEW: Share Your Feedback Section (Full Width, now with full animated gradient) */}
-          <section className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 shadow-xl rounded-xl p-8 lg:p-12 xl:p-16 border border-white/20 mt-10 lg:mt-16 xl:mt-20 animate-fade-in-slow" style={{ animationDelay: '1.0s' }}>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-emerald-800 mb-4 md:mb-6 text-center leading-snug tracking-wide">Share Your Feedback</h2>
-            <p className="text-lg md:text-xl text-emerald-700 mb-8 md:mb-10 text-center max-w-2xl mx-auto leading-relaxed">
-              We'd love to hear your thoughts and suggestions to help us improve Calmana.
-            </p>
-
-            <form className="space-y-6 md:space-y-8 max-w-xl mx-auto">
-              <div>
-                <label htmlFor="feedback-name" className="block text-emerald-700 text-base md:text-lg font-medium mb-2 leading-normal">Your Name</label>
-                <input
-                  type="text"
-                  id="feedback-name"
-                  name="name"
-                  className="w-full p-3 md:p-4 border border-white/30 rounded-lg bg-white/10 text-emerald-800 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-colors duration-200 leading-normal"
-                  placeholder="Enter your name"
-                />
-              </div>
-              <div>
-                <label htmlFor="feedback-email" className="block text-emerald-700 text-base md:text-lg font-medium mb-2 leading-normal">Your Email</label>
-                <input
-                  type="email"
-                  id="feedback-email"
-                  name="email"
-                  className="w-full p-3 md:p-4 border border-white/30 rounded-lg bg-white/10 text-emerald-800 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg transition-colors duration-200 leading-normal"
-                  placeholder="name@example.com"
-                />
-              </div>
-              <div>
-                <label htmlFor="feedback-message" className="block text-emerald-700 text-base md:text-lg font-medium mb-2 leading-normal">Your Message</label>
-                <textarea
-                  id="feedback-message"
-                  name="message"
-                  rows="5"
-                  className="w-full p-3 md:p-4 border border-white/30 rounded-lg bg-white/10 text-emerald-800 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base md:text-lg resize-y transition-colors duration-200 leading-normal"
-                  placeholder="Type your feedback here..."
-                ></textarea>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-emerald-600 text-white font-semibold py-2.5 lg:py-3 xl:py-4 px-5 lg:px-6 xl:px-7 rounded-md shadow-md hover:shadow-lg transition-all duration-300 text-base lg:text-lg xl:text-xl hover:brightness-110">
-                <span>Send Feedback</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </button>
-
-              {/* NEW: Meet the Developers Button */}
-              <button
-                type="button" // Use type="button" to prevent form submission
-                onClick={() => navigate('/developers')}
-                className="w-full bg-pink-600 text-white font-semibold py-2.5 lg:py-3 xl:py-4 px-5 lg:px-6 xl:px-7 rounded-md shadow-md hover:shadow-lg transition-all duration-300 text-base lg:text-lg xl:text-xl hover:brightness-110 mt-4"> {/* Added mt-4 for spacing */}
-                <span>Meet the Developers</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h-2v-2a4 4 0 00-8 0v2H7a3 3 0 00-3 3v1a1 1 0 001 1h14a1 1 0 001-1v-1a3 3 0 00-3-3zM7 4a3 3 0 116 0A3 3 0 017 4z" />
-                </svg>
-              </button>
-            </form>
-          </section> {/* End of Share Your Feedback Section */}
-
+            {/* Meet Developers Section */}
+            <section
+              className="bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-transform duration-300 p-8 flex flex-col justify-center items-center border border-white/20 cursor-pointer animate-fade-in-up min-h-[160px]"
+              style={{ animationDelay: '1.1s' }}
+              onClick={() => navigate('/developers')}
+            >
+              <h3 className="text-3xl font-bold text-emerald-800 mb-3 flex items-center justify-center leading-snug">
+                <span className="text-4xl mr-3 text-emerald-600">👩‍💻</span> Meet Developers
+              </h3>
+              <p className="text-emerald-700 text-center text-lg leading-relaxed max-w-sm">
+                Get to know the passionate team behind Calmana’s journey to your inner peace.
+              </p>
+            </section>
+          </div>
         </main>
       </div>
 
-      {/* Optional Footer */}
-      <footer className="mt-12 text-center text-emerald-700 text-sm lg:text-base xl:text-lg opacity-90 leading-relaxed animate-fade-in-slow" style={{ animationDelay: '1.2s' }}>
+      {/* Footer */}
+      <footer
+        className="mt-16 text-center text-emerald-700 text-base opacity-90 leading-relaxed animate-fade-in-slow"
+        style={{ animationDelay: '1.2s' }}
+      >
         &copy; {new Date().getFullYear()} Calmana. Your journey to inner peace begins here.
       </footer>
     </div>
   );
-}
+};
 
 export default Dashboard;

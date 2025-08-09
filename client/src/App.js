@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 
 import Home from './pages/Home';
 import Dashboard from './components/Dashboard';
-import Feedback from './components/Feedback';
+import Feedback from './components/Feedback';        // <-- Feedback component imported
 import MoodTracker from './components/MoodTracker';
 import MoodSender from './components/MoodSender';
 import CommunityFeed from './components/CommunityFeed';
@@ -18,12 +18,12 @@ import BookTherapy from './pages/booktherapy';
 import FindDoctors from './pages/finddoctors';
 import FAQ from './pages/FAQ';
 import StartSession from './pages/StartSession';
-import Developers from './pages/developers';
+import Developers from './pages/developers';        // <-- Developers component imported
 import SOSPage from './pages/SOSPage';
 import Resources from './pages/Resources';
 
-// ✅ NEW: Mood Page that displays mood chart and MoodTracker
 import Mood from './pages/mood';
+import DiaryPage from './pages/DiaryPage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -105,6 +105,7 @@ function App() {
           }
         />
 
+        {/* <-- FEEDBACK Route Added Back */}
         <Route
           path="/feedback"
           element={
@@ -196,6 +197,7 @@ function App() {
           }
         />
 
+        {/* <-- DEVELOPERS Route Added Back */}
         <Route
           path="/developers"
           element={
@@ -235,13 +237,27 @@ function App() {
           }
         />
 
-        {/* ✅ NEW MOOD PAGE */}
+        {/* NEW MOOD PAGE */}
         <Route
           path="/mood"
           element={
             isAuthenticated ? (
               <LayoutWrapper>
                 <Mood />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* DiaryPage */}
+        <Route
+          path="/diary"
+          element={
+            isAuthenticated ? (
+              <LayoutWrapper>
+                <DiaryPage />
               </LayoutWrapper>
             ) : (
               <Navigate to="/login" replace />

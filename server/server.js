@@ -1,51 +1,65 @@
+// server.js
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const axios = require("axios"); // Add axios for HTTP requests
+const axios = require("axios");
 require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
-const MONGO_URI = process.env.MONGO_URI || "your-default-mongo-uri";
-const JWT_SECRET = process.env.JWT_SECRET || "your-default-secret";
-const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || "your-default-google-api-key"; // Match .env key name
+const MONGO_URI = process.env.MONGO_URI;
+const JWT_SECRET = process.env.JWT_SECRET;
+const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
-// Middleware
+// --- Middleware ---
 app.use(cors());
-app.use(express.json()); // To parse JSON bodies
+app.use(express.json());
 
 // --- MongoDB Connection ---
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("✅ MongoDB connected"))
-.catch((err) => console.error("❌ MongoDB connection error:", err));
+mongoose
+  .connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err.message);
+    process.exit(1);
+  });
 
-// --- User Schema & Model ---
+// --- User Schema ---
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email:    { type: String, required: true, unique: true },
   password: { type: String, required: true },
 });
-
 const User = mongoose.model("User", userSchema);
 
-// Optional: Make User model globally accessible
-app.locals.User = User;
+// --- Auth Middleware ---
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Access denied" });
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ message: "Invalid token" });
+    req.user = user;
+    next();
+  });
+};
 
 // --- Default Route ---
 app.get("/", (req, res) => {
   res.send("✅ Calmana backend is running!");
 });
 
-// --- Signup Route ---
+// --- Auth Routes ---
+// Signup
 app.post("/api/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required." });
     }
@@ -61,18 +75,22 @@ app.post("/api/signup", async (req, res) => {
 
     const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: "1h" });
 
-    res.status(201).json({ message: "User registered successfully", token, userId: newUser._id });
+    res.status(201).json({
+      message: "User registered successfully",
+      token,
+      userId: newUser._id,
+      username: newUser.username,
+    });
   } catch (err) {
     console.error("Signup error:", err.message);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
-// --- Login Route ---
+// Login
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required." });
     }
@@ -85,47 +103,69 @@ app.post("/api/login", async (req, res) => {
 
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "1h" });
 
-    res.json({ token, userId: user._id });
+    res.json({
+      token,
+      userId: user._id,
+      username: user.username,
+    });
   } catch (err) {
     console.error("Login error:", err.message);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
-// --- Mood Routes ---
-const moodRoutes = require("./routes/mood.routes");
-app.use("/api/moods", moodRoutes);
+// --- Get User Data (Dashboard) ---
+app.get("/api/user", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    console.error("User fetch error:", err.message);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 
-// --- Doctors Search Route ---
+// --- Routes Imports ---
+const moodRoutes = require("./routes/mood.routes");
+const diaryRoutes = require("./routes/diary.routes");
+
+// --- Routes Usage ---
+app.use("/api/moods", moodRoutes);
+app.use("/api/diary", diaryRoutes);
+
+// --- Doctors Search ---
 app.get("/api/doctors", async (req, res) => {
   try {
     const { lat, lng } = req.query;
-
     if (!lat || !lng) {
       return res.status(400).json({ message: "Latitude and longitude are required." });
     }
 
-    const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+    const url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     const params = {
       location: `${lat},${lng}`,
       radius: 5000,
-      type: 'doctor',
-      keyword: 'mental health',
-      key: GOOGLE_API_KEY
+      type: "doctor",
+      keyword: "mental health",
+      key: GOOGLE_API_KEY,
     };
 
     const response = await axios.get(url, { params });
-    const doctors = response.data.results.map(result => ({
+    const doctors = response.data.results.map((result) => ({
       name: result.name,
       address: result.vicinity,
-      rating: result.rating || 'N/A',
-      place_id: result.place_id
+      rating: result.rating || "N/A",
+      place_id: result.place_id,
     }));
 
     res.json(doctors);
   } catch (error) {
-    console.error("Doctors search error:", error.response ? error.response.data : error.message);
-    res.status(500).json({ message: "Error fetching doctors", error: error.response ? error.response.data : error.message });
+    console.error("Doctors search error:", error.response?.data || error.message);
+    res.status(500).json({
+      message: "Error fetching doctors",
+      error: error.response?.data || error.message,
+    });
   }
 });
 
@@ -133,7 +173,3 @@ app.get("/api/doctors", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
-
-console.log("🔑 MONGO_URI:", process.env.MONGO_URI);
-console.log("🔐 JWT_SECRET:", process.env.JWT_SECRET);
-console.log("🌐 GOOGLE_MAPS_API_KEY:", process.env.GOOGLE_MAPS_API_KEY); // Log the correct env variable name
