@@ -1,21 +1,25 @@
 // src/components/developers.jsx
 import React from "react";
 import { FaInstagram, FaLinkedin, FaGithub } from "react-icons/fa";
+import KaushikImage from '../assets/kaushiknarayan.jpg';
+import PrakarshImage from '../assets/prakarshawasthi.jpg';
+
 
 const team = [
   {
     name: "PRAKARSH AWASTHI",
-    role: "Full‑Stack Engineer",
-    img: "",
+    role: "Full‑Stack Developer",
+    // Replace null or empty string below with image import/path when ready
+    img: PrakarshImage,
     links: {
-      instagram: "https://instagram.com/your_handle",
-      linkedin: "https://www.linkedin.com/in/your_handle",
-      github: "https://github.com/your_handle",
+      instagram: "https://www.instagram.com/prakarsh_34/",
+      linkedin: "https://www.linkedin.com/in/prakarsh-awasthi-332614312/",
+      github: "https://github.com/prakarsh34",
     },
   },
   {
     name: "HARDIK SAHNI",
-    role: "Backend Engineer",
+    role: "Full-Stack Developer",
     img: "",
     links: {
       instagram: "https://instagram.com/your_handle",
@@ -25,7 +29,7 @@ const team = [
   },
   {
     name: "DEEKSHA SINGH",
-    role: "Frontend Engineer",
+    role: "AI/ML Developer",
     img: "",
     links: {
       instagram: "https://instagram.com/your_handle",
@@ -35,17 +39,18 @@ const team = [
   },
   {
     name: "KAUSHIK NARAYAN",
-    role: "DevOps & Cloud",
-    img: "",
+    role: "AI/ML Developer",
+    // Replace null or empty string below with image import/path when ready
+    img: KaushikImage,
     links: {
-      instagram: "https://instagram.com/your_handle",
-      linkedin: "https://www.linkedin.com/in/your_handle",
-      github: "https://github.com/your_handle",
+      instagram: "https://www.instagram.com/kaushik_narayan_47/",
+      linkedin: "https://www.linkedin.com/in/kaushik-narayan-90626a325/",
+      github: "https://github.com/AGENT47MARINE",
     },
   },
   {
     name: "PRATYAKSH RANA",
-    role: "Mobile Engineer",
+    role: "Computer Vision Developer",
     img: "",
     links: {
       instagram: "https://instagram.com/your_handle",
@@ -66,54 +71,57 @@ const getInitials = (name) =>
 
 const Card = ({ person }) => {
   return (
-    <div className="group rounded-2xl border border-emerald-800 bg-emerald-950/80 backdrop-blur-sm p-5 shadow-sm hover:shadow-md hover:border-emerald-400 transition-all duration-300">
+    <div className="group rounded-2xl border border-emerald-800 bg-emerald-950/80 backdrop-blur-sm p-6 shadow-md hover:shadow-2xl hover:border-emerald-400 hover:-translate-y-2 hover:bg-emerald-900/80 transition-all duration-300 ease-out flex flex-col items-center justify-between min-h-[280px]">
+
       {/* Avatar */}
-      <div className="mb-4">
+      <div className="mb-5 flex justify-center">
         {person.img ? (
           <img
             src={person.img}
             alt={`${person.name} avatar`}
-            className="h-20 w-20 rounded-xl object-cover ring-1 ring-emerald-800"
+            className="h-20 w-20 rounded-xl object-cover ring-2 ring-emerald-700 group-hover:ring-emerald-400 transition"
             loading="lazy"
           />
         ) : (
-          <div className="h-20 w-20 rounded-xl grid place-items-center ring-1 ring-emerald-800 bg-emerald-900 text-emerald-200 font-semibold">
+          <div className="h-20 w-20 rounded-xl grid place-items-center ring-2 ring-emerald-700 bg-emerald-900 text-emerald-200 font-semibold text-lg group-hover:ring-emerald-400 transition">
             {getInitials(person.name)}
           </div>
         )}
       </div>
 
       {/* Name & Role */}
-      <h3 className="text-base sm:text-lg font-bold text-emerald-100 leading-tight">
-        {person.name}
-      </h3>
-      <p className="text-sm text-emerald-300 mt-1">{person.role}</p>
+      <div className="text-center flex-1">
+        <h3 className="text-lg font-bold text-emerald-100 group-hover:text-white">
+          {person.name}
+        </h3>
+        <p className="text-sm text-emerald-300 mt-1">{person.role}</p>
+      </div>
 
       {/* Socials */}
-      <div className="mt-3 flex items-center gap-3 text-emerald-300">
+      <div className="mt-4 flex items-center justify-center gap-3">
         <a
           href={person.links.instagram}
           target="_blank"
           rel="noreferrer"
-          className="p-1.5 rounded-lg ring-1 ring-emerald-800 hover:ring-emerald-400 hover:bg-emerald-900 transition"
+          className="p-2 rounded-lg ring-1 ring-emerald-800 hover:ring-emerald-400 hover:bg-emerald-900 transition"
         >
-          <FaInstagram className="h-4 w-4" />
+          <FaInstagram className="h-4 w-4 text-emerald-300 hover:text-pink-400 transition" />
         </a>
         <a
           href={person.links.linkedin}
           target="_blank"
           rel="noreferrer"
-          className="p-1.5 rounded-lg ring-1 ring-emerald-800 hover:ring-emerald-400 hover:bg-emerald-900 transition"
+          className="p-2 rounded-lg ring-1 ring-emerald-800 hover:ring-emerald-400 hover:bg-emerald-900 transition"
         >
-          <FaLinkedin className="h-4 w-4" />
+          <FaLinkedin className="h-4 w-4 text-emerald-300 hover:text-blue-400 transition" />
         </a>
         <a
           href={person.links.github}
           target="_blank"
           rel="noreferrer"
-          className="p-1.5 rounded-lg ring-1 ring-emerald-800 hover:ring-emerald-400 hover:bg-emerald-900 transition"
+          className="p-2 rounded-lg ring-1 ring-emerald-800 hover:ring-emerald-400 hover:bg-emerald-900 transition"
         >
-          <FaGithub className="h-4 w-4" />
+          <FaGithub className="h-4 w-4 text-emerald-300 hover:text-white transition" />
         </a>
       </div>
     </div>
@@ -125,24 +133,29 @@ const Developers = () => {
   const secondRow = team.slice(2);
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-950 text-emerald-100">
-      <div className="mx-auto max-w-6xl px-4 md:px-6 lg:px-8 py-10">
-        <header className="mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold">Meet the Developers</h2>
-          <p className="text-emerald-300 mt-1">
+    <section className="min-h-screen bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-950 text-emerald-100 py-12">
+      <div className="mx-auto max-w-6xl px-4 md:px-6 lg:px-8">
+        <header className="mb-10 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-wide">
+            Meet the Developers
+          </h2>
+          <p className="text-emerald-300 mt-2 text-base md:text-lg">
             A dedicated team building with passion.
+          </p>
+          <p className="text-emerald-300 mt-2 text-base md:text-lg">
+            Team Code4Cause
           </p>
         </header>
 
         {/* Row 1: 2 cards */}
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-8 sm:grid-cols-2">
           {firstRow.map((p) => (
             <Card key={p.name} person={p} />
           ))}
         </div>
 
         {/* Row 2: 3 cards */}
-        <div className="mt-6 grid gap-5 sm:grid-cols-3">
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 md:grid-cols-3">
           {secondRow.map((p) => (
             <Card key={p.name} person={p} />
           ))}
