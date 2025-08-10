@@ -19,26 +19,6 @@ export default function Sidebar() {
 
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
-  const NavDiv = ({ to, className, children }) => (
-    <div
-      tabIndex={0}
-      role="button"
-      onClick={() => {
-        navigate(to);
-        if (!isDesktop) setIsMobileMenuOpen(false);
-      }}
-      onKeyPress={(e) => {
-        if (e.key === 'Enter') {
-          navigate(to);
-          if (!isDesktop) setIsMobileMenuOpen(false);
-        }
-      }}
-      className={className}
-    >
-      {children}
-    </div>
-  );
-
   const sections = [
     {
       key: 'chatrooms',
@@ -78,7 +58,9 @@ export default function Sidebar() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
               <div>
-                <p className="text-xs lg:text-sm font-semibold text-emerald-800">New Message from Karen <span className="text-xs text-emerald-600 ml-1">10 min ago</span></p>
+                <p className="text-xs lg:text-sm font-semibold text-emerald-800">
+                  New Message from Karen <span className="text-xs text-emerald-600 ml-1">10 min ago</span>
+                </p>
                 <p className="text-emerald-700 text-xs mt-1">Hey, let’s catch up soon!</p>
               </div>
             </>
@@ -92,7 +74,9 @@ export default function Sidebar() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
               <div>
-                <p className="text-xs lg:text-sm font-semibold text-emerald-800">Community Update <span className="text-xs text-emerald-600 ml-1">1 hour ago</span></p>
+                <p className="text-xs lg:text-sm font-semibold text-emerald-800">
+                  Community Update <span className="text-xs text-emerald-600 ml-1">1 hour ago</span>
+                </p>
                 <p className="text-emerald-700 text-xs mt-1">New mindfulness session added!</p>
               </div>
             </>
@@ -104,7 +88,7 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Hamburger - show only if menu closed on mobile */}
+      {/* Hamburger (mobile only) */}
       {!isDesktop && !isMobileMenuOpen && (
         <button
           onClick={toggleMobileMenu}
@@ -117,7 +101,7 @@ export default function Sidebar() {
         </button>
       )}
 
-      {/* Sidebar - full screen on mobile when open */}
+      {/* Sidebar */}
       <aside
         className={`
           fixed top-0 left-0 h-full bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100
@@ -126,9 +110,8 @@ export default function Sidebar() {
           ${isDesktop ? 'relative sticky top-6 w-full max-w-none rounded-xl shadow-none transform-none' : ''}
           ${!isDesktop && (isMobileMenuOpen ? 'w-full translate-x-0' : '-translate-x-full w-0')}
         `}
-        style={{ animationDelay: '0.2s' }}
       >
-        {/* Close button on mobile */}
+        {/* Close btn (mobile only) */}
         {!isDesktop && (
           <button
             onClick={() => setIsMobileMenuOpen(false)}
@@ -141,25 +124,11 @@ export default function Sidebar() {
 
         <div className="space-y-6 overflow-y-auto h-full pb-10">
           {sections.map(({ key, title, items, icon }) => (
-            <div
-              key={key}
-              className="relative group"
-              onMouseEnter={() => {
-                if (!isDesktop) return;
-                document.getElementById(`${key}-dropdown`)?.classList.remove('max-h-0');
-                document.getElementById(`${key}-dropdown`)?.classList.add('max-h-[500px]');
-              }}
-              onMouseLeave={() => {
-                if (!isDesktop) return;
-                document.getElementById(`${key}-dropdown`)?.classList.add('max-h-0');
-                document.getElementById(`${key}-dropdown`)?.classList.remove('max-h-[500px]');
-              }}
-            >
+            <div key={key} className="relative group">
               <h3 className="text-base lg:text-lg font-bold text-emerald-800 mb-2 flex justify-between items-center cursor-pointer group-hover:text-emerald-700 transition-colors duration-200">
                 {title}
                 <span className="hidden lg:inline"></span>
               </h3>
-
               <div
                 id={`${key}-dropdown`}
                 className={`overflow-hidden transition-all duration-300 ease-in-out
@@ -168,11 +137,14 @@ export default function Sidebar() {
               >
                 <div className="space-y-1">
                   {items.map((item, idx) => {
-                    const labelContent = typeof item.label === 'string' ? (
-                      <span className="text-emerald-700 text-sm lg:text-base font-medium">{item.label}</span>
-                    ) : (
-                      item.label
-                    );
+                    const labelContent = typeof item.label === 'string'
+                      ? <span className="text-emerald-700 text-sm lg:text-base font-medium">{item.label}</span>
+                      : item.label;
+
+                    const handleClick = () => {
+                      navigate(item.to);
+                      if (!isDesktop) setIsMobileMenuOpen(false);
+                    };
 
                     if (key === 'directMessages') {
                       return (
@@ -180,16 +152,8 @@ export default function Sidebar() {
                           key={idx}
                           tabIndex={0}
                           role="button"
-                          onClick={() => {
-                            navigate(item.to);
-                            if (!isDesktop) setIsMobileMenuOpen(false);
-                          }}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              navigate(item.to);
-                              if (!isDesktop) setIsMobileMenuOpen(false);
-                            }
-                          }}
+                          onClick={handleClick}
+                          onKeyPress={(e) => e.key === 'Enter' && handleClick()}
                           className="w-full bg-white/10 rounded-lg p-2 lg:p-3 cursor-pointer hover:bg-white/20 flex items-center shadow-sm hover:shadow-md mb-1 border border-white/20"
                         >
                           <div
@@ -206,16 +170,8 @@ export default function Sidebar() {
                           key={idx}
                           tabIndex={0}
                           role="button"
-                          onClick={() => {
-                            navigate(item.to);
-                            if (!isDesktop) setIsMobileMenuOpen(false);
-                          }}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              navigate(item.to);
-                              if (!isDesktop) setIsMobileMenuOpen(false);
-                            }
-                          }}
+                          onClick={handleClick}
+                          onKeyPress={(e) => e.key === 'Enter' && handleClick()}
                           className="w-full bg-white/10 rounded-lg p-2 lg:p-3 cursor-pointer hover:bg-white/20 flex items-start shadow-sm hover:shadow-md mb-1 border border-white/20"
                         >
                           <div
@@ -234,16 +190,8 @@ export default function Sidebar() {
                           key={idx}
                           tabIndex={0}
                           role="button"
-                          onClick={() => {
-                            navigate(item.to);
-                            if (!isDesktop) setIsMobileMenuOpen(false);
-                          }}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              navigate(item.to);
-                              if (!isDesktop) setIsMobileMenuOpen(false);
-                            }
-                          }}
+                          onClick={handleClick}
+                          onKeyPress={(e) => e.key === 'Enter' && handleClick()}
                           className="w-full bg-white/10 rounded-lg p-2 lg:p-3 cursor-pointer hover:bg-white/20 flex items-center shadow-sm hover:shadow-md mb-1 border border-white/20"
                         >
                           {icon && <span className="text-emerald-400 mr-2 lg:mr-3 text-lg lg:text-xl">{icon}</span>}
@@ -298,7 +246,7 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {/* Overlay backdrop */}
+      {/* Backdrop for mobile */}
       {!isDesktop && isMobileMenuOpen && (
         <div
           onClick={() => setIsMobileMenuOpen(false)}
