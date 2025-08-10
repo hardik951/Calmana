@@ -5,10 +5,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 
 import Home from './pages/Home';
 import Dashboard from './components/Dashboard';
-import Feedback from './components/Feedback';        // <-- Feedback component imported
+import Feedback from './components/Feedback';
 import MoodTracker from './components/MoodTracker';
 import MoodSender from './components/MoodSender';
 import CommunityFeed from './components/CommunityFeed';
+import Community from './pages/community'; // ✅ Import Community page
 import AuthPage from './pages/AuthPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -18,10 +19,9 @@ import BookTherapy from './pages/booktherapy';
 import FindDoctors from './pages/finddoctors';
 import FAQ from './pages/FAQ';
 import StartSession from './pages/StartSession';
-import Developers from './pages/developers';        // <-- Developers component imported
+import Developers from './pages/developers';
 import SOSPage from './pages/SOSPage';
 import Resources from './pages/Resources';
-
 import Mood from './pages/mood';
 import DiaryPage from './pages/DiaryPage';
 
@@ -45,7 +45,6 @@ function App() {
     const location = useLocation();
     const noHeaderPaths = ['/', '/auth', '/login', '/signup'];
     const shouldShowHeader = !noHeaderPaths.includes(location.pathname);
-
     return (
       <>
         {shouldShowHeader && (
@@ -68,201 +67,115 @@ function App() {
         {/* Protected Routes */}
         <Route
           path="/dashboard"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <Dashboard />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><Dashboard /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/mood-tracker"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <MoodTracker />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><MoodTracker /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/mood-sender"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <MoodSender />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><MoodSender /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
-        {/* <-- FEEDBACK Route Added Back */}
         <Route
           path="/feedback"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <Feedback />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><Feedback /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/community-feed"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <CommunityFeed />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><CommunityFeed /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
+        />
+
+        {/* ✅ NEW: Full Community page route */}
+        <Route
+          path="/community"
+          element={isAuthenticated ? (
+            <LayoutWrapper><Community /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/ai-chat"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <AIChatPage />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><AIChatPage /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/book-therapy"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <BookTherapy />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><BookTherapy /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/find-doctors"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <FindDoctors />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><FindDoctors /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/start-session"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <StartSession />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><StartSession /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/faq"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <FAQ />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><FAQ /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
-        {/* <-- DEVELOPERS Route Added Back */}
         <Route
           path="/developers"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <Developers />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><Developers /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/resources"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <Resources />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><Resources /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         <Route
           path="/sos"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <SOSPage />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><SOSPage /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
-        {/* NEW MOOD PAGE */}
         <Route
           path="/mood"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <Mood />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><Mood /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
-        {/* DiaryPage */}
         <Route
           path="/diary"
-          element={
-            isAuthenticated ? (
-              <LayoutWrapper>
-                <DiaryPage />
-              </LayoutWrapper>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={isAuthenticated ? (
+            <LayoutWrapper><DiaryPage /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
 
         {/* Catch-All */}
