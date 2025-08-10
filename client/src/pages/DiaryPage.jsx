@@ -9,24 +9,22 @@ const DiaryPage = () => {
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
 
-  const userId = localStorage.getItem("userId");
   const API_BASE = "http://localhost:5001/api";
 
+  // Fetch all diary entries
   useEffect(() => {
     const fetchEntries = async () => {
-      if (!userId) return;
       setLoading(true);
       setError(null);
 
       try {
-        const { data } = await axios.get(`${API_BASE}/diary/${userId}`);
-        setEntries(data);
+        const token = localStorage.getItem("token");
+        const { data } = await axios.get(`${API_BASE}/diary`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setEntries(data.diaries || []);
       } catch (err) {
-        if (axios.isAxiosError && axios.isAxiosError(err)) {
-          console.error(err.response?.data || err.message);
-        } else {
-          console.error(err);
-        }
+        console.error("Fetch error:", err.response?.data || err.message);
         setError("Failed to load diary entries.");
       } finally {
         setLoading(false);
@@ -34,41 +32,45 @@ const DiaryPage = () => {
     };
 
     fetchEntries();
-  }, [userId]);
+  }, []);
 
+  // Save a new diary entry
   const saveEntry = async () => {
-    if (!newEntry.trim() || !userId) return;
+    if (!newEntry.trim()) return;
 
-    const entryData = {
+    const optimisticEntry = {
       date: new Date().toISOString(),
-      content: newEntry.trim(),
+      content: newEntry.trim()
     };
 
     setSaving(true);
     setError(null);
     setSuccessMsg(null);
 
-    // Optimistic update
-    setEntries((prev) => [entryData, ...prev]);
+    // Optimistic UI update
+    setEntries((prev) => [optimisticEntry, ...prev]);
     setNewEntry("");
 
     try {
-      const { data } = await axios.post(`${API_BASE}/diary/add`, {
-        userId,
-        content: entryData.content,
-        date: entryData.date,
-      });
+      const token = localStorage.getItem("token");
+      const { data } = await axios.post(
+        `${API_BASE}/diary/add`,
+        { content: optimisticEntry.content },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      // Replace optimistic entry with saved one from backend
-      setEntries((prev) => [data, ...prev.slice(1)]);
-      setSuccessMsg("Entry saved successfully!");
-      setTimeout(() => setSuccessMsg(null), 3000);
+      if (data.success) {
+        setEntries((prev) => [data.diary, ...prev.slice(1)]);
+        setSuccessMsg("Entry saved successfully!");
+        setTimeout(() => setSuccessMsg(null), 3000);
+      } else {
+        throw new Error(data.message || "Save failed");
+      }
     } catch (err) {
-      console.error("Error saving diary entry:", err);
+      console.error("Save error:", err.response?.data || err.message);
       setError("Failed to save entry.");
-      // Rollback optimistic update
-      setEntries((prev) => prev.slice(1));
-      setNewEntry(entryData.content);
+      setEntries((prev) => prev.slice(1)); // rollback
+      setNewEntry(optimisticEntry.content);
     } finally {
       setSaving(false);
     }
@@ -80,15 +82,8 @@ const DiaryPage = () => {
         📔 Personal Diary
       </h1>
 
-      {error && (
-        <div className="bg-red-100 text-red-700 p-2 rounded mb-3 text-sm">{error}</div>
-      )}
-
-      {successMsg && (
-        <div className="bg-green-100 text-green-700 p-2 rounded mb-3 text-sm">
-          {successMsg}
-        </div>
-      )}
+      {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-3 text-sm">{error}</div>}
+      {successMsg && <div className="bg-green-100 text-green-700 p-2 rounded mb-3 text-sm">{successMsg}</div>}
 
       <textarea
         className="w-full p-4 border rounded-lg bg-white/70 focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -116,7 +111,7 @@ const DiaryPage = () => {
         {!loading && entries.length > 0 ? (
           entries.map((entry, index) => (
             <div
-              key={entry.date + index}
+              key={(entry._id || entry.date) + index}
               className="bg-white/80 rounded-lg p-4 shadow border-l-4 border-emerald-500"
             >
               <p className="text-sm text-gray-500">

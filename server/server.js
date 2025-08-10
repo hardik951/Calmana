@@ -7,29 +7,29 @@ const jwt = require("jsonwebtoken");
 const axios = require("axios");
 require("dotenv").config();
 
+// App setup
 const app = express();
 const PORT = process.env.PORT || 5001;
 const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
 const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
-// --- Middleware ---
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// --- MongoDB Connection ---
-mongoose
-  .connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => {
+// MongoDB Connection
+(async () => {
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.log("✅ MongoDB connected");
+  } catch (err) {
     console.error("❌ MongoDB connection error:", err.message);
     process.exit(1);
-  });
+  }
+})();
 
-// --- User Schema ---
+// User Schema & Model
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email:    { type: String, required: true, unique: true },
@@ -37,37 +37,38 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", userSchema);
 
-// --- Auth Middleware ---
+// Auth Middleware (can be moved to ./middleware/auth.js)
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Access denied" });
+  if (!token)
+    return res.status(401).json({ message: "Access denied. No token provided." });
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ message: "Invalid token" });
-    req.user = user;
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err)
+      return res.status(403).json({ message: "Invalid or expired token." });
+    req.user = decoded; // contains userId
     next();
   });
 };
 
-// --- Default Route ---
+// Default API Route
 app.get("/", (req, res) => {
   res.send("✅ Calmana backend is running!");
 });
 
-// --- Auth Routes ---
+// ===== AUTH ROUTES =====
+
 // Signup
 app.post("/api/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    if (!username || !email || !password) {
+    if (!username || !email || !password)
       return res.status(400).json({ message: "All fields are required." });
-    }
 
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    if (existingUser)
       return res.status(400).json({ message: "User already exists." });
-    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ username, email, password: hashedPassword });
@@ -91,9 +92,8 @@ app.post("/api/signup", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
+    if (!email || !password)
       return res.status(400).json({ message: "All fields are required." });
-    }
 
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials." });
@@ -114,7 +114,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// --- Get User Data (Dashboard) ---
+// Get Logged-In User
 app.get("/api/user", authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select("-password");
@@ -126,21 +126,20 @@ app.get("/api/user", authenticateToken, async (req, res) => {
   }
 });
 
-// --- Routes Imports ---
+// ===== ROUTES IMPORTS =====
 const moodRoutes = require("./routes/mood.routes");
 const diaryRoutes = require("./routes/diary.routes");
 
-// --- Routes Usage ---
+// ===== USE ROUTES =====
 app.use("/api/moods", moodRoutes);
 app.use("/api/diary", diaryRoutes);
 
-// --- Doctors Search ---
+// ===== DOCTOR SEARCH =====
 app.get("/api/doctors", async (req, res) => {
   try {
     const { lat, lng } = req.query;
-    if (!lat || !lng) {
+    if (!lat || !lng)
       return res.status(400).json({ message: "Latitude and longitude are required." });
-    }
 
     const url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     const params = {
@@ -169,7 +168,7 @@ app.get("/api/doctors", async (req, res) => {
   }
 });
 
-// --- Start Server ---
+// ===== START SERVER =====
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

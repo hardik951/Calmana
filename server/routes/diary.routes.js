@@ -1,3 +1,4 @@
+// routes/diary.routes.js
 const express = require("express");
 const mongoose = require("mongoose");
 const Diary = require("../models/diary.model");
@@ -5,26 +6,27 @@ const { authenticateToken } = require("../middleware/auth");
 
 const router = express.Router();
 
-// Add a new diary entry
+/**
+ * POST /api/diary/add - Add a new diary entry
+ */
 router.post("/add", authenticateToken, async (req, res) => {
   try {
-    const { userId, title, content } = req.body;
+    const { title, content } = req.body;
+    const userId = req.user.userId; // From JWT token
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ success: false, message: "Invalid userId" });
-    }
-    if (req.user.userId !== userId) {
-      return res.status(403).json({ success: false, message: "Access denied" });
+      return res.status(400).json({ success: false, message: "Invalid user ID" });
     }
     if (!content || content.trim() === "") {
       return res.status(400).json({ success: false, message: "Content is required" });
     }
 
+    // Fix: Use `new` to create ObjectId explicitly
     const newDiary = new Diary({
-      userId: mongoose.Types.ObjectId(userId),
+      userId: new mongoose.Types.ObjectId(userId),
       title: title || "",
-      content,
-      date: new Date(),
+      content: content.trim(),
+      date: new Date()
     });
 
     await newDiary.save();
@@ -35,18 +37,12 @@ router.post("/add", authenticateToken, async (req, res) => {
   }
 });
 
-// Get all diary entries for a user
-router.get("/:userId", authenticateToken, async (req, res) => {
+/**
+ * GET /api/diary - Fetch all diary entries for logged-in user
+ */
+router.get("/", authenticateToken, async (req, res) => {
   try {
-    const { userId } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ success: false, message: "Invalid userId" });
-    }
-    if (req.user.userId !== userId) {
-      return res.status(403).json({ success: false, message: "Access denied" });
-    }
-
+    const userId = req.user.userId;
     const diaries = await Diary.find({ userId }).sort({ date: -1 });
     res.json({ success: true, diaries });
   } catch (err) {

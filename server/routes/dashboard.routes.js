@@ -5,26 +5,28 @@ import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/:userId", verifyToken, async (req, res) => {
+/**
+ * GET /api/feed
+ * Returns latest moods + diary entries for the logged-in user
+ */
+router.get("/", verifyToken, async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user.userId; // from JWT
 
-    // Security check: userId in token must match param userId
-    if (req.user.userId !== userId) {
-      return res.status(403).json({ success: false, message: "Access denied" });
-    }
-
+    // Fetch last 5 moods
     const moods = await Mood.find({ userId })
-      .sort({ timestamp: -1 }) // use timestamp for moods
+      .sort({ timestamp: -1 })
       .limit(5);
 
+    // Fetch last 5 diary entries
     const diaries = await Diary.find({ userId })
-      .sort({ date: -1 }) // use date for diaries
+      .sort({ date: -1 })
       .limit(5);
 
     res.json({ success: true, moods, diaries });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error("Feed fetch error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
