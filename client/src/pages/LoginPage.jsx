@@ -19,7 +19,7 @@ export default function LoginPage({ onLogin }) {
       const response = await fetch('http://localhost:5001/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, userType }), // include userType if needed in backend
+        body: JSON.stringify({ email, password, userType }),
       });
 
       const data = await response.json();
@@ -33,7 +33,8 @@ export default function LoginPage({ onLogin }) {
 
       if (onLogin) onLogin();
 
-      navigate('/dashboard');
+      const destination = userType === 'doctor' ? '/doctor-dashboard' : '/dashboard';
+      navigate(destination);
     } catch (err) {
       console.error('Login error:', err.message);
       setError(err.message || 'Failed to connect to the server.');
@@ -106,9 +107,28 @@ export default function LoginPage({ onLogin }) {
           </button>
         </form>
 
+        <form onSubmit={handleSubmit} className="space-y-6"></form>
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              console.log('Navigating to /doctor-dashboard');
+              localStorage.setItem('isAuthenticated', 'true');
+              navigate('/doctor-dashboard');
+            }}
+            className="w-full mt-3 bg-gray-300 text-gray-800 py-3 rounded-full font-semibold hover:bg-gray-400 transition-all"
+          >
+            🚀 For Development Dashboard
+          </button>
+        )}
+
         <p className="mt-6 text-center text-emerald-700">
           Don't have an account?{' '}
-          <button onClick={() => navigate('/signup')} className="text-emerald-600 hover:underline font-medium">
+          <button
+            onClick={() => navigate('/signup')}
+            className="text-emerald-600 hover:underline font-medium"
+          >
             Sign Up
           </button>
         </p>

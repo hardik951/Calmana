@@ -1,6 +1,4 @@
-// src/App.js
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import Home from './pages/Home';
@@ -9,7 +7,7 @@ import Feedback from './components/Feedback';
 import MoodTracker from './components/MoodTracker';
 import MoodSender from './components/MoodSender';
 import CommunityFeed from './components/CommunityFeed';
-import Community from './pages/community'; // ✅ Import Community page
+import Community from './pages/community';
 import AuthPage from './pages/AuthPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -24,21 +22,49 @@ import SOSPage from './pages/SOSPage';
 import Resources from './pages/Resources';
 import Mood from './pages/mood';
 import DiaryPage from './pages/DiaryPage';
+import DoctorDashboard from './pages/DoctorDashboard';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     const stored = localStorage.getItem('isAuthenticated');
+    console.log('Initial isAuthenticated:', stored === 'true');
     return stored === 'true';
   });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const stored = localStorage.getItem('isAuthenticated') === 'true';
+      console.log('Storage change detected, isAuthenticated should be:', stored);
+      if (isAuthenticated !== stored) {
+        setIsAuthenticated(stored);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    // Add a periodic check to ensure sync
+    const interval = setInterval(() => {
+      const stored = localStorage.getItem('isAuthenticated') === 'true';
+      if (isAuthenticated !== stored) {
+        console.log('Periodic sync, isAuthenticated updated to:', stored);
+        setIsAuthenticated(stored);
+      }
+    }, 1000); // Check every second
+    handleStorageChange(); // Initial check
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [isAuthenticated]); // Keep dependency to react to state changes
 
   const handleLogin = () => {
     setIsAuthenticated(true);
     localStorage.setItem('isAuthenticated', 'true');
+    console.log('Logged in, isAuthenticated set to true');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.setItem('isAuthenticated', 'false');
+    console.log('Logged out, isAuthenticated set to false');
   };
 
   const LayoutWrapper = ({ children }) => {
@@ -58,17 +84,22 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/signup" element={<SignupPage onLogin={handleLogin} />} />
 
-        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={isAuthenticated ? (
             <LayoutWrapper><Dashboard /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
+        />
+
+        <Route
+          path="/doctor-dashboard"
+          element={isAuthenticated ? (
+            <DoctorDashboard />
           ) : <Navigate to="/login" replace />}
         />
 
@@ -100,7 +131,6 @@ function App() {
           ) : <Navigate to="/login" replace />}
         />
 
-        {/* ✅ NEW: Full Community page route */}
         <Route
           path="/community"
           element={isAuthenticated ? (
@@ -178,7 +208,6 @@ function App() {
           ) : <Navigate to="/login" replace />}
         />
 
-        {/* Catch-All */}
         <Route
           path="*"
           element={<Navigate to={isAuthenticated ? '/dashboard' : '/'} replace />}
