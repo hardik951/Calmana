@@ -1,96 +1,101 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { 
-  Users, 
-  Calendar, 
-  MessageSquare, 
-  FileText, 
+import React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  Users,
+  Calendar,
+  MessageSquare,
+  FileText,
   TrendingUp,
   Activity,
   AlertCircle,
   Video,
   Send,
-  LayoutDashboard
-} from 'lucide-react';
+  LayoutDashboard,
+  Search,
+  MessageCircle,
+  Bell,
+  ChevronDown,
+} from "lucide-react";
+import { QuickInsights } from "./QuickInsights";
 
 const statsCards = [
   {
-    title: 'Total Patients',
-    value: '234',
+    title: "Total Patients",
+    value: "234",
     icon: Users,
-    change: '+12%',
-    changeType: 'positive',
+    change: "+12%",
+    changeType: "positive",
   },
   {
-    title: 'Appointments Today',
-    value: '8',
+    title: "Appointments Today",
+    value: "8",
     icon: Calendar,
-    change: '+2',
-    changeType: 'positive',
+    change: "+2",
+    changeType: "positive",
   },
   {
-    title: 'Unread Messages',
-    value: '15',
+    title: "Unread Messages",
+    value: "15",
     icon: MessageSquare,
-    change: '+5',
-    changeType: 'neutral',
+    change: "+5",
+    changeType: "neutral",
   },
   {
-    title: 'Pending Reports',
-    value: '7',
+    title: "Pending Reports",
+    value: "7",
     icon: FileText,
-    change: '-3',
-    changeType: 'positive',
+    change: "-3",
+    changeType: "positive",
   },
 ];
 
 const upcomingAppointments = [
   {
     id: 1,
-    patient: 'Emma Wilson',
-    time: '10:30 AM',
-    type: 'Follow-up',
-    avatar: '/api/placeholder/32/32',
+    patient: "Emma Wilson",
+    time: "10:30 AM",
+    type: "Follow-up",
+    avatar: "/api/placeholder/32/32",
   },
   {
     id: 2,
-    patient: 'Michael Chen',
-    time: '11:45 AM',
-    type: 'Initial Consultation',
-    avatar: '/api/placeholder/32/32',
+    patient: "Michael Chen",
+    time: "11:45 AM",
+    type: "Initial Consultation",
+    avatar: "/api/placeholder/32/32",
   },
   {
     id: 3,
-    patient: 'Sarah Davis',
-    time: '2:15 PM',
-    type: 'Therapy Session',
-    avatar: '/api/placeholder/32/32',
+    patient: "Sarah Davis",
+    time: "2:15 PM",
+    type: "Therapy Session",
+    avatar: "/api/placeholder/32/32",
   },
 ];
 
 const recentMessages = [
   {
     id: 1,
-    patient: 'John Smith',
-    message: 'Thank you for the session yesterday. I feel much better...',
-    time: '2 min ago',
+    patient: "John Smith",
+    message: "Thank you for the session yesterday. I feel much better...",
+    time: "2 min ago",
     unread: true,
   },
   {
     id: 2,
-    patient: 'Lisa Johnson',
-    message: 'Could we reschedule tomorrow\'s appointment?',
-    time: '15 min ago',
+    patient: "Lisa Johnson",
+    message: "Could we reschedule tomorrow's appointment?",
+    time: "15 min ago",
     unread: true,
   },
   {
     id: 3,
-    patient: 'David Brown',
-    message: 'The medication is working well. No side effects so far.',
-    time: '1 hr ago',
+    patient: "David Brown",
+    message: "The medication is working well. No side effects so far.",
+    time: "1 hr ago",
     unread: false,
   },
 ];
@@ -98,40 +103,82 @@ const recentMessages = [
 const pendingReports = [
   {
     id: 1,
-    patient: 'Alice Cooper',
-    type: 'Lab Results',
-    date: 'Today',
-    priority: 'high',
+    patient: "Alice Cooper",
+    type: "Lab Results",
+    date: "Today",
+    priority: "high",
   },
   {
     id: 2,
-    patient: 'Bob Wilson',
-    type: 'Psychological Assessment',
-    date: 'Yesterday',
-    priority: 'medium',
+    patient: "Bob Wilson",
+    type: "Psychological Assessment",
+    date: "Yesterday",
+    priority: "medium",
   },
   {
     id: 3,
-    patient: 'Carol Martinez',
-    type: 'Progress Report',
-    date: '2 days ago',
-    priority: 'low',
+    patient: "Carol Martinez",
+    type: "Progress Report",
+    date: "2 days ago",
+    priority: "low",
   },
 ];
 
-export function DoctorDashboardContent() {
+export function DoctorDashboardContent({ isSidebarOpen }) {
   return (
-    <div className="min-h-screen bg-gradient-to-r from-green-100 via-pink-100 to-green-200 p-6 space-y-6 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-r from-green-100 via-pink-100 to-green-200 p-4 space-y-4 overflow-auto w-full">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center w-full gap-6">
+        {!isSidebarOpen && (
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center text-white">
+              <span className="text-xl">⚕️</span>
+            </div>
+            <h1 className="font-bold text-xl text-green-800">Calmana</h1>
+          </div>
+        )}
+        <div className="flex-1 max-w-xl">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search patients, appointments..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-full bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent text-gray-800 placeholder-gray-500"
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-6">
+          <div className="relative">
+            <MessageCircle className="w-6 h-6 text-gray-600" />
+            <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[1.25rem] text-center">3</span>
+          </div>
+          <div className="relative">
+            <Bell className="w-6 h-6 text-gray-600" />
+            <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[1.25rem] text-center">5</span>
+          </div>
+          <div className="flex items-center gap-2 cursor-pointer">
+            <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-green-800 font-bold text-sm">
+              DS
+            </div>
+            <div className="hidden md:block">
+              <p className="font-semibold text-gray-800 text-sm">Dr. Smith</p>
+              <p className="text-xs text-gray-500">Psychiatrist</p>
+            </div>
+            <ChevronDown className="w-4 h-4 text-gray-600" />
+          </div>
+        </div>
+      </div>
+
+      {/* Dashboard Overview */}
+      <div className="flex items-center justify-between mt-2 w-full">
         <div>
-          <h1 className="text-3xl font-bold text-green-800 flex items-center gap-2">
+          <h2 className="text-3xl font-bold text-green-800 flex items-center gap-2">
             <LayoutDashboard className="w-8 h-8 text-green-800" />
             Dashboard Overview
-          </h1>
+          </h2>
           <p className="text-green-600 mt-1">Welcome back, Dr. Sarah Johnson</p>
         </div>
-        <div className="flex gap-3">
+        <div>
           <Button className="bg-green-700 text-white hover:bg-green-800">
             <Activity className="w-4 h-4 mr-2" />
             Start Session
@@ -140,8 +187,8 @@ export function DoctorDashboardContent() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statsCards.map((stat, index) => (
+      <div className="grid grid-cols-2 gap-6 w-full">
+        {statsCards.map((stat) => (
           <Card key={stat.title} className="bg-white/80 backdrop-blur-sm border-green-200 hover:shadow-md transition-all duration-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -166,7 +213,7 @@ export function DoctorDashboardContent() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 w-full">
         {/* Upcoming Appointments */}
         <Card className="bg-white/80 backdrop-blur-sm border-green-200">
           <CardHeader>
@@ -181,7 +228,9 @@ export function DoctorDashboardContent() {
               <div key={appointment.id} className="flex items-center gap-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
                 <Avatar className="w-10 h-10">
                   <AvatarImage src={appointment.avatar} alt={appointment.patient} />
-                  <AvatarFallback className="text-green-800">{appointment.patient.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  <AvatarFallback className="text-green-800">
+                    {appointment.patient.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
                   <p className="font-semibold text-sm text-green-800">{appointment.patient}</p>
@@ -202,7 +251,6 @@ export function DoctorDashboardContent() {
             </Button>
           </CardContent>
         </Card>
-
         {/* Recent Messages */}
         <Card className="bg-white/80 backdrop-blur-sm border-green-200">
           <CardHeader>
@@ -216,7 +264,9 @@ export function DoctorDashboardContent() {
             {recentMessages.map((message) => (
               <div key={message.id} className="flex items-start gap-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
                 <Avatar className="w-8 h-8">
-                  <AvatarFallback className="text-green-800">{message.patient.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  <AvatarFallback className="text-green-800">
+                    {message.patient.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -234,7 +284,6 @@ export function DoctorDashboardContent() {
             </Button>
           </CardContent>
         </Card>
-
         {/* Pending Reports */}
         <Card className="bg-white/80 backdrop-blur-sm border-green-200">
           <CardHeader>
@@ -253,13 +302,13 @@ export function DoctorDashboardContent() {
                   <p className="text-xs text-green-600">{report.date}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge 
-                    variant={report.priority === 'high' ? 'destructive' : report.priority === 'medium' ? 'default' : 'secondary'}
+                  <Badge
+                    variant={report.priority === "high" ? "destructive" : report.priority === "medium" ? "default" : "secondary"}
                     className="text-xs"
                   >
                     {report.priority}
                   </Badge>
-                  {report.priority === 'high' && <AlertCircle className="w-4 h-4 text-red-500" />}
+                  {report.priority === "high" && <AlertCircle className="w-4 h-4 text-red-500" />}
                 </div>
               </div>
             ))}
@@ -271,33 +320,12 @@ export function DoctorDashboardContent() {
         </Card>
       </div>
 
-      {/* Quick Actions Section */}
-      <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-        <CardHeader>
-          <CardTitle className="text-green-800">Quick Actions</CardTitle>
-          <CardDescription className="text-green-600">Frequently used actions for efficient workflow</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-20 flex-col gap-2 border-green-200 hover:bg-green-100 text-green-700">
-              <Activity className="w-6 h-6 text-green-700" />
-              <span className="text-sm">Start Session</span>
-            </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2 border-green-200 hover:bg-green-100 text-green-700">
-              <MessageSquare className="w-6 h-6 text-green-700" />
-              <span className="text-sm">Send Message</span>
-            </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2 border-green-200 hover:bg-green-100 text-green-700">
-              <Calendar className="w-6 h-6 text-green-700" />
-              <span className="text-sm">Schedule Appointment</span>
-            </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2 border-green-200 hover:bg-green-100 text-green-700">
-              <FileText className="w-6 h-6 text-green-700" />
-              <span className="text-sm">Create Report</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Quick Insights Section */}
+      <QuickInsights
+        patientEngagement={{ value: "92%", change: "+5%" }}
+        avgSessionTime={{ value: "45min", note: "Within target range" }}
+        satisfactionRate={{ value: "4.8/5", note: "Based on 500 reviews" }}
+      />
     </div>
   );
 }
