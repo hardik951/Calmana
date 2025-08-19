@@ -1,4 +1,3 @@
-pip install openai flask flask-cors python-dotenv
-
-pip install --upgrade openai
-
+cd backend
+pip install -r requirements.txt
+python app.py
