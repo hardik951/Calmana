@@ -1,10 +1,15 @@
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
-  Users,
   Calendar,
   MessageSquare,
   FileText,
@@ -15,17 +20,20 @@ import {
   Send,
   LayoutDashboard,
   Search,
-  MessageCircle,
   Bell,
   ChevronDown,
 } from "lucide-react";
 import { QuickInsights } from "./QuickInsights";
 
+// Optional: Your image asset path
+import YogaImage from "../assets/calmanayogaimg.png";
+
+// Data arrays for stats, appointments, messages, reports
 const statsCards = [
   {
     title: "Total Patients",
     value: "234",
-    icon: Users,
+    icon: require("lucide-react").Users,
     change: "+12%",
     changeType: "positive",
   },
@@ -124,11 +132,49 @@ const pendingReports = [
   },
 ];
 
-export function DoctorDashboardContent({ isSidebarOpen }) {
+// Welcome banner component
+function WelcomeBanner({ onStart }) {
   return (
-    <div className="min-h-screen bg-gradient-to-r from-green-100 via-pink-100 to-green-200 p-4 space-y-4 overflow-auto w-full">
+    <section className="w-full rounded-2xl bg-white/80 shadow-lg flex flex-col md:flex-row items-center justify-between px-10 py-8 mb-8 animate-fade-in-up">
+      <div className="flex-1">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-green-800 mb-4">
+          Calmana – <span className="text-green-600">Your Space for Peace</span>
+        </h2>
+        <p className="text-green-700 text-lg mb-6 max-w-xl">
+          Calmana is here to help you relax, refocus, and renew. Start a calming session whenever you need a moment of peace.
+        </p>
+        <button
+          onClick={onStart}
+          className="bg-green-600 text-white px-8 py-3 rounded-full font-semibold shadow hover:bg-green-700 transition"
+        >
+          Start Session
+        </button>
+      </div>
+      <div className="flex-shrink-0 mt-6 md:mt-0 md:ml-10 w-36 h-36 md:w-48 md:h-48 flex items-center justify-center">
+        <img
+          src={YogaImage}
+          alt="Yoga Emote"
+          className="w-full h-full object-contain"
+          draggable={false}
+        />
+      </div>
+    </section>
+  );
+}
+
+export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
+  return (
+    <div
+      className="
+        min-h-screen
+        bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100
+        bg-[length:300%_300%]
+        animate-gradient-green-pink-shift
+        p-8 space-y-10 w-full overflow-x-hidden
+      "
+    >
       {/* Header */}
-      <div className="flex items-center w-full gap-6">
+      <header className="sticky top-0 z-10 bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 px-4 py-3 rounded-lg flex items-center justify-between shadow-sm mb-6">
         {!isSidebarOpen && (
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center text-white">
@@ -137,195 +183,220 @@ export function DoctorDashboardContent({ isSidebarOpen }) {
             <h1 className="font-bold text-xl text-green-800">Calmana</h1>
           </div>
         )}
-        <div className="flex-1 max-w-xl">
+        <div className="flex-1 max-w-lg mx-6">
+          {/* Search Field */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               placeholder="Search patients, appointments..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-full bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent text-gray-800 placeholder-gray-500"
+              className="w-full rounded-full border border-gray-300 bg-white px-10 py-2 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent"
             />
           </div>
         </div>
-        <div className="flex items-center gap-6">
-          <div className="relative">
-            <MessageCircle className="w-6 h-6 text-gray-600" />
-            <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[1.25rem] text-center">3</span>
-          </div>
-          <div className="relative">
-            <Bell className="w-6 h-6 text-gray-600" />
-            <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[1.25rem] text-center">5</span>
-          </div>
-          <div className="flex items-center gap-2 cursor-pointer">
-            <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-green-800 font-bold text-sm">
+        <div className="flex items-center gap-5">
+          <MessageSquare className="relative w-5 h-5 text-gray-600">
+            <span className="absolute -top-1 -right-1 rounded-full bg-red-500 px-1.5 py-0.5 text-xs font-bold text-white min-w-[1.25rem] text-center">
+              3
+            </span>
+          </MessageSquare>
+          <Bell className="relative w-5 h-5 text-gray-600">
+            <span className="absolute -top-1 -right-1 rounded-full bg-red-500 px-1.5 py-0.5 text-xs font-bold text-white min-w-[1.25rem] text-center">
+              5
+            </span>
+          </Bell>
+          <div className="flex cursor-pointer items-center gap-2 select-none">
+            <div className="rounded-full bg-green-200 px-2 py-1 text-xs font-bold text-green-800">
               DS
             </div>
             <div className="hidden md:block">
-              <p className="font-semibold text-gray-800 text-sm">Dr. Smith</p>
-              <p className="text-xs text-gray-500">Psychiatrist</p>
+              <div className="text-xs font-semibold text-gray-900">Dr. Smith</div>
+              <div className="text-xs text-gray-500">Psychiatrist</div>
             </div>
-            <ChevronDown className="w-4 h-4 text-gray-600" />
+            <ChevronDown className="w-3 h-3 text-gray-600" />
           </div>
         </div>
-      </div>
+      </header>
+
+      {/* Welcome Banner */}
+      <WelcomeBanner onStart={onStartSession} />
 
       {/* Dashboard Overview */}
-      <div className="flex items-center justify-between mt-2 w-full">
+      <section className="flex flex-col md:flex-row justify-between gap-8">
         <div>
-          <h2 className="text-3xl font-bold text-green-800 flex items-center gap-2">
-            <LayoutDashboard className="w-8 h-8 text-green-800" />
+          <h2 className="flex items-center gap-3 text-4xl font-extrabold text-green-800">
+            <LayoutDashboard className="h-10 w-10 text-green-700" />
             Dashboard Overview
           </h2>
-          <p className="text-green-600 mt-1">Welcome back, Dr. Sarah Johnson</p>
+          <p className="mt-2 text-xl text-green-600">
+            Welcome back, <span className="font-semibold text-green-800">Dr. Sarah Johnson</span>
+          </p>
         </div>
-        <div>
-          <Button className="bg-green-700 text-white hover:bg-green-800">
-            <Activity className="w-4 h-4 mr-2" />
-            Start Session
-          </Button>
-        </div>
-      </div>
+        <Button onClick={onStartSession} className="rounded-2xl bg-green-700 px-8 py-4 text-lg font-semibold text-white hover:bg-green-800">
+          <Activity className="mr-2 h-6 w-6" />
+          Start Session
+        </Button>
+      </section>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-6 w-full">
+      <section className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
         {statsCards.map((stat) => (
-          <Card key={stat.title} className="bg-white/80 backdrop-blur-sm border-green-200 hover:shadow-md transition-all duration-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+          <Card key={stat.title} className="rounded-3xl bg-white/95 p-3 shadow-lg transition-transform duration-200 hover:scale-105 hover:shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-green-900">{stat.value}</p>
+                  <p className="mb-0 text-lg font-medium text-green-700">{stat.title}</p>
+                  <p className="text-4xl font-extrabold text-green-900">{stat.value}</p>
                 </div>
-                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                  <stat.icon className="w-6 h-6 text-white" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-500">
+                  <stat.icon className="h-9 w-9 text-white" />
                 </div>
               </div>
-              <div className="flex items-center mt-4">
-                <TrendingUp className={`w-4 h-4 mr-1 ${stat.changeType === 'positive' ? 'text-green-500' : 'text-green-600'}`} />
-                <span className={`text-sm font-medium ${stat.changeType === 'positive' ? 'text-green-500' : 'text-green-600'}`}>
-                  {stat.change}
-                </span>
-                <span className="text-xs text-green-600 ml-1">from last week</span>
+              <div className="mt-6 flex items-center">
+                <TrendingUp className={`mr-2 h-5 w-5 ${
+                  stat.changeType === "positive" ? "text-green-500" : 
+                  stat.changeType === "neutral" ? "text-yellow-600" : 
+                  "text-red-500"
+                }`} />
+                <p className={`mb-0 text-lg font-semibold ${
+                  stat.changeType === "positive" ? "text-green-500" : 
+                  stat.changeType === "neutral" ? "text-yellow-600" : 
+                  "text-red-500"
+                }`}>{stat.change}</p>
+                <p className="ml-2 text-sm text-green-600">from last week</p>
               </div>
             </CardContent>
           </Card>
         ))}
-      </div>
+      </section>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 w-full">
-        {/* Upcoming Appointments */}
-        <Card className="bg-white/80 backdrop-blur-sm border-green-200">
+      {/* Upcoming Appointments */}
+      <section className="grid grid-cols-1 gap-8 lg:grid-cols-3 mt-4">
+        <Card className="col-span-1 rounded-3xl bg-white/95 p-7 shadow-lg transition-transform duration-200 hover:scale-105 hover:shadow-2xl">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-800">
-              <Calendar className="w-5 h-5 text-green-800" />
+            <CardTitle className="flex items-center gap-3 text-2xl text-green-800">
+              <Calendar className="w-7 h-7 text-green-700" />
               Upcoming Appointments
             </CardTitle>
-            <CardDescription className="text-green-600">Today's scheduled sessions</CardDescription>
+            <CardDescription className="text-green-600 text-base">Today's scheduled sessions</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             {upcomingAppointments.map((appointment) => (
-              <div key={appointment.id} className="flex items-center gap-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
-                <Avatar className="w-10 h-10">
+              <div key={appointment.id} className="flex items-center gap-4 rounded-2xl bg-green-50 p-4 transition-colors hover:bg-green-100">
+                <Avatar className="w-12 h-12">
                   <AvatarImage src={appointment.avatar} alt={appointment.patient} />
-                  <AvatarFallback className="text-green-800">
-                    {appointment.patient.split(' ').map(n => n[0]).join('')}
+                  <AvatarFallback className="text-green-800 text-lg">
+                    {appointment.patient.split(" ").map(n => n[0]).join("")}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="font-semibold text-sm text-green-800">{appointment.patient}</p>
-                  <p className="text-xs text-green-600">{appointment.type}</p>
+                  <p className="font-semibold text-lg text-green-800">{appointment.patient}</p>
+                  <p className="text-base text-green-600">{appointment.type}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-green-800">{appointment.time}</p>
-                  <Button size="sm" variant="outline" className="mt-1 text-green-700 border-green-700 hover:bg-green-100">
-                    <Video className="w-3 h-3 mr-1 text-green-700" />
+                  <p className="text-lg font-bold text-green-800">{appointment.time}</p>
+                  <Button size="lg" variant="outline" className="mt-2 rounded-xl border-green-700 text-green-700 hover:bg-green-100">
+                    <Video className="mr-2 w-4 h-4 text-green-700" />
                     Join
                   </Button>
                 </div>
               </div>
             ))}
-            <Button variant="outline" className="w-full mt-4 text-green-700 border-green-700 hover:bg-green-100">
-              <Calendar className="w-4 h-4 mr-2 text-green-700" />
+            <Button variant="outline" className="w-full rounded-xl border-green-700 py-3 text-green-700 hover:bg-green-100 mt-6 text-lg">
+              <Calendar className="mr-3 w-5 h-5 text-green-700" />
               View All Appointments
             </Button>
           </CardContent>
         </Card>
+
         {/* Recent Messages */}
-        <Card className="bg-white/80 backdrop-blur-sm border-green-200">
+        <Card className="col-span-1 rounded-3xl bg-white/95 p-7 shadow-lg transition-transform duration-200 hover:scale-105 hover:shadow-2xl">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-800">
-              <MessageSquare className="w-5 h-5 text-green-800" />
+            <CardTitle className="flex items-center gap-3 text-2xl text-green-800">
+              <MessageSquare className="w-7 h-7 text-green-700" />
               Recent Messages
             </CardTitle>
-            <CardDescription className="text-green-600">Latest patient communications</CardDescription>
+            <CardDescription className="text-green-600 text-base">Latest patient communications</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             {recentMessages.map((message) => (
-              <div key={message.id} className="flex items-start gap-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback className="text-green-800">
-                    {message.patient.split(' ').map(n => n[0]).join('')}
+              <div key={message.id} className="flex items-start gap-4 rounded-2xl bg-green-50 p-4 transition-colors hover:bg-green-100">
+                <Avatar className="w-10 h-10">
+                  <AvatarFallback className="text-green-800 text-lg">
+                    {message.patient.split(" ").map(n => n[0]).join("")}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold text-sm text-green-800">{message.patient}</p>
-                    {message.unread && <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse-soft" />}
+                  <div className="flex items-center gap-3">
+                    <p className="font-semibold text-lg text-green-800">{message.patient}</p>
+                    {message.unread && (
+                      <div className="animate-pulse w-3 h-3 rounded-full bg-green-500" />
+                    )}
                   </div>
-                  <p className="text-xs text-green-600 truncate">{message.message}</p>
-                  <p className="text-xs text-green-600 mt-1">{message.time}</p>
+                  <p className="truncate text-base text-green-700">{message.message}</p>
+                  <p className="mt-1 text-base text-green-500">{message.time}</p>
                 </div>
               </div>
             ))}
-            <Button variant="outline" className="w-full mt-4 text-green-700 border-green-700 hover:bg-green-100">
-              <Send className="w-4 h-4 mr-2 text-green-700" />
+            <Button variant="outline" className="w-full rounded-xl border-green-700 py-3 text-green-700 hover:bg-green-100 mt-6 text-lg">
+              <Send className="mr-3 w-5 h-5 text-green-700" />
               View All Messages
             </Button>
           </CardContent>
         </Card>
+
         {/* Pending Reports */}
-        <Card className="bg-white/80 backdrop-blur-sm border-green-200">
+        <Card className="col-span-1 rounded-3xl bg-white/95 p-7 shadow-lg transition-transform duration-200 hover:scale-105 hover:shadow-2xl">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-800">
-              <FileText className="w-5 h-5 text-green-800" />
+            <CardTitle className="flex items-center gap-3 text-2xl text-green-800">
+              <FileText className="w-7 h-7 text-green-700" />
               Pending Reports
             </CardTitle>
-            <CardDescription className="text-green-600">Reports awaiting review</CardDescription>
+            <CardDescription className="text-green-600 text-base">Reports awaiting review</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             {pendingReports.map((report) => (
-              <div key={report.id} className="flex items-center gap-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
+              <div key={report.id} className="flex items-center gap-4 rounded-2xl bg-green-50 p-4 transition-colors hover:bg-green-100">
                 <div className="flex-1">
-                  <p className="font-semibold text-sm text-green-800">{report.patient}</p>
-                  <p className="text-xs text-green-600">{report.type}</p>
-                  <p className="text-xs text-green-600">{report.date}</p>
+                  <p className="font-semibold text-lg text-green-800">{report.patient}</p>
+                  <p className="text-base text-green-600">{report.type}</p>
+                  <p className="text-base text-green-600">{report.date}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Badge
-                    variant={report.priority === "high" ? "destructive" : report.priority === "medium" ? "default" : "secondary"}
-                    className="text-xs"
+                    variant={
+                      report.priority === "high"
+                        ? "destructive"
+                        : report.priority === "medium"
+                        ? "default"
+                        : "secondary"
+                    }
+                    className="capitalize px-2 py-1 text-base"
                   >
                     {report.priority}
                   </Badge>
-                  {report.priority === "high" && <AlertCircle className="w-4 h-4 text-red-500" />}
+                  {report.priority === "high" && (
+                    <AlertCircle className="w-6 h-6 text-red-500" />
+                  )}
                 </div>
               </div>
             ))}
-            <Button variant="outline" className="w-full mt-4 text-green-700 border-green-700 hover:bg-green-100">
-              <FileText className="w-4 h-4 mr-2 text-green-700" />
+            <Button variant="outline" className="w-full rounded-xl border-green-700 py-3 text-green-700 hover:bg-green-100 mt-6 text-lg">
+              <FileText className="mr-3 w-5 h-5 text-green-700" />
               Review All Reports
             </Button>
           </CardContent>
         </Card>
-      </div>
+      </section>
 
       {/* Quick Insights Section */}
-      <QuickInsights
-        patientEngagement={{ value: "92%", change: "+5%" }}
-        avgSessionTime={{ value: "45min", note: "Within target range" }}
-        satisfactionRate={{ value: "4.8/5", note: "Based on 500 reviews" }}
-      />
+      <section className="mt-10">
+        <QuickInsights
+          patientEngagement={{ value: "92%", change: "+5%" }}
+          avgSessionTime={{ value: "45min", note: "Within target range" }}
+          satisfactionRate={{ value: "4.8/5", note: "Based on 500 reviews" }}
+        />
+      </section>
     </div>
   );
 }

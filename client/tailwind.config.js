@@ -1,4 +1,3 @@
-// tailwind.config.js
 const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
@@ -16,13 +15,13 @@ module.exports = {
           '50%': { backgroundPosition: '100% 50%' },
           '100%': { backgroundPosition: '0% 50%' },
         },
-        'fade-in-up': {
-          '0%': { opacity: '0', transform: 'translateY(15px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
         'fade-in': {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
+        },
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(15px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         'fade-slide-left': {
           '0%': { opacity: '0', transform: 'translateX(-12px)' },
@@ -32,14 +31,29 @@ module.exports = {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0' },
         },
+        // Added flicker animation
+        'flicker': {
+          '0%, 19%, 21%, 23%, 25%, 54%, 56%, 100%': {
+            opacity: '1',
+            transform: 'scale(1)',
+          },
+          '20%, 22%, 24%, 55%': {
+            opacity: '0.8',
+            transform: 'scale(0.98)',
+          },
+        },
       },
       animation: {
         'gradient-green-pink-shift': 'gradient-green-pink-shift 15s ease infinite',
         'fade-in': 'fade-in 1s ease-out forwards',
-        'fade-in-slow': 'fade-in 1.2s ease-out forwards',
         'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
         'fade-slide-left': 'fade-slide-left 0.7s ease-out forwards',
         'typing-blink': 'typing-blink 1s step-end infinite',
+        // Flicker added here
+        'flicker': 'flicker 3s linear infinite',
+      },
+      backgroundSize: {
+        '300': '300% 300%',
       },
       boxShadow: {
         'green-glow': '0 0 8px 2px rgba(52, 211, 153, 0.3), 0 0 12px 4px rgba(134, 239, 172, 0.15)',
@@ -47,33 +61,24 @@ module.exports = {
         'chat-bubble': '0 2px 6px rgba(0, 0, 0, 0.08)',
       },
       colors: {
-        // Primary brand colors
         calmGreen: '#A7F3D0',
         calmPink: '#FCE7F3',
         calmText: '#374151',
-
-        // UI Neutrals
         softGray: '#F9FAFB',
         grayOneHundred: '#F3F4F6',
         grayTwoHundred: '#E5E7EB',
         grayThreeHundred: '#D1D5DB',
         grayEightHundred: '#1F2937',
-
-        // Accent Greens
         softEmerald: '#6EE7B7',
         emeraldOneHundred: '#D1FAE5',
         emeraldSixHundred: '#059669',
         emeraldSevenHundred: '#047857',
         greenFiveHundred: '#22C55E',
-        greenSixHundred: '#16A34A',
-
-        // Accent Lime
+        greenSixHundred: '#16A64A',
         limeFiveHundred: '#84CC16',
         limeSixHundred: '#65A30D',
-
-        // Chat bubble colors
-        userBubble: '#bbf7d0',  // lighter green for user
-        botBubble: '#dcfce7',   // soft green for bot
+        userBubble: '#bbf7d0',
+        botBubble: '#dcfce7',
       },
     },
   },
