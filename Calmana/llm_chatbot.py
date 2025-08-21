@@ -1,7 +1,7 @@
 import requests
 
 # 🔐 Paste your Together.ai API key here
-TOGETHER_API_KEY = "tgp_v1_Jf-DJAzO1EU_AgQQVQiHyRQ5mYX7qxlR8MGwPvXuK2o"
+TOGETHER_API_KEY = "key here"
 
 def generate_question(conversation_history):
     headers = {
