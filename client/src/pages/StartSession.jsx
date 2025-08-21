@@ -9,22 +9,40 @@ export default function StartSession() {
   ]);
   const [input, setInput] = useState('');
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
+
+    // Add user message to UI
     setMessages([...messages, { sender: 'user', text: input }]);
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { sender: 'ai', text: 'Thank you for sharing. Can you tell me more about what brings you here today?' }]);
-    }, 800);
-    setInput('');
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation: [...messages.map(m => `${m.sender}: ${m.text}`), `user: ${input}`].join("\n")
+        })
+      });
+
+      const data = await response.json();
+      if (data.reply) {
+        setMessages(prev => [...prev, { sender: 'ai', text: data.reply }]);
+      } else {
+        setMessages(prev => [...prev, { sender: 'ai', text: "⚠️ Error fetching reply" }]);
+      }
+    } catch (err) {
+      setMessages(prev => [...prev, { sender: 'ai', text: "❌ Connection error" }]);
+    }
+
+    setInput("");
   };
 
   return (
     <div className="relative w-screen h-screen min-h-screen min-w-full flex flex-col items-center justify-center overflow-hidden font-inter">
-      {/* Animated Gradient Background with Subtle Shapes */}
+      {/* Background */}
       <div className="absolute inset-0 z-0">
         <div className="w-full h-full bg-gradient-to-br from-emerald-200 via-pink-100 to-green-200 animate-gradient-green-pink-shift bg-[length:300%_300%]" />
-        {/* Decorative blurred shapes for depth */}
         <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-emerald-300 opacity-30 rounded-full blur-3xl animate-pulse-slow" />
         <div className="absolute bottom-[-15%] right-[-10%] w-[50vw] h-[50vw] bg-pink-200 opacity-30 rounded-full blur-3xl animate-pulse-slower" />
         <div className="absolute top-[30%] right-[-8%] w-[30vw] h-[30vw] bg-green-200 opacity-20 rounded-full blur-2xl animate-pulse" />
@@ -87,4 +105,4 @@ export default function StartSession() {
       </div>
     </div>
   );
-} 
+}
