@@ -38,8 +38,26 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-8 font-inter flex flex-col">
       {/* Main layout */}
       <div className="container mx-auto max-w-screen-xl grid grid-cols-1 lg:grid-cols-4 gap-10 flex-grow">
-        {/* Sidebar */}
-        <Sidebar />
+        
+        {/* Sidebar + extra block */}
+        <div className="col-span-1">
+          <div className="flex flex-col gap-6">
+            <Sidebar />
+
+            {/* Breathing Animation Block */}
+            <section
+              className={`${cardClasses} flex flex-col justify-center items-center text-center`}
+            >
+              <h3 className="text-xl font-extrabold text-emerald-800 mb-4">🌬️ Breathing Exercise</h3>
+              <div className="relative flex items-center justify-center w-40 h-40">
+                <div className="absolute w-32 h-32 rounded-full bg-emerald-300 opacity-50 animate-ping"></div>
+                <div className="absolute w-24 h-24 rounded-full bg-emerald-400 opacity-70 animate-pulse"></div>
+                <div className="w-16 h-16 rounded-full bg-emerald-600"></div>
+              </div>
+              <p className="mt-4 text-emerald-700 font-medium">Breathe in... Breathe out...</p>
+            </section>
+          </div>
+        </div>
 
         {/* Main content */}
         <main className="lg:col-span-3 space-y-10">

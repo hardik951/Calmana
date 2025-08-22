@@ -7,6 +7,25 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
+  // Mantras array for rotating display
+  const mantras = [
+    "Breathe deeply. Let calmness settle your mind.",
+    "You are safe and supported, always.",
+    "Peace begins with a single breath.",
+    "Embrace the present moment with grace.",
+  ];
+
+  // State to track current mantra index
+  const [mantraIndex, setMantraIndex] = useState(0);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setMantraIndex((prevIndex) => (prevIndex + 1) % mantras.length);
+    }, 7000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   useEffect(() => {
     const handleResize = () => {
       const desktop = window.innerWidth >= 1024;
@@ -242,6 +261,15 @@ export default function Sidebar() {
             >
               🚨 SOS
             </button>
+          </div>
+
+          {/* Rotating Daily Mantra Box */}
+          <div className="mt-6 p-4 bg-gradient-to-br from-emerald-50 via-pink-50 to-green-50 border border-emerald-200 rounded-xl shadow flex flex-col items-center text-center">
+            <span className="text-3xl mb-2">🧘‍♂️</span>
+            <h4 className="text-lg font-semibold text-emerald-700 mb-2">Calmana Mantra</h4>
+            <p className="text-sm italic text-emerald-800">
+              {mantras[mantraIndex]}
+            </p>
           </div>
         </div>
       </aside>
