@@ -31,7 +31,6 @@ module.exports = {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0' },
         },
-        // Added flicker animation
         'flicker': {
           '0%, 19%, 21%, 23%, 25%, 54%, 56%, 100%': {
             opacity: '1',
@@ -49,7 +48,6 @@ module.exports = {
         'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
         'fade-slide-left': 'fade-slide-left 0.7s ease-out forwards',
         'typing-blink': 'typing-blink 1s step-end infinite',
-        // Flicker added here
         'flicker': 'flicker 3s linear infinite',
       },
       backgroundSize: {
@@ -80,7 +78,26 @@ module.exports = {
         userBubble: '#bbf7d0',
         botBubble: '#dcfce7',
       },
+      typography: (theme) => ({
+        green: {
+          css: {
+            color: theme('colors.calmText'),
+            a: { color: theme('colors.emeraldSixHundred') },
+            h1: { color: theme('colors.greenSixHundred') },
+            h2: { color: theme('colors.greenSixHundred') },
+            h3: { color: theme('colors.greenSixHundred') },
+            code: { color: theme('colors.emeraldSevenHundred') },
+            strong: { color: theme('colors.greenSixHundred') },
+            blockquote: {
+              color: theme('colors.greenFiveHundred'),
+              borderLeftColor: theme('colors.limeFiveHundred'),
+            },
+          },
+        },
+      }),
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 };
