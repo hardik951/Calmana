@@ -16,7 +16,6 @@ const DiaryPage = () => {
     const fetchEntries = async () => {
       setLoading(true);
       setError(null);
-
       try {
         const token = localStorage.getItem("token");
         const { data } = await axios.get(`${API_BASE}/diary`, {
@@ -77,52 +76,71 @@ const DiaryPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-6">
-      <h1 className="text-3xl font-bold text-emerald-800 mb-4 flex items-center gap-2">
-        📔 Personal Diary
-      </h1>
+    <div className="min-h-screen bg-gradient-to-tr from-emerald-50 via-pink-50 to-green-50 p-8 flex flex-col items-center">
+      <div className="w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8 flex flex-col">
+        <h1 className="text-4xl font-extrabold text-emerald-700 mb-8 flex items-center gap-3 select-none">
+          📔 Personal Diary
+        </h1>
 
-      {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-3 text-sm">{error}</div>}
-      {successMsg && <div className="bg-green-100 text-green-700 p-2 rounded mb-3 text-sm">{successMsg}</div>}
-
-      <textarea
-        className="w-full p-4 border rounded-lg bg-white/70 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-        rows={5}
-        placeholder="Write your thoughts here..."
-        value={newEntry}
-        onChange={(e) => setNewEntry(e.target.value)}
-      />
-
-      <button
-        onClick={saveEntry}
-        disabled={saving || !newEntry.trim()}
-        className={`mt-3 px-5 py-2 rounded-lg transition-all ${
-          saving || !newEntry.trim()
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-emerald-600 text-white hover:brightness-110"
-        }`}
-      >
-        {saving ? "Saving..." : "Save Entry"}
-      </button>
-
-      {loading && <p className="mt-6 text-gray-600">Loading entries...</p>}
-
-      <div className="mt-8 space-y-4 max-h-[500px] overflow-y-auto pr-1">
-        {!loading && entries.length > 0 ? (
-          entries.map((entry, index) => (
-            <div
-              key={(entry._id || entry.date) + index}
-              className="bg-white/80 rounded-lg p-4 shadow border-l-4 border-emerald-500"
-            >
-              <p className="text-sm text-gray-500">
-                {new Date(entry.date).toLocaleString()}
-              </p>
-              <p className="mt-2 text-emerald-900 whitespace-pre-line">{entry.content}</p>
-            </div>
-          ))
-        ) : (
-          !loading && <p className="text-gray-600 italic">No diary entries yet.</p>
+        {error && (
+          <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-5 font-semibold shadow-sm">
+            {error}
+          </div>
         )}
+        {successMsg && (
+          <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-5 font-semibold shadow-sm">
+            {successMsg}
+          </div>
+        )}
+
+        <textarea
+          className="w-full p-5 border border-emerald-300 rounded-2xl shadow-inner resize-y text-gray-700 placeholder:italic placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-400 transition"
+          rows={6}
+          placeholder="Write your thoughts here..."
+          value={newEntry}
+          onChange={(e) => setNewEntry(e.target.value)}
+          disabled={saving}
+        />
+
+        <button
+          onClick={saveEntry}
+          disabled={saving || !newEntry.trim()}
+          className={`mt-6 py-3 rounded-xl font-bold transition-all text-lg ${
+            saving || !newEntry.trim()
+              ? "bg-emerald-300 cursor-not-allowed text-emerald-700"
+              : "bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 shadow-md"
+          }`}
+        >
+          {saving ? "Saving..." : "Save Entry"}
+        </button>
+
+        <div className="mt-12">
+          {loading ? (
+            <p className="text-center text-gray-500 text-lg font-medium animate-pulse select-none">
+              Loading entries...
+            </p>
+          ) : entries.length === 0 ? (
+            <p className="text-center text-gray-400 italic text-lg select-none">
+              No diary entries yet.
+            </p>
+          ) : (
+            <div className="grid gap-6 max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-300 scrollbar-track-transparent pr-1">
+              {entries.map((entry, index) => (
+                <div
+                  key={(entry._id || entry.date) + index}
+                  className="bg-emerald-50 rounded-2xl p-6 shadow-md border-l-8 border-emerald-500 hover:scale-[1.02] transform transition-transform cursor-default duration-200"
+                >
+                  <p className="text-sm text-emerald-500 font-semibold">
+                    {new Date(entry.date).toLocaleString()}
+                  </p>
+                  <p className="mt-3 text-emerald-900 whitespace-pre-wrap leading-relaxed font-medium select-text">
+                    {entry.content}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
