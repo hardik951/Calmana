@@ -1,18 +1,21 @@
 import os
 import requests
 from dotenv import load_dotenv
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
-# Load the API key from environment variables for security
+# Load the API key
 load_dotenv()
 TOGETHER_API_KEY = os.environ.get("TOGETHER_API_KEY")
 
 if not TOGETHER_API_KEY:
     raise ValueError("Error: TOGETHER_API_KEY not found in environment variables.")
 
+app = Flask(__name__)
+CORS(app, origins=["http://localhost:3000"])  # Allow React dev server
+
+# Keep your function as is
 def get_supportive_response(conversation_history, diagnosed_issue, user_message):
-    """
-    Queries the language model with a sensitive, empathetic prompt.
-    """
     headers = {
         "Authorization": f"Bearer {TOGETHER_API_KEY}",
         "Content-Type": "application/json"
@@ -53,6 +56,23 @@ def get_supportive_response(conversation_history, diagnosed_issue, user_message)
 
     return response.json()["choices"][0]["message"]["content"].strip()
 
+
+# New Flask route to handle React chat
+@app.route("/chat", methods=["POST"])
+def chat():
+    try:
+        data = request.get_json()
+        conversation_history = data.get("conversation", "").split("\n")
+        diagnosed_issue = data.get("diagnosed_issue", "generalized anxiety")
+        user_message = conversation_history[-1] if conversation_history else ""
+        reply = get_supportive_response(conversation_history, diagnosed_issue, user_message)
+        return jsonify({"reply": reply})
+    except Exception as e:
+        return jsonify({"reply": f"Error: {str(e)}"}), 500
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=8000, host="0.0.0.0")
 def compassionate_followup_chat(diagnosed_issue):
     """
     Runs an interactive supportive chat with the user after diagnosis.
