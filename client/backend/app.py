@@ -7,6 +7,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 import pyttsx3
 import tempfile
+import threading
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Setup
@@ -218,6 +219,8 @@ def root():
 # /speak route (pyttsx3) - moved above app.run so route is registered.
 # It writes a temp WAV, sends it, and deletes the file after sending.
 # ──────────────────────────────────────────────────────────────────────────────
+
+
 @app.route("/speak", methods=["POST"])
 def speak():
     """
@@ -232,27 +235,30 @@ def speak():
         if not text:
             return jsonify({"error": "Missing 'text'"}), 400
 
-        engine = pyttsx3.init()
-        voices = engine.getProperty("voices")
-
-        # Pick voice by gender if available
-        if gender == "male":
-            for v in voices:
-                if "male" in v.name.lower():
-                    engine.setProperty("voice", v.id)
-                    break
-        else:  # default female if found
-            for v in voices:
-                if "female" in v.name.lower():
-                    engine.setProperty("voice", v.id)
-                    break
-
         tmpfile = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
         tmp_path = tmpfile.name
         tmpfile.close()
 
-        engine.save_to_file(text, tmp_path)
-        engine.runAndWait()
+        def tts_worker(text_to_speak, path, gender_choice):
+            engine = pyttsx3.init()
+            voices = engine.getProperty("voices")
+            if gender_choice == "male":
+                for v in voices:
+                    if "male" in v.name.lower():
+                        engine.setProperty("voice", v.id)
+                        break
+            else:
+                for v in voices:
+                    if "female" in v.name.lower():
+                        engine.setProperty("voice", v.id)
+                        break
+            engine.save_to_file(text_to_speak, path)
+            engine.runAndWait()
+
+        # Run TTS in a separate thread
+        t = threading.Thread(target=tts_worker, args=(text, tmp_path, gender))
+        t.start()
+        t.join()  # Wait here just until audio is ready (still faster than blocking entire Flask)
 
         @after_this_request
         def cleanup(response):
@@ -262,10 +268,11 @@ def speak():
                 pass
             return response
 
-        return send_file(tmp_path, mimetype="audio/wav", as_attachment=False)
+        return send_file(tmp_path, mimetype="audio/wav", as_attachment=False, conditional=True)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 
 if __name__ == "__main__":
