@@ -1,142 +1,88 @@
-import requests
 import os
+import requests
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 
-# ✅ Load environment variables
+# Load the API key from environment variables for security
 load_dotenv()
+TOGETHER_API_KEY = os.environ.get("TOGETHER_API_KEY")
 
-# 🔑 Secure Together API key
-TOGETHER_API_KEY = os.getenv("")
+if not TOGETHER_API_KEY:
+    raise ValueError("Error: TOGETHER_API_KEY not found in environment variables.")
 
-# 🧠 Conversation store (per user in API mode, global in CLI mode)
-user_conversations = {}
-
-# ✅ Shared function to generate questions
-def generate_question(conversation_history):
+def get_supportive_response(conversation_history, diagnosed_issue, user_message):
+    """
+    Queries the language model with a sensitive, empathetic prompt.
+    """
     headers = {
         "Authorization": f"Bearer {TOGETHER_API_KEY}",
         "Content-Type": "application/json"
     }
 
-    system_message = {
-        "role": "system",
-        "content": (
-            "You are a mental health assistant. "
-            "Ask one diagnostic question at a time. Each question must have a clear question prompt, "
-            "and should lead forward with the previous question. "
-            "Followed by appropriate multiple-choice options labeled A), B), and C). "
-            "Do NOT output only options without a question. "
-            "Wait for the user to answer exactly one option (A, B, or C) or the number (1, 2, or 3). "
-            "Based on the user's exact choice, ask the next relevant question. "
-            "Never guess or skip ahead without user input."
-        )
-    }
+    system_prompt = (
+    "You are a compassionate mental health support companion. "
+    "Your purpose is to listen with empathy and gently support users "
+    "who are experiencing emotional or mental health struggles. "
+    "Never provide recipes, technical instructions, or unrelated advice. "
+    "If the user asks for unrelated content, kindly acknowledge once, then redirect back to their feelings. "
+    "Keep responses short (2–4 sentences), varied in wording, and avoid repeating the same advice. "
+    "If the user says 'stop' or asks to end, respect their boundary and respond briefly with kindness. "
+    "Provide reassurance and coping suggestions only when relevant. "
+    "Include the professional disclaimer only once at the start of the chat."
+    )
+
+    user_prompt = (
+        f"The user has been diagnosed with: {diagnosed_issue}.\n"
+        f"User says: \"{user_message}\"\n"
+        "Provide a thoughtful, empathetic response to help them explore how they're feeling."
+    )
 
     payload = {
         "model": "mistralai/Mistral-7B-Instruct-v0.1",
         "messages": [
-            system_message,
-            {"role": "user", "content": "\n".join(conversation_history)}
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": "\n\n".join(conversation_history) + "\n\n" + user_prompt}
         ],
-        "max_tokens": 300,
-        "temperature": 0.7
+        "max_tokens": 300,       # allow a bit longer responses
+        "temperature": 0.6,      # reduce randomness to avoid rambling
+        "top_p": 0.9             # add nucleus sampling for variety
     }
 
-    response = requests.post(
-        "https://api.together.xyz/v1/chat/completions",
-        headers=headers,
-        json=payload
-    )
-
+    response = requests.post("https://api.together.xyz/v1/chat/completions", headers=headers, json=payload)
     if response.status_code != 200:
-        raise Exception(f"⚠️ API Error {response.status_code}: {response.text}")
+        raise Exception(f"API error {response.status_code}: {response.text}")
 
     return response.json()["choices"][0]["message"]["content"].strip()
 
+def compassionate_followup_chat(diagnosed_issue):
+    """
+    Runs an interactive supportive chat with the user after diagnosis.
+    """
+    print(f"\n—I understand you've received a diagnosis related to: {diagnosed_issue}.\n")
+    print("I'm here if you'd like to talk about how you're feeling or what’s on your mind.")
+    print("(Type 'exit' at any time to stop.)\n")
+    print("⚠️ Note: I'm not a licensed mental health professional. "
+          "If you're struggling, please consider reaching out to a trusted friend, family member, "
+          "or mental health professional.\n")
 
-# ==============================
-# 🌐 FastAPI Backend for React
-# ==============================
-app = FastAPI()
-
-# Enable CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # frontend URL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.post("/chat")
-async def chat(request: Request):
-    """Frontend sends { user_id, message }, backend keeps memory per user."""
-    data = await request.json()
-    user_id = data.get("user_id")
-    user_message = data.get("message", "").strip()
-
-    if not user_id:
-        return {"error": "Missing user_id"}
-
-    if user_id not in user_conversations:
-        user_conversations[user_id] = []
-
-    # Add user input
-    if user_message:
-        user_conversations[user_id].append(user_message)
-
-    # Generate bot reply
-    try:
-        reply = generate_question(user_conversations[user_id])
-    except Exception as e:
-        return {"error": str(e)}
-
-    user_conversations[user_id].append(reply)
-
-    return {"reply": reply}
-
-
-# ==============================
-# 🖥 CLI Interactive Mode
-# ==============================
-def run_conversation():
-    conversation = []
-    print("\n🧠 Welcome to the Mental Health Diagnostic Bot\n")
-    print("Type 'exit' anytime to quit.\n")
-
-    for _ in range(10):
-        try:
-            question = generate_question(conversation)
-        except Exception as e:
-            print("❌ Error:", e)
-            return
-
-        print("\n🤖", question)
-        user_input = input("Your answer (A/B/C or 1/2/3, or 'exit'): ").strip()
-        if user_input.lower() == "exit":
-            print("\n👋 Thank you for chatting. Take care!\n")
-            return
-
-        conversation.append(question)
-        conversation.append(user_input)
-
-    print("\n🧠 Thank you for using the Mental Health Diagnostic Bot. Take care!\n")
-
-
-def main():
+    conversation_history = []
     while True:
-        run_conversation()
-        again = input("Start a new session? (yes/no): ").strip().lower()
-        if again not in ["yes", "y"]:
-            print("\n👋 Goodbye! Take care!\n")
+        user_input = input("You: ").strip()
+        if user_input.lower() == "exit":
+            print("\nTake care of yourself—and remember, reaching out to a trusted friend or professional can be a strong next step.\n")
             break
 
+        conversation_history.append(f"You: {user_input}")
+        try:
+            reply = get_supportive_response(conversation_history, diagnosed_issue, user_input)
+        except Exception as e:
+            print(f"Error generating response: {e}")
+            break
 
-# ==============================
-# 🚀 Entry Point
-# ==============================
+        conversation_history.append(f"Bot: {reply}")
+        print(f"\nBot: {reply}\n")
+
 if __name__ == "__main__":
-    # Run in CLI mode
-    main()
+    # Example usage:
+    # compassionate_followup_chat("generalized anxiety")
+    diagnosed_issue = input("Enter the diagnosed issue to start follow-up chat: ").strip()
+    compassionate_followup_chat(diagnosed_issue)
