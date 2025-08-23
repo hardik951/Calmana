@@ -1,6 +1,6 @@
 # backend/app.py
 
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, after_this_request
 from flask_cors import CORS
 import os, requests, re
 from datetime import datetime
@@ -123,7 +123,7 @@ def call_mistral(messages, temperature=0.7, model="mistral-tiny"):
         "Content-Type": "application/json"
     }
     payload = {
-        "model": model,               # "mistral-tiny" is fast & cheap. You can switch to "mistral-small"/"mistral-large".
+        "model": model,               # "mistral-tiny" is fast & cheap. You can switch to "mistral-small"/"mistral-large". 
         "messages": messages,
         "temperature": temperature
     }
@@ -134,14 +134,10 @@ def call_mistral(messages, temperature=0.7, model="mistral-tiny"):
     return data["choices"][0]["message"]["content"].strip()
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Routes
+# Routes (chat/history/moods/reset/root) - unchanged
 # ──────────────────────────────────────────────────────────────────────────────
 @app.route("/chat", methods=["POST"])
 def chat():
-    """
-    Body: { "message": "...", "session_id": "optional-string" }
-    Returns: { "reply": "...", "emotion": "sad|happy|..." }
-    """
     try:
         body = request.get_json(force=True) or {}
         user_message = (body.get("message") or "").strip()
@@ -188,9 +184,6 @@ def chat():
 
 @app.route("/history", methods=["GET"])
 def history():
-    """
-    Query: ?session_id=...
-    """
     session_id = (request.args.get("session_id") or "default-session").strip()
     sess = get_session(session_id)
     return jsonify({
@@ -201,10 +194,6 @@ def history():
 
 @app.route("/moods", methods=["GET"])
 def moods():
-    """
-    Query: ?session_id=...
-    Returns mood counts for charts on your homepage.
-    """
     session_id = (request.args.get("session_id") or "default-session").strip()
     sess = get_session(session_id)
     return jsonify(sess["mood_counts"])
@@ -212,10 +201,6 @@ def moods():
 
 @app.route("/reset", methods=["POST"])
 def reset():
-    """
-    Reset memory for a given session.
-    Body: { "session_id": "..." }
-    """
     body = request.get_json(force=True) or {}
     session_id = (body.get("session_id") or "default-session").strip()
     MEMORY[session_id] = {
@@ -229,11 +214,10 @@ def reset():
 def root():
     return jsonify({"ok": True, "service": "Calmana Agent API", "endpoints": ["/chat", "/history", "/moods", "/reset"]})
 
-
-if __name__ == "__main__":
-    # Bind to all interfaces so mobile/same-network tests work; keep port 5000 to match your React calls
-    app.run(host="0.0.0.0", port=5000, debug=True)
-
+# ──────────────────────────────────────────────────────────────────────────────
+# /speak route (pyttsx3) - moved above app.run so route is registered.
+# It writes a temp WAV, sends it, and deletes the file after sending.
+# ──────────────────────────────────────────────────────────────────────────────
 @app.route("/speak", methods=["POST"])
 def speak():
     """
@@ -270,7 +254,20 @@ def speak():
         engine.save_to_file(text, tmp_path)
         engine.runAndWait()
 
+        @after_this_request
+        def cleanup(response):
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+            return response
+
         return send_file(tmp_path, mimetype="audio/wav", as_attachment=False)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+if __name__ == "__main__":
+    # Bind to all interfaces so mobile/same-network tests work; keep port 5000 to match your React calls
+    app.run(host="0.0.0.0", port=5000, debug=True)

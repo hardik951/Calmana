@@ -17,10 +17,10 @@ export default function AIChat() {
   const [isListening, setIsListening] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [language, setLanguage] = useState('en');
-  const [talkMode, setTalkMode] = useState(false); // 🔥 Talk mode toggle
+  const [talkMode, setTalkMode] = useState(false); // Talk mode toggle
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
-  const stopRequestedRef = useRef(false); // 🔥 Track manual stop
+  const stopRequestedRef = useRef(false); // Track manual stop
 
   // Speech Recognition Setup
   useEffect(() => {
@@ -33,16 +33,19 @@ export default function AIChat() {
 
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        setInput(transcript); // direct input from mic
+        setInput(transcript); // place transcript into input
         sendMessage(transcript); // auto-send when voice finishes
       };
 
+      // DO NOT auto-restart here — restart after TTS finishes so conversation doesn't overlap.
       recognition.onend = () => {
         setIsListening(false);
-        if (talkMode && !stopRequestedRef.current) {
-          recognition.start(); // auto restart if talk mode is active
-          setIsListening(true);
-        }
+        // no auto restart here — handled after TTS completes
+      };
+
+      recognition.onerror = (err) => {
+        console.warn('Recognition error', err);
+        setIsListening(false);
       };
 
       recognitionRef.current = recognition;
@@ -50,21 +53,51 @@ export default function AIChat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language, talkMode]);
 
-  // Toggle manual listening
+  // When talkMode toggles ON/OFF, start/stop recognition accordingly
+  useEffect(() => {
+    if (!recognitionRef.current) return;
+
+    if (talkMode) {
+      // user turned on Talk Mode -> start listening (user click is a gesture so browser permits)
+      stopRequestedRef.current = false;
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (err) {
+        console.warn('Failed to start recognition:', err);
+      }
+    } else {
+      // talk mode off -> stop listening
+      stopRequestedRef.current = true;
+      try {
+        recognitionRef.current.stop();
+      } catch (err) {}
+      setIsListening(false);
+    }
+  }, [talkMode]);
+
+  // Toggle manual listening (mic button)
   const toggleListening = () => {
     if (!recognitionRef.current) return;
     if (isListening) {
-      stopRequestedRef.current = true; // user manually stopped
-      recognitionRef.current.stop();
+      // user manually stops: set stopRequested so auto-restart won't happen
+      stopRequestedRef.current = true;
+      try {
+        recognitionRef.current.stop();
+      } catch (err) {}
       setIsListening(false);
     } else {
       stopRequestedRef.current = false;
-      recognitionRef.current.start();
-      setIsListening(true);
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (err) {
+        console.warn('Failed to start recognition:', err);
+      }
     }
   };
 
-  // Play bot reply with backend TTS
+  // Play bot reply with backend TTS and restart mic AFTER audio ends (if talkMode still active)
   const playBotSpeech = async (text) => {
     try {
       const res = await axios.post(
@@ -75,8 +108,35 @@ export default function AIChat() {
 
       const audioBlob = new Blob([res.data], { type: "audio/wav" });
       const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audio.play();
+
+      return new Promise((resolve, reject) => {
+        const audio = new Audio(audioUrl);
+
+        audio.onended = () => {
+          // restart recognition only if talk mode is still on and the user didn't manually stop
+          if (talkMode && !stopRequestedRef.current) {
+            try {
+              recognitionRef.current?.start();
+              setIsListening(true);
+            } catch (err) {
+              console.warn('Failed to restart recognition after TTS:', err);
+            }
+          }
+          resolve();
+        };
+
+        audio.onerror = (e) => {
+          console.error('Audio playback error', e);
+          resolve(); // still resolve so app continues
+        };
+
+        // attempt to play; browsers may block autoplay in some contexts but since this is triggered after a user action it should work
+        audio.play().catch((err) => {
+          console.warn('Playback failed or blocked:', err);
+          // even if blocked, resolve to avoid hanging
+          resolve();
+        });
+      });
     } catch (err) {
       console.error("TTS error:", err);
     }
@@ -84,7 +144,7 @@ export default function AIChat() {
 
   // Send message to backend
   const sendMessage = async (messageText = input) => {
-    if (!messageText.trim()) return;
+    if (!messageText || !messageText.trim()) return;
 
     const userMessage = { from: 'user', text: messageText };
     setMessages((prev) => [...prev, userMessage]);
@@ -99,9 +159,19 @@ export default function AIChat() {
       const botReply = res.data.reply || '🤖 Sorry, I didn’t get that.';
       setMessages((prev) => [...prev, { from: 'bot', text: botReply }]);
 
-      // 🔊 Speak reply if Talk Mode is active
+      // If Talk Mode: stop recognition (if running), play TTS, then playBotSpeech will restart mic when audio finishes
       if (talkMode) {
-        playBotSpeech(botReply);
+        try {
+          // Stop recognition now to avoid overlapping capture while TTS plays
+          stopRequestedRef.current = false; // don't treat this as manual stop
+          recognitionRef.current?.stop();
+          setIsListening(false);
+        } catch (err) {
+          console.warn('Error stopping recognition before TTS:', err);
+        }
+
+        // Wait for playback to finish (playBotSpeech resolves after audio.onended)
+        await playBotSpeech(botReply);
       }
     } catch (error) {
       setMessages((prev) => [
@@ -188,22 +258,28 @@ export default function AIChat() {
           placeholder="Type your message..."
           className="w-full border border-green-300 rounded-lg p-4 text-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-400"
         />
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2 mt-2 items-center">
           <button
             onClick={() => sendMessage()}
             className="w-full py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"
           >
             Send
           </button>
-          <button
-            onClick={toggleListening}
-            className={`px-4 rounded-lg font-bold text-white ${
-              isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-500 hover:bg-gray-600'
-            }`}
-            title="Voice input"
-          >
-            🎤
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleListening}
+              className={`px-4 rounded-lg font-bold text-white ${
+                isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-500 hover:bg-gray-600'
+              }`}
+              title="Voice input"
+            >
+              🎤
+            </button>
+            {/* small visual indicator */}
+            <div className="text-sm">
+              {isListening ? <span className="text-green-700">Listening…</span> : <span className="text-gray-500">Not listening</span>}
+            </div>
+          </div>
         </div>
       </div>
     </div>
