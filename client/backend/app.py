@@ -1,12 +1,12 @@
 # backend/app.py
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-import os
-import requests
-from dotenv import load_dotenv
+import os, requests, re
 from datetime import datetime
-import re
+from dotenv import load_dotenv
+import pyttsx3
+import tempfile
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Setup
@@ -233,3 +233,44 @@ def root():
 if __name__ == "__main__":
     # Bind to all interfaces so mobile/same-network tests work; keep port 5000 to match your React calls
     app.run(host="0.0.0.0", port=5000, debug=True)
+
+@app.route("/speak", methods=["POST"])
+def speak():
+    """
+    Body: { "text": "hello there", "gender": "male"|"female" }
+    Returns: WAV audio file
+    """
+    try:
+        body = request.get_json(force=True) or {}
+        text = (body.get("text") or "").strip()
+        gender = body.get("gender", "female").lower()
+
+        if not text:
+            return jsonify({"error": "Missing 'text'"}), 400
+
+        engine = pyttsx3.init()
+        voices = engine.getProperty("voices")
+
+        # Pick voice by gender if available
+        if gender == "male":
+            for v in voices:
+                if "male" in v.name.lower():
+                    engine.setProperty("voice", v.id)
+                    break
+        else:  # default female if found
+            for v in voices:
+                if "female" in v.name.lower():
+                    engine.setProperty("voice", v.id)
+                    break
+
+        tmpfile = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
+        tmp_path = tmpfile.name
+        tmpfile.close()
+
+        engine.save_to_file(text, tmp_path)
+        engine.runAndWait()
+
+        return send_file(tmp_path, mimetype="audio/wav", as_attachment=False)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

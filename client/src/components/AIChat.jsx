@@ -17,8 +17,10 @@ export default function AIChat() {
   const [isListening, setIsListening] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [language, setLanguage] = useState('en');
+  const [talkMode, setTalkMode] = useState(false); // 🔥 Talk mode toggle
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
+  const stopRequestedRef = useRef(false); // 🔥 Track manual stop
 
   // Speech Recognition Setup
   useEffect(() => {
@@ -31,41 +33,76 @@ export default function AIChat() {
 
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        setInput((prev) => prev + transcript);
+        setInput(transcript); // direct input from mic
+        sendMessage(transcript); // auto-send when voice finishes
       };
 
-      recognition.onend = () => setIsListening(false);
+      recognition.onend = () => {
+        setIsListening(false);
+        if (talkMode && !stopRequestedRef.current) {
+          recognition.start(); // auto restart if talk mode is active
+          setIsListening(true);
+        }
+      };
+
       recognitionRef.current = recognition;
     }
-  }, [language]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language, talkMode]);
 
-  // Toggle Voice Input
+  // Toggle manual listening
   const toggleListening = () => {
+    if (!recognitionRef.current) return;
     if (isListening) {
-      recognitionRef.current?.stop();
+      stopRequestedRef.current = true; // user manually stopped
+      recognitionRef.current.stop();
       setIsListening(false);
     } else {
-      recognitionRef.current?.start();
+      stopRequestedRef.current = false;
+      recognitionRef.current.start();
       setIsListening(true);
     }
   };
 
-  // Send message to backend
-  const sendMessage = async () => {
-    if (!input.trim()) return;
+  // Play bot reply with backend TTS
+  const playBotSpeech = async (text) => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/speak",
+        { text, gender: "female" },
+        { responseType: "blob" }
+      );
 
-    const userMessage = { from: 'user', text: input };
+      const audioBlob = new Blob([res.data], { type: "audio/wav" });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+    } catch (err) {
+      console.error("TTS error:", err);
+    }
+  };
+
+  // Send message to backend
+  const sendMessage = async (messageText = input) => {
+    if (!messageText.trim()) return;
+
+    const userMessage = { from: 'user', text: messageText };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
 
     try {
       const res = await axios.post('http://localhost:5000/chat', {
-        message: input,
+        message: messageText,
       });
 
       const botReply = res.data.reply || '🤖 Sorry, I didn’t get that.';
       setMessages((prev) => [...prev, { from: 'bot', text: botReply }]);
+
+      // 🔊 Speak reply if Talk Mode is active
+      if (talkMode) {
+        playBotSpeech(botReply);
+      }
     } catch (error) {
       setMessages((prev) => [
         ...prev,
@@ -90,8 +127,17 @@ export default function AIChat() {
 
   return (
     <div className="flex flex-col h-full w-full px-4 sm:px-10 py-6 bg-gradient-to-br from-green-100 via-pink-100 to-green-50">
-      {/* Language selector */}
-      <div className="flex justify-end mb-2">
+      {/* Language selector + Mode toggle */}
+      <div className="flex justify-between mb-2">
+        <button
+          onClick={() => setTalkMode((prev) => !prev)}
+          className={`px-3 py-1 rounded-md font-semibold text-white ${
+            talkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-500 hover:bg-gray-600'
+          }`}
+        >
+          {talkMode ? '🎤 Talk Mode' : '💬 Chat Mode'}
+        </button>
+
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
@@ -122,7 +168,6 @@ export default function AIChat() {
           </div>
         ))}
 
-        {/* Typing indicator */}
         {isTyping && (
           <div className="flex items-center space-x-1 px-4">
             <div className="w-2 h-2 bg-green-700 rounded-full animate-ping" />
@@ -145,7 +190,7 @@ export default function AIChat() {
         />
         <div className="flex gap-2 mt-2">
           <button
-            onClick={sendMessage}
+            onClick={() => sendMessage()}
             className="w-full py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"
           >
             Send
