@@ -1,143 +1,170 @@
-import React from "react";
+import React, { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { Volume2, VolumeX } from "lucide-react";
+
+// 🎵 Import your music file
+import musicFile from "../assets/Music.mp3";
+
+const leafEmojis = ["🍃", "🍂", "🌿", "🍁", "🍀", "🌱"];
 
 export default function Home() {
   const navigate = useNavigate();
-  const text = "CALMANA".split("");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
 
-  // Container for staggering letter animations
-  const container = {
-    hidden: { opacity: 1 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.35 },
-    },
-  };
-
-  // Letters animate in then drift out right
-  const letter = {
-    hidden: { x: -200, opacity: 0, scale: 0.8, rotate: -15 },
-    visible: {
-      x: [0, 320],
-      opacity: [1, 0],
-      scale: [1.2, 1],
-      rotate: [0, 8],
-      transition: { duration: 1.8, ease: "easeInOut" },
-    },
-  };
-
-  // Leaf floating gently
-  const leaf = {
-    hidden: { x: -100, y: 0, rotate: -15, opacity: 0 },
-    visible: {
-      x: ["-5%", "110%"],
-      y: [0, -25, 10, -15, 0],
-      rotate: [-15, 15, -8, 12, 0],
-      opacity: [0, 1, 1, 0.5, 0],
-      transition: {
-        duration: 5.5,
-        ease: "easeInOut",
-      },
-    },
+  const toggleMusic = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => console.log("Audio play error:", err));
+    }
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-green-50 via-emerald-100 to-green-200 p-6 overflow-hidden relative">
-      {/* Leaf drifting */}
-      <motion.span
-        className="absolute top-28 text-5xl select-none"
-        variants={leaf}
-        initial="hidden"
-        animate="visible"
-        aria-hidden="true"
-      >
-        🍃
-      </motion.span>
+    <div
+      className="relative flex items-center justify-center min-h-screen 
+                 bg-gradient-to-b from-green-900 via-green-700 to-pink-600 
+                 text-white overflow-hidden"
+    >
+      {/* 🎵 Background Music */}
+      <audio ref={audioRef} loop>
+        <source src={musicFile} type="audio/mpeg" />
+      </audio>
 
-      {/* CALMANA letters */}
+      {/* 🎵 Music Toggle Button */}
+      <button
+        onClick={toggleMusic}
+        className="absolute top-6 right-6 p-3 rounded-full bg-white/20 
+                   backdrop-blur-md shadow-lg hover:bg-white/30 transition z-50"
+      >
+        {isPlaying ? (
+          <Volume2 className="w-6 h-6 text-white" />
+        ) : (
+          <VolumeX className="w-6 h-6 text-white" />
+        )}
+      </button>
+
+      {/* Aurora Background */}
       <motion.div
-        className="grid grid-cols-7 w-full max-w-6xl mt-20 mb-16 select-none"
-        variants={container}
-        initial="hidden"
-        animate="visible"
-        aria-label="Animated CALMANA Text"
-        role="heading"
-        aria-level={1}
-      >
-        {text.map((char, index) => (
-          <motion.span
-            key={index}
-            variants={letter}
-            className="text-7xl md:text-8xl font-extrabold text-emerald-700 drop-shadow-md flex justify-center"
-            aria-hidden="false"
-            aria-label={char}
-          >
-            {char}
-          </motion.span>
-        ))}
-      </motion.div>
-
-      {/* Title */}
-      <motion.h2
-        className="text-4xl md:text-5xl font-bold text-green-800 text-center mb-6 select-none"
-        initial={{ opacity: 0, scale: 0.85 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{
-          duration: 1,
-          delay: text.length * 0.35 + 0.5,
-          ease: "easeOut",
-        }}
-        role="heading"
-        aria-level={2}
-      >
-        Welcome to Calmana
-      </motion.h2>
-
-      {/* Subtitle */}
-      <motion.p
-        className="text-lg md:text-xl text-green-700 font-medium mb-12 text-center max-w-2xl leading-relaxed select-none"
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 1,
-          delay: text.length * 0.35 + 1.2,
-          ease: "easeOut",
-        }}
-      >
-        Your personal oasis for{" "}
-        <span className="font-semibold text-emerald-700">wellness</span> and{" "}
-        <span className="font-semibold text-green-800">calm</span>.
-      </motion.p>
-
-      {/* Enter button with smooth entrance and flicker */}
-      <motion.button
-        className="bg-gradient-to-r from-green-500 via-emerald-500 to-lime-400 text-white px-10 py-4 rounded-full shadow-xl text-lg font-semibold tracking-wide flex items-center gap-3 transition-transform transform focus:outline-none focus:ring-4 focus:ring-green-400 focus:ring-opacity-60 select-none justify-center"
-        onClick={() => navigate("/auth")}
-        initial={{ opacity: 0, y: 40 }}
+        className="absolute inset-0 bg-gradient-to-r from-green-400 via-pink-300 to-purple-400 opacity-30 blur-3xl"
         animate={{
-          opacity: [0, 1, 0.8, 1, 0.85, 1], // flicker effect
-          y: 0,
+          background: [
+            "linear-gradient(to right, #34d399, #f9a8d4, #a78bfa)",
+            "linear-gradient(to right, #6ee7b7, #fbcfe8, #c4b5fd)",
+            "linear-gradient(to right, #4ade80, #f472b6, #818cf8)",
+          ],
         }}
         transition={{
-          opacity: {
-            repeat: Infinity,
-            repeatType: "loop",
-            duration: 3,
-            ease: "easeInOut",
-            delay: text.length * 0.35 + 1.8,
-          },
-          y: { type: "spring", stiffness: 120, damping: 20, duration: 1 },
+          duration: 15,
+          repeat: Infinity,
+          repeatType: "reverse",
         }}
-        whileHover={{ scale: 1.1, boxShadow: "0 0 25px rgba(34,197,94,0.8)" }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Enter Calmana"
-      >
-        <span className="text-2xl" aria-hidden="true">
-          🍃
-        </span>{" "}
-        Enter Calmana
-      </motion.button>
+      />
+
+      {/* ✨ Starry Dots */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(80)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-white"
+            style={{
+              width: Math.random() * 2 + 1,
+              height: Math.random() * 2 + 1,
+              top: `${Math.random() * 100}vh`,
+              left: `${Math.random() * 100}vw`,
+              opacity: Math.random() * 0.8 + 0.2,
+            }}
+            animate={{
+              opacity: [0.2, 1, 0.5],
+              scale: [1, 1.4, 1],
+            }}
+            transition={{
+              duration: 2 + Math.random() * 3,
+              repeat: Infinity,
+              repeatType: "reverse",
+              delay: Math.random() * 4,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* 🍃 Floating Leaves */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none text-2xl">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{
+              y: -20,
+              x: `${Math.random() * 100}vw`,
+              opacity: 0,
+            }}
+            animate={{
+              y: ["-10vh", "110vh"],
+              x: [`${Math.random() * 100}vw`, `${Math.random() * 100}vw`],
+              opacity: [0, 1, 0.6],
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 15 + Math.random() * 15,
+              repeat: Infinity,
+              delay: Math.random() * 10,
+              ease: "easeInOut",
+            }}
+            className="absolute"
+          >
+            {leafEmojis[Math.floor(Math.random() * leafEmojis.length)]}
+          </motion.div>
+        ))}
+      </div>
+
+      {/* 🌟 Main Content */}
+      <AnimatePresence>
+        <motion.div
+          key="main"
+          initial={{ opacity: 0, scale: 1.2 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.8, ease: "easeInOut" }}
+          className="flex flex-col items-center text-center space-y-6 px-4 z-20"
+        >
+          <motion.h2
+            initial={{ opacity: 0, scale: 1.3 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="text-4xl md:text-6xl font-serif font-bold 
+                       bg-clip-text text-transparent 
+                       bg-gradient-to-r from-green-100 via-pink-200 to-white 
+                       drop-shadow-lg"
+          >
+            Welcome to CALMANA
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 2, delay: 0.8 }}
+            className="text-lg md:text-2xl text-green-100 max-w-3xl"
+          >
+            Your Personal Oasis for Wellness & Calm
+          </motion.p>
+
+          <motion.button
+            onClick={() => navigate("/auth")}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-10 py-4 rounded-full font-semibold text-xl shadow-lg 
+                       bg-gradient-to-r from-pink-400 via-green-400 to-teal-500 
+                       text-white tracking-wide"
+          >
+            Enter
+          </motion.button>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

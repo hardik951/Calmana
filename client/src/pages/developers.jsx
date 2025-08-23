@@ -3,6 +3,11 @@ import React from "react";
 import { FaInstagram, FaLinkedin, FaGithub } from "react-icons/fa";
 import KaushikImage from '../assets/kaushiknarayan.jpg';
 import PrakarshImage from '../assets/prakarshawasthi.jpg';
+import DeekshaImage from '../assets/deekshaimg.jpg';
+import HardikImage from '../assets/Hardikimg.jpg';
+import PratyakshImage from '../assets/Pratyakshimg.jpg';
+
+
 
 
 const team = [
@@ -20,21 +25,21 @@ const team = [
   {
     name: "HARDIK SAHNI",
     role: "Full-Stack Developer",
-    img: "",
+    img: HardikImage,
     links: {
-      instagram: "https://instagram.com/your_handle",
-      linkedin: "https://www.linkedin.com/in/your_handle",
-      github: "https://github.com/your_handle",
+      instagram: "https://www.instagram.com/_.hardiksahni._/",
+      linkedin: "https://www.linkedin.com/in/hardik-sahni-175749320/",
+      github: "https://github.com/hardik951",
     },
   },
   {
     name: "DEEKSHA SINGH",
     role: "AI/ML Developer",
-    img: "",
+    img: DeekshaImage,
     links: {
-      instagram: "https://instagram.com/your_handle",
-      linkedin: "https://www.linkedin.com/in/your_handle",
-      github: "https://github.com/your_handle",
+      instagram: "https://www.instagram.com/quaffle_2203/",
+      linkedin: "https://www.linkedin.com/in/deeksha-singh-37441826b/",
+      github: "https://github.com/Deeksha0403",
     },
   },
   {
@@ -51,7 +56,7 @@ const team = [
   {
     name: "PRATYAKSH RANA",
     role: "Computer Vision Developer",
-    img: "",
+    img: PratyakshImage,
     links: {
       instagram: "https://instagram.com/your_handle",
       linkedin: "https://www.linkedin.com/in/your_handle",

@@ -8,6 +8,8 @@ module.exports = {
     extend: {
       fontFamily: {
         inter: ['Inter', ...defaultTheme.fontFamily.sans],
+        playfair: ['"Playfair Display"', 'serif'],
+        dancing: ['"Dancing Script"', 'cursive'],
       },
       keyframes: {
         'gradient-green-pink-shift': {
@@ -37,14 +39,26 @@ module.exports = {
             transform: 'scale(1)',
           },
           '20%, 22%, 24%, 55%': {
-            opacity: '0.8',
+            opacity: '0.85',
             transform: 'scale(0.98)',
           },
         },
-        // marquee keyframes updated for seamless scroll
         marquee: {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-50%)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        glow: {
+          '0%': { boxShadow: '0 0 8px rgba(139,92,246,0.6), 0 0 15px rgba(99,102,241,0.4)' },
+          '100%': { boxShadow: '0 0 20px rgba(139,92,246,0.9), 0 0 35px rgba(99,102,241,0.6)' },
+        },
+        float: {
+          '0%': { transform: 'translateY(0) translateX(0)' },
+          '50%': { transform: 'translateY(-20px) translateX(10px)' },
+          '100%': { transform: 'translateY(0) translateX(0)' },
         },
       },
       animation: {
@@ -55,8 +69,10 @@ module.exports = {
         'typing-blink': 'typing-blink 1s step-end infinite',
         'flicker': 'flicker 3s linear infinite',
         marquee: 'marquee 35s linear infinite',
+        shimmer: 'shimmer 3s linear infinite',
+        glow: 'glow 2s ease-in-out infinite alternate',
+        float: 'float 8s ease-in-out infinite',
       },
-      // ... existing colors, shadows, typography, etc.
     },
   },
   plugins: [
