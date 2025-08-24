@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState('');
@@ -45,14 +46,23 @@ export default function LoginPage({ onLogin }) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-100 via-emerald-100 to-lime-100 p-6 sm:p-8 lg:p-10 xl:p-12 font-inter">
-      <div className="relative bg-white/60 backdrop-blur-xl shadow-2xl rounded-3xl p-8 md:p-10 lg:p-12 xl:p-16 w-full max-w-md md:max-w-lg lg:max-w-xl border border-emerald-200">
+      
+      {/* Animated Login Card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 40 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="relative bg-white/60 backdrop-blur-xl shadow-2xl rounded-3xl p-8 md:p-10 lg:p-12 xl:p-16 w-full max-w-md md:max-w-lg lg:max-w-xl border border-emerald-200"
+      >
         <h2 className="text-3xl font-bold text-emerald-800 mb-8 text-center">Login to Calmana</h2>
 
         <div className="flex justify-center mb-8 gap-6">
           {['patient', 'doctor'].map((type) => (
-            <button
+            <motion.button
               key={type}
               type="button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className={`flex flex-col items-center px-6 py-3 rounded-2xl font-semibold border-2 transition-all duration-200 shadow-sm text-base focus:outline-none ${
                 userType === type
                   ? 'bg-emerald-600 text-white border-emerald-600 scale-105 shadow-lg'
@@ -63,7 +73,7 @@ export default function LoginPage({ onLogin }) {
             >
               <span className="text-2xl mb-1">{type === 'patient' ? '🧑‍🦰' : '🩺'}</span>
               <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
-            </button>
+            </motion.button>
           ))}
         </div>
 
@@ -98,19 +108,22 @@ export default function LoginPage({ onLogin }) {
 
           {error && <p className="text-red-500 text-center text-sm">{error}</p>}
 
-          <button
+          <motion.button
             type="submit"
             disabled={loading}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             className="w-full bg-gradient-to-r from-emerald-500 to-green-400 text-white py-3 rounded-full font-semibold hover:scale-105 transition-all"
           >
             {loading ? 'Logging in...' : '🔒 Login'}
-          </button>
+          </motion.button>
         </form>
 
-        <form onSubmit={handleSubmit} className="space-y-6"></form>
         {process.env.NODE_ENV === 'development' && (
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={(e) => {
               e.preventDefault();
               console.log('Navigating to /doctor-dashboard');
@@ -120,7 +133,7 @@ export default function LoginPage({ onLogin }) {
             className="w-full mt-3 bg-gray-300 text-gray-800 py-3 rounded-full font-semibold hover:bg-gray-400 transition-all"
           >
             🚀 For Development Dashboard
-          </button>
+          </motion.button>
         )}
 
         <p className="mt-6 text-center text-emerald-700">
@@ -132,7 +145,7 @@ export default function LoginPage({ onLogin }) {
             Sign Up
           </button>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import MoodTracker from './MoodTracker';
 import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 
 // Yoga image
 import YogaImage from '../assets/calmanayogaimg.png';
@@ -54,6 +55,12 @@ const Dashboard = () => {
     "rounded-2xl border border-white/20 p-6 shadow-md transition-all duration-300 " +
     "hover:shadow-2xl hover:scale-[1.02]";
 
+  // Animation variants
+  const fadeUp = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-8 font-inter flex flex-col">
       {/* Main layout */}
@@ -61,14 +68,34 @@ const Dashboard = () => {
         
         {/* Sidebar + Timer Block */}
         <div className="col-span-1 flex flex-col gap-6">
-          <Sidebar />
+          <motion.div variants={fadeUp} initial="hidden" animate="visible">
+            <Sidebar />
+          </motion.div>
 
           {/* Timer Block */}
-          <section
-            className={`${cardClasses} flex flex-col items-center justify-center text-center`}
+          <motion.section
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            className={`${cardClasses} flex flex-col items-center justify-center text-center relative overflow-hidden`}
           >
-            <h3 className="text-xl font-extrabold text-emerald-800 mb-4">⏱️ Timer</h3>
-            <p className="text-emerald-700 text-3xl font-mono mb-4">{formatTime(timer)}</p>
+            <h3 className="text-xl font-extrabold text-emerald-800 mb-2">⏱️ Timer</h3>
+            <p className="text-emerald-600 text-sm mb-4">
+              Use this timer to stay mindful during meditation, journaling, or focus sessions.
+            </p>
+
+            {/* Pulsating circle around timer */}
+            <motion.div
+              className="relative flex items-center justify-center w-32 h-32 mb-4"
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <div className="absolute w-32 h-32 rounded-full bg-emerald-300 opacity-20"></div>
+              <p className="relative text-emerald-800 text-3xl font-mono font-bold">
+                {formatTime(timer)}
+              </p>
+            </motion.div>
+
             <div className="flex gap-3 flex-wrap justify-center">
               <button
                 onClick={() => setIsRunning(!isRunning)}
@@ -83,13 +110,16 @@ const Dashboard = () => {
                 Reset
               </button>
             </div>
-          </section>
-        </div>
+          </motion.section>
+        </div> {/* ✅ properly closed left column */}
 
         {/* Main content */}
         <main className="lg:col-span-3 space-y-10">
           {/* Start Session Block */}
-          <section
+          <motion.section
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
             className={`${cardClasses} flex flex-col md:flex-row items-center justify-between`}
             style={{ minHeight: '180px' }}
           >
@@ -109,12 +139,17 @@ const Dashboard = () => {
             <div className="flex-shrink-0 w-40 h-40 md:w-48 md:h-48 flex items-center justify-center">
               <img src={YogaImage} alt="Yoga Emote" className="w-full h-full object-contain" />
             </div>
-          </section>
+          </motion.section>
 
           {/* Cards grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Mood Tracker */}
-            <section className={`${cardClasses} min-h-[220px] flex flex-col justify-between`}>
+            <motion.section
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className={`${cardClasses} min-h-[220px] flex flex-col justify-between`}
+            >
               <div>
                 <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center mb-1">
                   <span className="text-4xl mr-2">😊</span> Mood Tracker
@@ -126,10 +161,13 @@ const Dashboard = () => {
               <div className="flex-1 flex items-center justify-center">
                 <MoodTracker token={token} />
               </div>
-            </section>
+            </motion.section>
 
             {/* Personal Diary */}
-            <section 
+            <motion.section
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
               className={`${cardClasses} min-h-[220px] flex flex-col cursor-pointer`}
               onClick={() => navigate('/diary')}
             >
@@ -155,10 +193,15 @@ const Dashboard = () => {
                   <li className="bg-white/20 p-3 rounded border-l-4 border-gray-300">No diary entries yet.</li>
                 )}
               </ul>
-            </section>
+            </motion.section>
 
             {/* AI Chat */}
-            <section className={`${cardClasses} min-h-[160px] flex flex-col justify-between`}>
+            <motion.section
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className={`${cardClasses} min-h-[160px] flex flex-col justify-between`}
+            >
               <div>
                 <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center gap-2 mb-1">
                   <span className="text-3xl">🧠</span> Calmana AI Assistant
@@ -171,10 +214,15 @@ const Dashboard = () => {
               >
                 <span className="mr-1 text-xl">🚀</span> Start AI Chat
               </button>
-            </section>
+            </motion.section>
 
             {/* Community */}
-            <section className={`${cardClasses} min-h-[140px] flex flex-col justify-between`}>
+            <motion.section
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className={`${cardClasses} min-h-[140px] flex flex-col justify-between`}
+            >
               <div>
                 <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center mb-1">
                   <span className="text-3xl mr-2">🌍</span> Community
@@ -189,10 +237,13 @@ const Dashboard = () => {
               >
                 Visit Community
               </button>
-            </section>
+            </motion.section>
 
             {/* Feedback */}
-            <section 
+            <motion.section
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
               className={`${cardClasses} min-h-[120px] flex flex-col justify-between cursor-pointer`}
               onClick={() => navigate('/feedback')}
             >
@@ -200,10 +251,13 @@ const Dashboard = () => {
                 <span className="text-2xl mr-2">💬</span> Feedback
               </h3>
               <p className="text-emerald-700">Help us improve Calmana by sharing your feedback.</p>
-            </section>
+            </motion.section>
 
             {/* Meet Developers */}
-            <section 
+            <motion.section
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
               className={`${cardClasses} min-h-[120px] flex flex-col justify-between cursor-pointer`}
               onClick={() => navigate('/developers')}
             >
@@ -213,15 +267,20 @@ const Dashboard = () => {
               <p className="text-emerald-700">
                 Meet the team behind Calmana’s vision for well-being.
               </p>
-            </section>
+            </motion.section>
           </div>
         </main>
       </div>
 
       {/* Footer */}
-      <footer className="mt-16 text-center text-emerald-700 text-base opacity-90">
+      <motion.footer
+        variants={fadeUp}
+        initial="hidden"
+        animate="visible"
+        className="mt-16 text-center text-emerald-700 text-base opacity-90"
+      >
         &copy; {new Date().getFullYear()} Calmana. Your journey to inner peace begins here.
-      </footer>
+      </motion.footer>
     </div>
   );
 };
