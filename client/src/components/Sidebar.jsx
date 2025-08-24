@@ -15,10 +15,9 @@ export default function Sidebar() {
     "Embrace the present moment with grace.",
   ];
 
-  // State to track current mantra index
   const [mantraIndex, setMantraIndex] = useState(0);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Rotate mantra every 7s
   useEffect(() => {
     const intervalId = setInterval(() => {
       setMantraIndex((prevIndex) => (prevIndex + 1) % mantras.length);
@@ -146,7 +145,6 @@ export default function Sidebar() {
             <div key={key} className="relative group">
               <h3 className="text-base lg:text-lg font-bold text-emerald-800 mb-2 flex justify-between items-center cursor-pointer group-hover:text-emerald-700 transition-colors duration-200">
                 {title}
-                <span className="hidden lg:inline"></span>
               </h3>
               <div
                 id={`${key}-dropdown`}
@@ -250,8 +248,24 @@ export default function Sidebar() {
             </form>
           </div>
 
+          {/* View Plans Button */}
+          <div className="mt-6 relative">
+            <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-300 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full shadow">
+              💎 Premium
+            </span>
+            <button
+              onClick={() => {
+                navigate('/plans');
+                if (!isDesktop) setIsMobileMenuOpen(false);
+              }}
+              className="w-full bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:from-emerald-500 hover:to-green-700 transition-all duration-300"
+            >
+              💎 View Plans
+            </button>
+          </div>
+
           {/* SOS Button */}
-          <div className="mt-6">
+          <div className="mt-4">
             <button
               onClick={() => {
                 navigate('/sos');

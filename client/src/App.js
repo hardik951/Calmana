@@ -23,6 +23,8 @@ import Resources from './pages/Resources';
 import Mood from './pages/mood';
 import DiaryPage from './pages/DiaryPage';
 import DoctorDashboard from './pages/DoctorDashboard';
+import Plans from './pages/Plans';
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -109,6 +111,14 @@ function App() {
             <LayoutWrapper><MoodTracker /></LayoutWrapper>
           ) : <Navigate to="/login" replace />}
         />
+
+        <Route
+  path="/plans"
+  element={isAuthenticated ? (
+    <LayoutWrapper><Plans /></LayoutWrapper>
+  ) : <Navigate to="/login" replace />}
+/>
+
 
         <Route
           path="/mood-sender"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import MoodTracker from './MoodTracker';
 import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,11 @@ const Dashboard = () => {
   const [diaryEntries, setDiaryEntries] = useState([]);
   const token = localStorage.getItem('token');
   const API_BASE = 'http://localhost:5001/api';
+
+  // Timer state
+  const [timer, setTimer] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     if (!token) return;
@@ -28,6 +33,21 @@ const Dashboard = () => {
     fetchDiary();
   }, [token]);
 
+  useEffect(() => {
+    if (isRunning) {
+      timerRef.current = setInterval(() => setTimer(prev => prev + 1), 1000);
+    } else {
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [isRunning]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+  };
+
   // Card style for reusability
   const cardClasses =
     "bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 " +
@@ -39,24 +59,31 @@ const Dashboard = () => {
       {/* Main layout */}
       <div className="container mx-auto max-w-screen-xl grid grid-cols-1 lg:grid-cols-4 gap-10 flex-grow">
         
-        {/* Sidebar + extra block */}
-        <div className="col-span-1">
-          <div className="flex flex-col gap-6">
-            <Sidebar />
+        {/* Sidebar + Timer Block */}
+        <div className="col-span-1 flex flex-col gap-6">
+          <Sidebar />
 
-            {/* Breathing Animation Block */}
-            <section
-              className={`${cardClasses} flex flex-col justify-center items-center text-center`}
-            >
-              <h3 className="text-xl font-extrabold text-emerald-800 mb-4">🌬️ Breathing Exercise</h3>
-              <div className="relative flex items-center justify-center w-40 h-40">
-                <div className="absolute w-32 h-32 rounded-full bg-emerald-300 opacity-50 animate-ping"></div>
-                <div className="absolute w-24 h-24 rounded-full bg-emerald-400 opacity-70 animate-pulse"></div>
-                <div className="w-16 h-16 rounded-full bg-emerald-600"></div>
-              </div>
-              <p className="mt-4 text-emerald-700 font-medium">Breathe in... Breathe out...</p>
-            </section>
-          </div>
+          {/* Timer Block */}
+          <section
+            className={`${cardClasses} flex flex-col items-center justify-center text-center`}
+          >
+            <h3 className="text-xl font-extrabold text-emerald-800 mb-4">⏱️ Timer</h3>
+            <p className="text-emerald-700 text-3xl font-mono mb-4">{formatTime(timer)}</p>
+            <div className="flex gap-3 flex-wrap justify-center">
+              <button
+                onClick={() => setIsRunning(!isRunning)}
+                className="bg-emerald-600 text-white px-4 py-2 rounded-full shadow hover:bg-emerald-700 transition font-semibold"
+              >
+                {isRunning ? 'Pause' : 'Start'}
+              </button>
+              <button
+                onClick={() => { setTimer(0); setIsRunning(false); }}
+                className="bg-red-500 text-white px-4 py-2 rounded-full shadow hover:bg-red-600 transition font-semibold"
+              >
+                Reset
+              </button>
+            </div>
+          </section>
         </div>
 
         {/* Main content */}
