@@ -24,6 +24,7 @@ import Mood from './pages/mood';
 import DiaryPage from './pages/DiaryPage';
 import DoctorDashboard from './pages/DoctorDashboard';
 import Plans from './pages/Plans';
+import VideoSession from './pages/VideoSession';
 
 
 function App() {
@@ -153,7 +154,15 @@ function App() {
           element={isAuthenticated ? (
             <LayoutWrapper><AIChatPage /></LayoutWrapper>
           ) : <Navigate to="/login" replace />}
+        /> 
+
+        <Route
+          path="/video-session"
+          element={isAuthenticated ? (
+            <LayoutWrapper><VideoSession /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
         />
+
 
         <Route
           path="/book-therapy"

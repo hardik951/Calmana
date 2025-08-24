@@ -54,12 +54,20 @@ export default function StartSession() {
         </p>
 
         {!sessionStarted ? (
-          <button
-            onClick={() => setSessionStarted(true)}
-            className="bg-emerald-600 text-white py-3 px-8 rounded-full font-bold shadow-2xl hover:bg-emerald-700 hover:scale-105 transition-all duration-300 mb-8"
-          >
-            Start Session
-          </button>
+          <>
+            <button
+              onClick={() => setSessionStarted(true)}
+              className="bg-emerald-600 text-white py-3 px-8 rounded-full font-bold shadow-2xl hover:bg-emerald-700 hover:scale-105 transition-all duration-300 mb-4"
+            >
+              Start AI Diagnosis 
+            </button>
+            <button
+              onClick={() => navigate('/video-session')}
+              className="bg-green-600 text-white py-3 px-8 rounded-full font-bold shadow-2xl hover:bg-green-700 hover:scale-105 transition-all duration-300"
+            >
+              Start Video Session
+            </button>
+          </>
         ) : (
           <div className="flex flex-col items-center justify-center w-full h-[70vh]">
             <div className="bg-white/90 shadow-2xl rounded-3xl p-6 w-full max-w-2xl h-full flex flex-col border border-emerald-100">
