@@ -2,7 +2,7 @@
 
 from flask import Flask, request, jsonify, send_file, after_this_request
 from flask_cors import CORS
-import os, requests, re
+import os, requests, re, sqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 import pyttsx3
@@ -275,6 +275,25 @@ def speak():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# ──────────────────────────────────────────────────────────────────────────────
+# NEW: Emotion route (pulls latest from fg.py's DB)
+# ──────────────────────────────────────────────────────────────────────────────
+@app.route("/emotion", methods=["GET"])
+def get_latest_emotion():
+    try:
+        conn = sqlite3.connect("emotion_data.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT timestamp, emotion, confidence FROM emotions ORDER BY ROWID DESC LIMIT 1")
+        row = cursor.fetchone()
+        conn.close()
+
+        if row:
+            return jsonify({"timestamp": row[0], "emotion": row[1], "confidence": row[2]})
+        else:
+            return jsonify({"emotion": None, "confidence": 0.0, "timestamp": None})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 
 
