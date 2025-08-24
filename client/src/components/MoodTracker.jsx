@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 // Example data
 const moodData = [
@@ -29,9 +30,15 @@ const moodColors = {
 };
 
 export default function MoodTracker() {
+  const navigate = useNavigate();
+
+  const handleAddMood = () => {
+    navigate("/mood"); // Redirect to Mood.jsx page route
+  };
+
   return (
     <div className="w-full flex flex-col items-center p-6 bg-gradient-to-r from-green-100 via-pink-100 to-green-100 rounded-3xl shadow-lg">
-      
+
       <p className="text-gray-700 mb-6 text-center max-w-md">
         Track your moods and visualize your emotional journey.
       </p>
@@ -74,7 +81,10 @@ export default function MoodTracker() {
         </div>
 
         <div className="flex justify-center mt-6">
-          <button className="px-6 py-3 text-lg rounded-full bg-green-600 text-white hover:bg-green-700 shadow-md">
+          <button
+            onClick={handleAddMood}
+            className="px-6 py-3 text-lg rounded-full bg-green-600 text-white hover:bg-green-700 shadow-md"
+          >
             Add Mood
           </button>
         </div>
