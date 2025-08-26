@@ -8,37 +8,64 @@ export default function StartSession() {
     { sender: 'ai', text: 'Hello! I am your AI assistant. How are you feeling today?' }
   ]);
   const [input, setInput] = useState('');
-  const [diagnosedIssue, setDiagnosedIssue] = useState('generalized anxiety'); // can be dynamic later
+  const [diagnosedIssue, setDiagnosedIssue] = useState(null); 
+ // can be dynamic later
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+ const handleSend = async (e) => {
+  e.preventDefault();
+  if (!input.trim()) return;
 
-    // Add user message to UI
-    setMessages([...messages, { sender: 'user', text: input }]);
+  // Add user message to UI
+  const newMessages = [...messages, { sender: "user", text: input }];
+  setMessages(newMessages);
 
-    try {
-      const response = await fetch("http://127.0.0.1:8000/chat", {
+  try {
+    if (!diagnosedIssue) {
+      // 🚑 Diagnostic mode
+      const response = await fetch("http://127.0.0.1:8000/diagnosis", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          conversation: [...messages.map(m => `${m.sender}: ${m.text}`), `user: ${input}`].join("\n"),
-          diagnosed_issue: diagnosedIssue
-        })
+          conversation: newMessages.map(m => ({
+            role: m.sender === "user" ? "user" : "assistant",
+            content: m.text
+          }))
+        }),
       });
 
       const data = await response.json();
       if (data.reply) {
-        setMessages(prev => [...prev, { sender: 'ai', text: data.reply }]);
-      } else {
-        setMessages(prev => [...prev, { sender: 'ai', text: "⚠️ Error fetching reply" }]);
-      }
-    } catch (err) {
-      setMessages(prev => [...prev, { sender: 'ai', text: "❌ Connection error" }]);
-    }
+        setMessages(prev => [...prev, { sender: "ai", text: data.reply }]);
 
-    setInput("");
-  };
+        if (data.done && data.reply.includes("Final Diagnosis:")) {
+          // 📝 Extract diagnosis
+          const diagnosisText = data.reply.replace("Final Diagnosis:", "").trim();
+          setDiagnosedIssue(diagnosisText);
+        }
+      }
+    } else {
+      // 💬 Supportive chat mode
+      const response = await fetch("http://127.0.0.1:8000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation: newMessages.map(m => m.text),
+          diagnosed_issue: diagnosedIssue,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.reply) {
+        setMessages(prev => [...prev, { sender: "ai", text: data.reply }]);
+      }
+    }
+  } catch (err) {
+    setMessages(prev => [...prev, { sender: "ai", text: "❌ Connection error" }]);
+  }
+
+  setInput("");
+};
+
 
   return (
     <div className="relative w-screen h-screen flex flex-col items-center justify-center font-inter">

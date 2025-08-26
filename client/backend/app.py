@@ -26,13 +26,13 @@ MEMORY = {}
 MAX_TURNS = 16  # keep last N turns for context to avoid long payloads
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Emotion detection (rule-based) + crisis detection
+# Emotion detection (improved) + crisis detection
 # ──────────────────────────────────────────────────────────────────────────────
 EMOTION_KEYWORDS = {
-    "happy":   ["happy", "joy", "excited", "glad", "cheerful", "grateful", "content"],
-    "sad":     ["sad", "down", "depressed", "unhappy", "lonely", "tearful", "hopeless"],
-    "angry":   ["angry", "mad", "furious", "annoyed", "irritated", "rage", "pissed"],
-    "anxious": ["anxious", "worried", "nervous", "tense", "panic", "stressed", "overwhelmed"],
+    "happy":   ["happy", "joy", "excited", "glad", "cheerful", "grateful", "content", "fantastic", "great", "smile", "love"],
+    "sad":     ["sad", "down", "depressed", "unhappy", "lonely", "tearful", "hopeless", "cry", "miserable", "blue"],
+    "angry":   ["angry", "mad", "furious", "annoyed", "irritated", "rage", "pissed", "hate", "frustrated"],
+    "anxious": ["anxious", "worried", "nervous", "tense", "panic", "stressed", "overwhelmed", "scared", "afraid"],
     "neutral": []
 }
 
@@ -54,10 +54,15 @@ CRISIS_RESPONSE = (
 )
 
 def detect_emotion(text: str) -> str:
+    """
+    Improved detection: uses regex word boundaries so partial matches
+    (e.g. 'gladsome' triggering 'sad') are avoided.
+    """
     t = text.lower()
     for emotion, words in EMOTION_KEYWORDS.items():
-        if any(w in t for w in words):
-            return emotion
+        for w in words:
+            if re.search(rf"\b{re.escape(w)}\b", t):
+                return emotion
     return "neutral"
 
 def is_crisis(text: str) -> bool:
@@ -65,12 +70,12 @@ def is_crisis(text: str) -> bool:
     return any(re.search(pat, t) for pat in CRISIS_PATTERNS)
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Memory helpers
+# Memory helpers (unchanged)
 # ──────────────────────────────────────────────────────────────────────────────
 def get_session(session_id: str):
     if session_id not in MEMORY:
         MEMORY[session_id] = {
-            "history": [],                     # list of {"role": "user"/"assistant", "content": "...", "ts": ISO}
+            "history": [],
             "mood_counts": {"happy":0, "sad":0, "angry":0, "anxious":0, "neutral":0}
         }
     return MEMORY[session_id]
@@ -110,15 +115,13 @@ def build_messages(session_id: str, user_message: str):
     # Pull short-term memory
     sess = get_session(session_id)
     recent_history = [{"role": h["role"], "content": h["content"]} for h in sess["history"][-MAX_TURNS*2:]]
-
     messages = [{"role": "system", "content": persona}]
     messages.extend(recent_history)
     messages.append({"role": "user", "content": user_message})
-
     return messages
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Mistral call
+# Mistral call (unchanged)
 # ──────────────────────────────────────────────────────────────────────────────
 def call_mistral(messages, temperature=0.7, model="mistral-tiny"):
     url = "https://api.mistral.ai/v1/chat/completions"
@@ -126,11 +129,7 @@ def call_mistral(messages, temperature=0.7, model="mistral-tiny"):
         "Authorization": f"Bearer {MISTRAL_API_KEY}",
         "Content-Type": "application/json"
     }
-    payload = {
-        "model": model,               # "mistral-tiny" is fast & cheap. You can switch to "mistral-small"/"mistral-large". 
-        "messages": messages,
-        "temperature": temperature
-    }
+    payload = {"model": model, "messages": messages, "temperature": temperature}
     resp = requests.post(url, headers=headers, json=payload, timeout=45)
     if resp.status_code != 200:
         raise RuntimeError(f"Mistral API error {resp.status_code}: {resp.text}")
@@ -138,7 +137,7 @@ def call_mistral(messages, temperature=0.7, model="mistral-tiny"):
     return data["choices"][0]["message"]["content"].strip()
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Routes (chat/history/moods/reset/root) - unchanged
+# Routes (chat/history/moods/reset/root/speak/emotion) - only chat updated
 # ──────────────────────────────────────────────────────────────────────────────
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -150,7 +149,7 @@ def chat():
         if not user_message:
             return jsonify({"error": "Missing 'message'"}), 400
 
-        # Crisis check (respond immediately without calling the model)
+        # Crisis check
         if is_crisis(user_message):
             emotion = "sad"
             increment_mood(session_id, emotion)
@@ -162,15 +161,14 @@ def chat():
         emotion = detect_emotion(user_message)
         increment_mood(session_id, emotion)
 
-        # Build messages with memory
+        # Build messages
         append_history(session_id, "user", user_message)
         messages = build_messages(session_id, user_message)
 
         # Call Mistral
         try:
             reply = call_mistral(messages)
-        except Exception as api_err:
-            # Fallback if Mistral fails
+        except Exception:
             reply = (
                 "Thanks for sharing that. I'm having trouble connecting right now, "
                 "but I’m here to support you. You might try a brief grounding exercise: "
@@ -179,7 +177,6 @@ def chat():
             )
 
         append_history(session_id, "assistant", reply)
-
         return jsonify({"reply": reply, "emotion": emotion})
 
     except Exception as e:
@@ -190,10 +187,7 @@ def chat():
 def history():
     session_id = (request.args.get("session_id") or "default-session").strip()
     sess = get_session(session_id)
-    return jsonify({
-        "session_id": session_id,
-        "turns": sess["history"]
-    })
+    return jsonify({"session_id": session_id, "turns": sess["history"]})
 
 
 @app.route("/moods", methods=["GET"])
@@ -207,10 +201,7 @@ def moods():
 def reset():
     body = request.get_json(force=True) or {}
     session_id = (body.get("session_id") or "default-session").strip()
-    MEMORY[session_id] = {
-        "history": [],
-        "mood_counts": {"happy":0, "sad":0, "angry":0, "anxious":0, "neutral":0}
-    }
+    MEMORY[session_id] = {"history": [], "mood_counts": {"happy":0, "sad":0, "angry":0, "anxious":0, "neutral":0}}
     return jsonify({"ok": True, "session_id": session_id})
 
 
@@ -261,14 +252,12 @@ def speak():
         # Run TTS in a separate thread
         t = threading.Thread(target=tts_worker, args=(text, tmp_path, gender))
         t.start()
-        t.join()  # Wait here just until audio is ready (still faster than blocking entire Flask)
+        t.join()
 
         @after_this_request
         def cleanup(response):
-            try:
-                os.remove(tmp_path)
-            except Exception:
-                pass
+            try: os.remove(tmp_path)
+            except Exception: pass
             return response
 
         return send_file(tmp_path, mimetype="audio/wav", as_attachment=False, conditional=True)
@@ -276,27 +265,23 @@ def speak():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ──────────────────────────────────────────────────────────────────────────────
-# NEW: Emotion route (pulls latest from fg.py's DB)
-# ──────────────────────────────────────────────────────────────────────────────
+
 @app.route("/emotion", methods=["GET"])
-def get_latest_emotion():
+def get_emotion():
     try:
         conn = sqlite3.connect("emotion_data.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT timestamp, emotion, confidence FROM emotions ORDER BY ROWID DESC LIMIT 1")
+        cursor.execute("SELECT emotion, confidence FROM emotions ORDER BY timestamp DESC LIMIT 1")
         row = cursor.fetchone()
         conn.close()
 
         if row:
-            return jsonify({"timestamp": row[0], "emotion": row[1], "confidence": row[2]})
+            return jsonify({"emotion": row[0], "confidence": row[1]})
         else:
-            return jsonify({"emotion": None, "confidence": 0.0, "timestamp": None})
+            return jsonify({"emotion": "Neutral", "confidence": 0.0})
     except Exception as e:
         return jsonify({"error": str(e)})
 
 
-
 if __name__ == "__main__":
-    # Bind to all interfaces so mobile/same-network tests work; keep port 5000 to match your React calls
     app.run(host="0.0.0.0", port=5000, debug=True)
