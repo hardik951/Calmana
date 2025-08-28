@@ -8,68 +8,84 @@ export default function StartSession() {
     { sender: 'ai', text: 'Hello! I am your AI assistant. How are you feeling today?' }
   ]);
   const [input, setInput] = useState('');
-  const [diagnosedIssue, setDiagnosedIssue] = useState(null); 
- // can be dynamic later
+  const [diagnosedIssue, setDiagnosedIssue] = useState(null);
 
- const handleSend = async (e) => {
-  e.preventDefault();
-  if (!input.trim()) return;
+  // -------------------------
+  // Helper to parse options from AI message
+  // -------------------------
+  const parseOptions = (text) => {
+    const optionRegex = /([A-J0-9])[\.\)]\s*([^\n]+)/g;
+    const options = [];
+    let match;
+    while ((match = optionRegex.exec(text)) !== null) {
+      options.push(match[1] + ". " + match[2].trim());
+    }
+    return options.length > 0 ? options : null;
+  };
 
-  // Add user message to UI
-  const newMessages = [...messages, { sender: "user", text: input }];
-  setMessages(newMessages);
+  const handleSend = async (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
 
-  try {
-    if (!diagnosedIssue) {
-      // 🚑 Diagnostic mode
-      const response = await fetch("http://127.0.0.1:8000/diagnosis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          conversation: newMessages.map(m => ({
-            role: m.sender === "user" ? "user" : "assistant",
-            content: m.text
-          }))
-        }),
-      });
+    sendUserMessage(input);
+    setInput('');
+  };
 
-      const data = await response.json();
-      if (data.reply) {
-        setMessages(prev => [...prev, { sender: "ai", text: data.reply }]);
+  // Send selected option as user message
+  const handleOptionClick = (opt) => {
+    sendUserMessage(opt);
+  };
 
-        if (data.done && data.reply.includes("Final Diagnosis:")) {
-          // 📝 Extract diagnosis
-          const diagnosisText = data.reply.replace("Final Diagnosis:", "").trim();
-          setDiagnosedIssue(diagnosisText);
+  const sendUserMessage = async (text) => {
+    const newMessages = [...messages, { sender: 'user', text }];
+    setMessages(newMessages);
+
+    try {
+      if (!diagnosedIssue) {
+        // 🚑 Diagnostic mode
+        const response = await fetch("http://127.0.0.1:8000/diagnosis", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            conversation: newMessages.map(m => ({
+              role: m.sender === "user" ? "user" : "assistant",
+              content: m.text
+            }))
+          }),
+        });
+
+        const data = await response.json();
+        if (data.reply) {
+          setMessages(prev => [...prev, { sender: "ai", text: data.reply }]);
+
+          if (data.done && data.reply.includes("Final Diagnosis:")) {
+            const diagnosisText = data.reply.replace("Final Diagnosis:", "").trim();
+            setDiagnosedIssue(diagnosisText);
+          }
+        }
+      } else {
+        // 💬 Supportive chat mode
+        const response = await fetch("http://127.0.0.1:8000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            conversation: newMessages.map(m => m.text),
+            diagnosed_issue: diagnosedIssue,
+          }),
+        });
+
+        const data = await response.json();
+        if (data.reply) {
+          setMessages(prev => [...prev, { sender: "ai", text: data.reply }]);
         }
       }
-    } else {
-      // 💬 Supportive chat mode
-      const response = await fetch("http://127.0.0.1:8000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          conversation: newMessages.map(m => m.text),
-          diagnosed_issue: diagnosedIssue,
-        }),
-      });
-
-      const data = await response.json();
-      if (data.reply) {
-        setMessages(prev => [...prev, { sender: "ai", text: data.reply }]);
-      }
+    } catch (err) {
+      setMessages(prev => [...prev, { sender: "ai", text: "❌ Connection error" }]);
     }
-  } catch (err) {
-    setMessages(prev => [...prev, { sender: "ai", text: "❌ Connection error" }]);
-  }
-
-  setInput("");
-};
-
+  };
 
   return (
     <div className="relative w-screen h-screen flex flex-col items-center justify-center font-inter">
-      {/* Background */}
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-emerald-200 via-pink-100 to-green-200 animate-gradient-green-pink-shift" />
 
       <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
@@ -86,7 +102,7 @@ export default function StartSession() {
               onClick={() => setSessionStarted(true)}
               className="bg-emerald-600 text-white py-3 px-8 rounded-full font-bold shadow-2xl hover:bg-emerald-700 hover:scale-105 transition-all duration-300 mb-4"
             >
-              Start AI Diagnosis 
+              Start AI Assessment
             </button>
             <button
               onClick={() => navigate('/video-session')}
@@ -100,13 +116,31 @@ export default function StartSession() {
             <div className="bg-white/90 shadow-2xl rounded-3xl p-6 w-full max-w-2xl h-full flex flex-col border border-emerald-100">
               <h3 className="text-2xl font-bold text-emerald-700 mb-2 text-center">Mental Health Diagnosis</h3>
               <div className="flex-1 overflow-y-auto mb-2 space-y-2 pr-2 custom-scrollbar">
-                {messages.map((msg, idx) => (
-                  <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`px-3 py-2 rounded-2xl max-w-md text-sm ${msg.sender === 'user' ? 'bg-emerald-200 text-right' : 'bg-emerald-50 text-left'}`}>
-                      {msg.text}
+                {messages.map((msg, idx) => {
+                  const options = msg.sender === 'ai' ? parseOptions(msg.text) : null;
+                  const questionText = options ? msg.text.split(/(?=[A-J0-9][\.\)])/)[0].trim() : msg.text;
+
+                  return (
+                    <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`px-3 py-2 rounded-2xl max-w-md text-sm ${msg.sender === 'user' ? 'bg-emerald-200 text-right' : 'bg-emerald-50 text-left'}`}>
+                        <p>{questionText}</p>
+                        {options && (
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {options.map((opt, i) => (
+                              <button
+                                key={i}
+                                onClick={() => handleOptionClick(opt)}
+                                className="bg-emerald-500 text-white px-3 py-1.5 rounded-md text-sm hover:bg-emerald-700 active:bg-emerald-800"
+                              >
+                                {opt}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <form onSubmit={handleSend} className="flex gap-2 mt-2">
                 <input

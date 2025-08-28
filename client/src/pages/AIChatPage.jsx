@@ -16,7 +16,7 @@ export default function AIChatPage() {
           ← Back to Dashboard
         </button>
         <h1 className="text-3xl lg:text-4xl font-extrabold text-center text-green-900 mb-6">
-          Calmana AI Chat
+          Calmana AI Therapy
         </h1>
         <div className="h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar px-2">
           <AIChat />

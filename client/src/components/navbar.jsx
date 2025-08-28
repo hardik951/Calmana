@@ -60,7 +60,7 @@ const Navbar = () => {
                   Find Doctors
                 </Link>
                 <Link to="/ai-chat" className="hover:text-emerald-700 transition duration-200">
-                  AI Chat
+                  AI Therapy
                 </Link>
                 <Link to="/resources" className="hover:text-emerald-700 transition duration-200">
                   Resources
@@ -69,7 +69,7 @@ const Navbar = () => {
                   FAQ's
                 </Link>
                 <Link to="/book-therapy" className="hover:text-emerald-700 transition duration-200">
-                  Book Therapy
+                  Book an Appointment
                 </Link>
               </>
             )}
