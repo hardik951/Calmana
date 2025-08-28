@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Volume2, VolumeX } from "lucide-react";
 import musicFile from "../assets/Music.mp3";
+import welcomeImage from "../assets/YourImage.png"; // <-- replace with your actual image file
 
 const leafEmojis = ["🍃", "🍂", "🌿", "🍁", "🍀", "🌱"];
 
@@ -104,6 +105,16 @@ export default function Home() {
           transition={{ duration: 1.8, ease: "easeInOut" }}
           className="flex flex-col items-center text-center space-y-6 px-4 z-20"
         >
+          {/* Image above the text */}
+          <motion.img
+            src={welcomeImage}
+            alt="Welcome"
+            className="w-40 md:w-60 mb-4 drop-shadow-lg"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+          />
+
           <motion.h2
             initial={{ opacity: 0, scale: 1.3 }}
             animate={{ opacity: 1, scale: 1 }}

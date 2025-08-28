@@ -5,17 +5,17 @@ const Plans = () => {
   const [premiumBilling, setPremiumBilling] = useState("1M");
 
   const plusPrices = {
-    "1M": "₹199 / month",
-    "3M": "₹499 / 3 months (Save 15%)",
-    "6M": "₹899 / 6 months (Save 25%)",
-    "1Y": "₹1399 / year (Save 40%)",
+    "1M": "₹299 / month",
+    "3M": "₹760 / 3 months (Save 15%)",
+    "6M": "₹1345 / 6 months (Save 25%)",
+    "1Y": "₹2155 / year (Save 40%)",
   };
 
   const premiumPrices = {
-    "1M": "₹399 / month",
-    "3M": "₹1099 / 3 months (Save 15%)",
-    "6M": "₹1999 / 6 months (Save 25%)",
-    "1Y": "₹2899 / year (Save 40%)",
+    "1M": "₹499 / month",
+    "3M": "₹1270 / 3 months (Save 15%)",
+    "6M": "₹2245 / 6 months (Save 25%)",
+    "1Y": "₹3590 / year (Save 40%)",
   };
 
   return (
@@ -70,10 +70,10 @@ const Plans = () => {
               onChange={(e) => setPlusBilling(e.target.value)}
               className="mb-4 p-2 rounded-lg border border-gray-300"
             >
-              <option value="1M">1 Month – ₹199</option>
-              <option value="3M">3 Months – ₹499 (Save 15%)</option>
-              <option value="6M">6 Months – ₹899 (Save 25%)</option>
-              <option value="1Y">1 Year – ₹1399 (Save 40%)</option>
+              <option value="1M">1 Month – ₹299</option>
+              <option value="3M">3 Months – ₹760 (Save 15%)</option>
+              <option value="6M">6 Months – ₹1345 (Save 25%)</option>
+              <option value="1Y">1 Year – ₹2155 (Save 40%)</option>
             </select>
 
             <button
@@ -109,10 +109,10 @@ const Plans = () => {
               onChange={(e) => setPremiumBilling(e.target.value)}
               className="mb-4 p-2 rounded-lg border border-gray-300"
             >
-              <option value="1M">1 Month – ₹399</option>
-              <option value="3M">3 Months – ₹1099 (Save 15%)</option>
-              <option value="6M">6 Months – ₹1999 (Save 25%)</option>
-              <option value="1Y">1 Year – ₹2899 (Save 40%)</option>
+              <option value="1M">1 Month – ₹499</option>
+              <option value="3M">3 Months – ₹1270 (Save 15%)</option>
+              <option value="6M">6 Months – ₹2245 (Save 25%)</option>
+              <option value="1Y">1 Year – ₹3590 (Save 40%)</option>
             </select>
 
             <button
