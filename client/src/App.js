@@ -25,6 +25,7 @@ import DiaryPage from './pages/DiaryPage';
 import DoctorDashboard from './pages/DoctorDashboard';
 import Plans from './pages/Plans';
 import VideoSession from './pages/VideoSession';
+import DoctorAppointment from "./pages/DoctorAppointment";
 
 
 function App() {
@@ -163,7 +164,6 @@ function App() {
           ) : <Navigate to="/login" replace />}
         />
 
-
         <Route
           path="/book-therapy"
           element={isAuthenticated ? (
@@ -224,6 +224,13 @@ function App() {
           path="/diary"
           element={isAuthenticated ? (
             <LayoutWrapper><DiaryPage /></LayoutWrapper>
+          ) : <Navigate to="/login" replace />}
+        />
+
+        <Route
+          path="/doctor-appointment"
+          element={isAuthenticated ? (
+            <LayoutWrapper><DoctorAppointment /></LayoutWrapper>
           ) : <Navigate to="/login" replace />}
         />
 

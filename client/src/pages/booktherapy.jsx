@@ -20,10 +20,10 @@ export default function BookTherapy() {
           Start Instant AI Therapy
         </button>
         <button
-          onClick={() => navigate('/find-doctors')}
+          onClick={() => navigate('/doctor-appointment')}
           className="bg-white border border-emerald-600 text-emerald-700 px-6 py-3 rounded-full hover:bg-emerald-50 transition"
         >
-          Book a Human Therapist
+          Book Doctor's Appointment
         </button>
       </div>
     </div>
