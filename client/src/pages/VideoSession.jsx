@@ -23,6 +23,34 @@ const VideoSession = () => {
   // Web Speech API refs
   const recognitionRef = useRef(null);
 
+ const sendFrameToBackend = async () => {
+  if (!videoRef.current || !cameraOn) return;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = videoRef.current.videoWidth;
+  canvas.height = videoRef.current.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+
+  const dataUrl = canvas.toDataURL("image/jpeg"); // Base64 encoded
+
+  try {
+    const res = await fetch(`${EMOTION_API}/analyze_frame`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: dataUrl }),
+    });
+
+     const data = await res.json();
+    if (data.emotion) {
+      setDetectedEmotion(data.emotion);
+   }
+   } catch (err) {
+     console.error("⚠️ Error sending frame:", err);
+   }
+ };
+
+
   // Start camera
   const startCamera = async () => {
     try {
@@ -55,22 +83,22 @@ const VideoSession = () => {
   };
 
   const toggleCamera = () => {
-    if (!streamRef.current) {
-      startCamera();
-      return;
+  if (cameraOn) {
+    // 🔴 Turn off camera completely
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
     }
-    const videoTracks = streamRef.current.getVideoTracks();
-    if (videoTracks.length === 0) return;
-
-    const isEnabled = videoTracks[0].enabled;
-    videoTracks.forEach((track) => (track.enabled = !isEnabled));
-    setCameraOn(!isEnabled);
-    if (!isEnabled && videoRef.current) {
-      videoRef.current.srcObject = streamRef.current;
-    } else if (isEnabled && videoRef.current) {
+    if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-  };
+    setCameraOn(false);
+    setDetectedEmotion("Neutral");
+  } else {
+    // 🟢 Turn on camera
+    startCamera();
+  }
+};
 
   // 🎤 Toggle Mic (speech-to-text)
   const toggleMic = () => {
@@ -107,21 +135,20 @@ const VideoSession = () => {
     }
   };
 
-  // ✅ Poll backend for latest emotion (cleaned version)
+  // 🎥 Start camera on mount & auto-send frames every 2s
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetch(`${EMOTION_API}/get_latest_emotion`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.emotion) {
-            setDetectedEmotion(data.emotion);
-          }
-        })
-        .catch((err) => console.error("Error fetching emotion:", err));
-    }, 3000); // poll every 3s
+  let interval;
 
-    return () => clearInterval(interval);
-  }, []);
+  if (cameraOn) {
+    interval = setInterval(() => {
+      sendFrameToBackend();
+    }, 2000);
+  }
+
+  return () => {
+    if (interval) clearInterval(interval);
+  };
+  }, [cameraOn]);
 
   // 📨 Send user message → backend chat
   const handleSend = async (overrideInput) => {
@@ -173,7 +200,6 @@ const VideoSession = () => {
           const audio = new Audio(audioUrl);
           audio.play();
         } else {
-          // fallback: browser voice
           if (window.speechSynthesis) {
             const utterance = new SpeechSynthesisUtterance(aiMessage.text);
             utterance.rate = 1;
@@ -260,7 +286,6 @@ const VideoSession = () => {
         <h2 className="text-2xl font-bold text-emerald-800 mb-2 text-center">
           AI Assistant
         </h2>
-        {/* Show emotion awareness */}
         <div className="text-center mb-3 text-sm text-gray-700">
           Chat Emotion: <span className="font-semibold">{chatEmotion}</span>
         </div>

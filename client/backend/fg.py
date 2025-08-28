@@ -1,20 +1,20 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import cv2
+import base64
+import numpy as np
 from deepface import DeepFace
 import sqlite3
-import threading
-import time
 from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
+DB_NAME = "emotions.db"
+
 # ───────────────────────────────────────────
 # SQLite Setup
 # ───────────────────────────────────────────
-DB_NAME = "emotions.db"
-
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -31,83 +31,70 @@ def init_db():
 
 init_db()
 
-# ───────────────────────────────────────────
-# Background Thread for Emotion Detection
-# ───────────────────────────────────────────
-latest_emotion = {"emotion": None, "confidence": None, "timestamp": None}
+latest_emotion = {"emotion": "Unknown", "confidence": 0.0, "timestamp": None}
 
-def open_camera():
-    """Try multiple backends until the camera opens successfully."""
-    backends = [cv2.CAP_DSHOW, cv2.CAP_MSMF, cv2.CAP_VFW, cv2.CAP_ANY]
-    for backend in backends:
-        cap = cv2.VideoCapture(0, backend)
-        if cap.isOpened():
-            print(f"✅ Camera opened using backend {backend}")
-            return cap
-        cap.release()
-    raise RuntimeError("❌ Could not open webcam. Check camera permissions or close other apps using it.")
+# Warmup DeepFace model once
+print("⏳ Loading DeepFace model...")
+_ = DeepFace.analyze(np.zeros((100, 100, 3), dtype=np.uint8), actions=["emotion"], enforce_detection=False)
+print("✅ DeepFace model loaded.")
 
-def emotion_detection_loop():
+
+# ───────────────────────────────────────────
+# Analyze Frame
+# ───────────────────────────────────────────
+@app.route("/analyze_frame", methods=["POST"])
+def analyze_frame():
     global latest_emotion
+    try:
+        data = request.json.get("image")
+        if not data:
+            return jsonify({"error": "No image data"}), 400
 
-    while True:
-        cap = open_camera()
-        ret, frame = cap.read()
-        cap.release()  # 🔑 release immediately so camera isn’t locked
+        # Decode base64 image
+        img_data = base64.b64decode(data.split(",")[1])
+        np_arr = np.frombuffer(img_data, np.uint8)
+        frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
-        if not ret:
-            time.sleep(2)
-            continue
+        result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
+        if isinstance(result, list):
+            result = result[0]
 
-        try:
-            result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
-            if isinstance(result, list):
-                result = result[0]  # deepface returns list sometimes
+        dominant_emotion = result.get('dominant_emotion', "Unknown")
+        confidence = result.get('emotion', {}).get(dominant_emotion, 0.0)
 
-            dominant_emotion = result.get('dominant_emotion', "Unknown")
-            confidence = result.get('emotion', {}).get(dominant_emotion, 0.0)
+        # Store in SQLite
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO emotions (emotion, confidence) VALUES (?, ?)",
+                       (dominant_emotion, float(confidence)))
+        conn.commit()
+        conn.close()
 
-            # Store in SQLite
-            conn = sqlite3.connect(DB_NAME)
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO emotions (emotion, confidence) VALUES (?, ?)",
-                           (dominant_emotion, float(confidence)))
-            conn.commit()
-            conn.close()
+        # Update latest_emotion
+        latest_emotion = {
+            "emotion": str(dominant_emotion),
+            "confidence": float(confidence),
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
 
-            # Update latest_emotion
-            latest_emotion = {
-                "emotion": str(dominant_emotion),
-                "confidence": float(confidence) if confidence else 0.0,
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
+        return jsonify(latest_emotion)
 
-        except Exception as e:
-            print("⚠️ Emotion detection error:", str(e))
+    except Exception as e:
+        print("⚠️ Emotion detection error:", str(e))
+        return jsonify({"error": str(e), "emotion": "Unknown", "confidence": 0.0}), 500
 
-        time.sleep(2)  # Detect every 2 seconds
-
-# Start detection in background thread
-threading.Thread(target=emotion_detection_loop, daemon=True).start()
 
 # ───────────────────────────────────────────
-# API Routes
+# Get Latest Emotion
 # ───────────────────────────────────────────
 @app.route("/get_latest_emotion", methods=["GET"])
 def get_latest_emotion():
-    if latest_emotion:
-        emotion_value = latest_emotion.get("emotion") or "Unknown"
-        confidence_value = latest_emotion.get("confidence") or 0.0
-
-        safe_emotion = {
-            "emotion": str(emotion_value),
-            "confidence": float(confidence_value)
-        }
-        return jsonify(safe_emotion)
-    else:
-        return jsonify({"emotion": "Unknown", "confidence": 0.0})
+    return jsonify(latest_emotion)
 
 
+# ───────────────────────────────────────────
+# Get All Emotions (last 20)
+# ───────────────────────────────────────────
 @app.route("/get_all_emotions", methods=["GET"])
 def get_all_emotions():
     conn = sqlite3.connect(DB_NAME)
@@ -115,9 +102,9 @@ def get_all_emotions():
     cursor.execute("SELECT emotion, confidence, timestamp FROM emotions ORDER BY id DESC LIMIT 20")
     rows = cursor.fetchall()
     conn.close()
-
     emotions = [{"emotion": r[0], "confidence": r[1], "timestamp": r[2]} for r in rows]
     return jsonify(emotions)
+
 
 # ───────────────────────────────────────────
 # Run Flask App
