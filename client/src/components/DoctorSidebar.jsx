@@ -66,14 +66,7 @@ export function DoctorSidebar() {
       <div className="px-4 py-6 border-t border-primary/20 bg-green-50">
         <h4 className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-3 select-none">Quick Actions</h4>
         <div className="space-y-3">
-          <Button 
-            variant="solid" 
-            size="sm" 
-            className="w-full flex items-center gap-3 justify-start bg-gradient-to-r from-emerald-500 via-pink-500 to-green-600 shadow-md hover:from-emerald-600 hover:via-pink-600 hover:to-green-700"
-          >
-            <Activity className="w-5 h-5" />
-            Start Appointment
-          </Button>
+          
           <Button 
             variant="solid" 
             size="sm" 

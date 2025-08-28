@@ -138,16 +138,16 @@ function WelcomeBanner({ onStart }) {
     <section className="w-full rounded-2xl bg-white/80 shadow-lg flex flex-col md:flex-row items-center justify-between px-10 py-8 mb-8 animate-fade-in-up">
       <div className="flex-1">
         <h2 className="text-3xl md:text-4xl font-extrabold text-green-800 mb-4">
-          Calmana – <span className="text-green-600">Your Space for Peace</span>
+          Calmana – <span className="text-green-600">Your Space to Care</span>
         </h2>
         <p className="text-green-700 text-lg mb-6 max-w-xl">
-          Calmana is here to help you relax, refocus, and renew. Start a calming session whenever you need a moment of peace.
+          Calmana is here to help you connect, guide, and support your patients effectively. Join our network to provide professional care in a calm, focused, and secure environment.
         </p>
         <button
           onClick={onStart}
           className="bg-green-600 text-white px-8 py-3 rounded-full font-semibold shadow hover:bg-green-700 transition"
         >
-          Start Session
+          Start your Upcoming Session
         </button>
       </div>
       <div className="flex-shrink-0 mt-6 md:mt-0 md:ml-10 w-36 h-36 md:w-48 md:h-48 flex items-center justify-center">
@@ -234,7 +234,7 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
         </div>
         <Button onClick={onStartSession} className="rounded-2xl bg-green-700 px-8 py-4 text-lg font-semibold text-white hover:bg-green-800">
           <Activity className="mr-2 h-6 w-6" />
-          Start Session
+          Go Live 
         </Button>
       </section>
 
