@@ -23,33 +23,35 @@ const VideoSession = () => {
   // Web Speech API refs
   const recognitionRef = useRef(null);
 
- const sendFrameToBackend = async () => {
-  if (!videoRef.current || !cameraOn) return;
+  // 🔹 Chat container ref for auto-scroll
+  const chatContainerRef = useRef(null);
 
-  const canvas = document.createElement("canvas");
-  canvas.width = videoRef.current.videoWidth;
-  canvas.height = videoRef.current.videoHeight;
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+  const sendFrameToBackend = async () => {
+    if (!videoRef.current || !cameraOn) return;
 
-  const dataUrl = canvas.toDataURL("image/jpeg"); // Base64 encoded
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
-  try {
-    const res = await fetch(`${EMOTION_API}/analyze_frame`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: dataUrl }),
-    });
+    const dataUrl = canvas.toDataURL("image/jpeg"); // Base64 encoded
 
-     const data = await res.json();
-    if (data.emotion) {
-      setDetectedEmotion(data.emotion);
-   }
-   } catch (err) {
-     console.error("⚠️ Error sending frame:", err);
-   }
- };
+    try {
+      const res = await fetch(`${EMOTION_API}/analyze_frame`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: dataUrl }),
+      });
 
+      const data = await res.json();
+      if (data.emotion) {
+        setDetectedEmotion(data.emotion);
+      }
+    } catch (err) {
+      console.error("⚠️ Error sending frame:", err);
+    }
+  };
 
   // Start camera
   const startCamera = async () => {
@@ -83,22 +85,22 @@ const VideoSession = () => {
   };
 
   const toggleCamera = () => {
-  if (cameraOn) {
-    // 🔴 Turn off camera completely
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
+    if (cameraOn) {
+      // 🔴 Turn off camera completely
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+      setCameraOn(false);
+      setDetectedEmotion("Neutral");
+    } else {
+      // 🟢 Turn on camera
+      startCamera();
     }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    setCameraOn(false);
-    setDetectedEmotion("Neutral");
-  } else {
-    // 🟢 Turn on camera
-    startCamera();
-  }
-};
+  };
 
   // 🎤 Toggle Mic (speech-to-text)
   const toggleMic = () => {
@@ -137,17 +139,17 @@ const VideoSession = () => {
 
   // 🎥 Start camera on mount & auto-send frames every 2s
   useEffect(() => {
-  let interval;
+    let interval;
 
-  if (cameraOn) {
-    interval = setInterval(() => {
-      sendFrameToBackend();
-    }, 2000);
-  }
+    if (cameraOn) {
+      interval = setInterval(() => {
+        sendFrameToBackend();
+      }, 2000);
+    }
 
-  return () => {
-    if (interval) clearInterval(interval);
-  };
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [cameraOn]);
 
   // 📨 Send user message → backend chat
@@ -227,6 +229,16 @@ const VideoSession = () => {
     if (e.key === "Enter") handleSend();
   };
 
+  // 🔹 Auto-scroll when messages change
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: "smooth", // smooth scrolling
+      });
+    }
+  }, [messages]);
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-6 gap-6">
       {/* Left: User Camera */}
@@ -290,7 +302,11 @@ const VideoSession = () => {
           Chat Emotion: <span className="font-semibold">{chatEmotion}</span>
         </div>
 
-        <div className="flex-1 overflow-y-auto border rounded-lg p-3 mb-4 bg-emerald-50">
+        {/* 🔹 Scrollable chat with auto-scroll */}
+        <div
+          ref={chatContainerRef}
+          className="flex-1 overflow-y-auto border rounded-lg p-3 mb-4 bg-emerald-50 max-h-[400px]"
+        >
           {messages.map(({ id, text, sender }) => (
             <div
               key={id}
