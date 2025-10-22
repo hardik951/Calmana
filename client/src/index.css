@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(16, 185, 129, 0.5); /* Emerald shade */
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Fade-in-up animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+/* Gradient shift animation */
+@keyframes gradient-green-pink-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient-green-pink-shift {
+  background-size: 400% 400%;
+  animation: gradient-green-pink-shift 15s ease infinite;
+}
+/* Avatar */
+.avatar-wrap { display:flex; align-items:center; justify-content:center; margin-right:12px; }
+.avatar-face { position:relative; width:64px; height:64px; border-radius:50%; background:#f3faf7; border:2px solid #a7f3d0; display:flex; align-items:center; justify-content:center; }
+.avatar-emoji { font-size:28px; }
+.avatar-mouth { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); width:16px; height:6px; background:#333; border-radius:3px; opacity:0.8; transition:height 0.08s ease; }
+.avatar-mouth.speaking { height:16px; }
+
+/* Chat shell */
+.chat-shell { display:flex; flex-direction:column; height:100vh; max-width:720px; margin:0 auto; padding:16px; }
+.topbar { display:flex; align-items:center; gap:10px; padding:8px 0; }
+.title .name { font-weight:700; font-size:18px; }
+.title .sub { font-size:12px; color:#4b5563; }
+
+.log { flex:1; overflow:auto; padding:12px 4px; background:#ffffff; border:1px solid #e5e7eb; border-radius:8px; }
+.msg { display:flex; margin:8px 0; }
+.msg.user { justify-content:flex-end; }
+.bubble { max-width:70%; padding:10px 12px; border-radius:14px; box-shadow:0 1px 2px rgba(0,0,0,0.06); font-size:14px; line-height:1.4; }
+.msg.user .bubble { background:#d1fae5; color:#064e3b; }
+.msg.bot  .bubble { background:#ecfdf5; color:#065f46; }
+
+.composer { margin-top:10px; display:flex; gap:8px; }
+.composer textarea { flex:1; padding:10px; border:1px solid #a7f3d0; border-radius:8px; resize:none; }
+.actions { display:flex; gap:8px; }
+.btn { padding:10px 12px; border:none; border-radius:8px; cursor:pointer; font-weight:600; }
+.btn.send { background:#10b981; color:#fff; }
+.btn.mic { background:#6b7280; color:#fff; }
+.btn.mic.live { background:#ef4444; }
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(50vh) rotate(180deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-fall {
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
