@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+<<<<<<< HEAD
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-tabs": "^1.1.13",
+=======
+>>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
     "@react-google-maps/api": "^2.20.7",
     "@react-three/drei": "^10.6.1",
     "@react-three/fiber": "^9.3.0",
@@ -15,7 +18,10 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.11.0",
     "canvas-confetti": "^1.9.3",
+<<<<<<< HEAD
     "clsx": "^2.1.1",
+=======
+>>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
     "framer-motion": "^12.23.12",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.526.0",
@@ -27,7 +33,10 @@
     "react-scripts": "^5.0.1",
     "recharts": "^3.1.2",
     "remark-gfm": "^4.0.1",
+<<<<<<< HEAD
     "tailwind-merge": "^3.3.1",
+=======
+>>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
     "three": "^0.178.0",
     "web-vitals": "^2.1.4"
   },
