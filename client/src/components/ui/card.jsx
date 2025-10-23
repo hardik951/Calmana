@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import * as React from "react"
 
 import { cn } from "../../lib/utils" // <-- Make sure this path is correct

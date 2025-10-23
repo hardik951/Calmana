@@ -22,14 +22,11 @@ import {
   Search,
   Bell,
   ChevronDown,
-<<<<<<< HEAD
   Users, // <-- Added Users
   Menu,   // <-- Added Menu
 } from "lucide-react";
 import { Separator } from "./ui/separator"; // <-- Added Separator
-=======
 } from "lucide-react";
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
 import { QuickInsights } from "./QuickInsights";
 
 // Optional: Your image asset path
@@ -40,11 +37,8 @@ const statsCards = [
   {
     title: "Total Patients",
     value: "234",
-<<<<<<< HEAD
     icon: Users, // <-- Fixed icon
-=======
     icon: require("lucide-react").Users,
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
     change: "+12%",
     changeType: "positive",
   },
@@ -71,10 +65,7 @@ const statsCards = [
   },
 ];
 
-<<<<<<< HEAD
 // ... (upcomingAppointments, recentMessages, pendingReports arrays remain the same) ...
-=======
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
 const upcomingAppointments = [
   {
     id: 1,
@@ -147,10 +138,7 @@ const pendingReports = [
   },
 ];
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
 // Welcome banner component
 function WelcomeBanner({ onStart }) {
   return (
@@ -163,11 +151,8 @@ function WelcomeBanner({ onStart }) {
           Calmana is here to help you connect, guide, and support your patients effectively. Join our network to provide professional care in a calm, focused, and secure environment.
         </p>
         <button
-<<<<<<< HEAD
           onClick={onStart} // <-- This is the correct button
-=======
           onClick={onStart}
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
           className="bg-green-600 text-white px-8 py-3 rounded-full font-semibold shadow hover:bg-green-700 transition"
         >
           Start your Upcoming Session
@@ -185,16 +170,13 @@ function WelcomeBanner({ onStart }) {
   );
 }
 
-<<<<<<< HEAD
 // Renamed props to match what DoctorDashboard is sending
 export function DoctorDashboardContent({ 
   isSidebarOpen, 
   onStartSession, 
   onToggleSidebar 
 }) {
-=======
 export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
   return (
     <div
       className="
@@ -205,7 +187,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
         p-8 space-y-10 w-full overflow-x-hidden
       "
     >
-<<<<<<< HEAD
       {/* ===== HEADER - MORE PROFESSIONAL ===== */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md px-6 py-4 flex items-center justify-between shadow-md mb-6 rounded-2xl">
         
@@ -269,7 +250,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
               <div className="text-xs text-gray-500">Psychiatrist</div>
             </div>
             <ChevronDown className="w-4 h-4 text-muted-foreground" />
-=======
       {/* Header */}
       <header className="sticky top-0 z-10 bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 px-4 py-3 rounded-lg flex items-center justify-between shadow-sm mb-6">
         {!isSidebarOpen && (
@@ -311,17 +291,13 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
               <div className="text-xs text-gray-500">Psychiatrist</div>
             </div>
             <ChevronDown className="w-3 h-3 text-gray-600" />
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
           </div>
         </div>
       </header>
 
       {/* Welcome Banner */}
-<<<<<<< HEAD
       <WelcomeBanner onStart={onStartSession} /> 
-=======
       <WelcomeBanner onStart={onStartSession} />
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
 
       {/* Dashboard Overview */}
       <section className="flex flex-col md:flex-row justify-between gap-8">
@@ -331,7 +307,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
             Dashboard Overview
           </h2>
           <p className="mt-2 text-xl text-green-600">
-<<<<<<< HEAD
             Welcome back,{" "}
             <span className="font-semibold text-green-800">
               Dr. Sarah Johnson
@@ -345,21 +320,18 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
         >
           <Activity className="mr-2 h-6 w-6" />
           Go Live
-=======
             Welcome back, <span className="font-semibold text-green-800">Dr. Sarah Johnson</span>
           </p>
         </div>
         <Button onClick={onStartSession} className="rounded-2xl bg-green-700 px-8 py-4 text-lg font-semibold text-white hover:bg-green-800">
           <Activity className="mr-2 h-6 w-6" />
           Go Live 
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
         </Button>
       </section>
 
       {/* Stats Cards */}
       <section className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
         {statsCards.map((stat) => (
-<<<<<<< HEAD
           <Card
             key={stat.title}
             className="rounded-3xl bg-white/95 p-3 shadow-lg transition-transform duration-200 hover:scale-105 hover:shadow-2xl"
@@ -373,21 +345,18 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
                   <p className="text-4xl font-extrabold text-green-900">
                     {stat.value}
                   </p>
-=======
           <Card key={stat.title} className="rounded-3xl bg-white/95 p-3 shadow-lg transition-transform duration-200 hover:scale-105 hover:shadow-2xl">
             <CardContent className="p-8">
               <div className="flex justify-between">
                 <div>
                   <p className="mb-0 text-lg font-medium text-green-700">{stat.title}</p>
                   <p className="text-4xl font-extrabold text-green-900">{stat.value}</p>
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
                 </div>
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-500">
                   <stat.icon className="h-9 w-9 text-white" />
                 </div>
               </div>
               <div className="mt-6 flex items-center">
-<<<<<<< HEAD
                 <TrendingUp
                   className={`mr-2 h-5 w-5 ${
                     stat.changeType === "positive"
@@ -408,7 +377,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
                 >
                   {stat.change}
                 </p>
-=======
                 <TrendingUp className={`mr-2 h-5 w-5 ${
                   stat.changeType === "positive" ? "text-green-500" : 
                   stat.changeType === "neutral" ? "text-yellow-600" : 
@@ -419,7 +387,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
                   stat.changeType === "neutral" ? "text-yellow-600" : 
                   "text-red-500"
                 }`}>{stat.change}</p>
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
                 <p className="ml-2 text-sm text-green-600">from last week</p>
               </div>
             </CardContent>
@@ -435,7 +402,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
               <Calendar className="w-7 h-7 text-green-700" />
               Upcoming Appointments
             </CardTitle>
-<<<<<<< HEAD
             <CardDescription className="text-green-600 text-base">
               Today's scheduled sessions
             </CardDescription>
@@ -475,7 +441,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
                     variant="outline"
                     className="mt-2 rounded-xl border-green-700 text-green-700 hover:bg-green-100"
                   >
-=======
             <CardDescription className="text-green-600 text-base">Today's scheduled sessions</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -494,21 +459,17 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
                 <div className="text-right">
                   <p className="text-lg font-bold text-green-800">{appointment.time}</p>
                   <Button size="lg" variant="outline" className="mt-2 rounded-xl border-green-700 text-green-700 hover:bg-green-100">
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
                     <Video className="mr-2 w-4 h-4 text-green-700" />
                     Join
                   </Button>
                 </div>
               </div>
             ))}
-<<<<<<< HEAD
             <Button
               variant="outline"
               className="w-full rounded-xl border-green-700 py-3 text-green-700 hover:bg-green-100 mt-6 text-lg"
             >
-=======
             <Button variant="outline" className="w-full rounded-xl border-green-700 py-3 text-green-700 hover:bg-green-100 mt-6 text-lg">
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
               <Calendar className="mr-3 w-5 h-5 text-green-700" />
               View All Appointments
             </Button>
@@ -522,7 +483,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
               <MessageSquare className="w-7 h-7 text-green-700" />
               Recent Messages
             </CardTitle>
-<<<<<<< HEAD
             <CardDescription className="text-green-600 text-base">
               Latest patient communications
             </CardDescription>
@@ -539,7 +499,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
-=======
             <CardDescription className="text-green-600 text-base">Latest patient communications</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -548,23 +507,18 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
                 <Avatar className="w-10 h-10">
                   <AvatarFallback className="text-green-800 text-lg">
                     {message.patient.split(" ").map(n => n[0]).join("")}
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3">
-<<<<<<< HEAD
                     <p className="font-semibold text-lg text-green-800">
                       {message.patient}
                     </p>
-=======
                     <p className="font-semibold text-lg text-green-800">{message.patient}</p>
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
                     {message.unread && (
                       <div className="animate-pulse w-3 h-3 rounded-full bg-green-500" />
                     )}
                   </div>
-<<<<<<< HEAD
                   <p className="truncate text-base text-green-700">
                     {message.message}
                   </p>
@@ -578,14 +532,12 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
               variant="outline"
               className="w-full rounded-xl border-green-700 py-3 text-green-700 hover:bg-green-100 mt-6 text-lg"
             >
-=======
                   <p className="truncate text-base text-green-700">{message.message}</p>
                   <p className="mt-1 text-base text-green-500">{message.time}</p>
                 </div>
               </div>
             ))}
             <Button variant="outline" className="w-full rounded-xl border-green-700 py-3 text-green-700 hover:bg-green-100 mt-6 text-lg">
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
               <Send className="mr-3 w-5 h-5 text-green-700" />
               View All Messages
             </Button>
@@ -599,7 +551,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
               <FileText className="w-7 h-7 text-green-700" />
               Pending Reports
             </CardTitle>
-<<<<<<< HEAD
             <CardDescription className="text-green-600 text-base">
               Reports awaiting review
             </CardDescription>
@@ -614,7 +565,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
                   <p className="font-semibold text-lg text-green-800">
                     {report.patient}
                   </p>
-=======
             <CardDescription className="text-green-600 text-base">Reports awaiting review</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -622,7 +572,6 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
               <div key={report.id} className="flex items-center gap-4 rounded-2xl bg-green-50 p-4 transition-colors hover:bg-green-100">
                 <div className="flex-1">
                   <p className="font-semibold text-lg text-green-800">{report.patient}</p>
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
                   <p className="text-base text-green-600">{report.type}</p>
                   <p className="text-base text-green-600">{report.date}</p>
                 </div>
@@ -645,14 +594,11 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
                 </div>
               </div>
             ))}
-<<<<<<< HEAD
             <Button
               variant="outline"
               className="w-full rounded-xl border-green-700 py-3 text-green-700 hover:bg-green-100 mt-6 text-lg"
             >
-=======
             <Button variant="outline" className="w-full rounded-xl border-green-700 py-3 text-green-700 hover:bg-green-100 mt-6 text-lg">
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
               <FileText className="mr-3 w-5 h-5 text-green-700" />
               Review All Reports
             </Button>
@@ -670,8 +616,5 @@ export function DoctorDashboardContent({ isSidebarOpen, onStartSession }) {
       </section>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
 }
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4

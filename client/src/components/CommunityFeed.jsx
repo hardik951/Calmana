@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 // Added Palette icon for the new theme selector
 import { Heart, MessageSquare, Send, Palette } from 'lucide-react';
