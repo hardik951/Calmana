@@ -1,47 +1,37 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
-// We no longer need Menu or X here as the button is removed
-import { DoctorSidebar } from '../components/DoctorSidebar';
-import { DoctorDashboardContent } from '../components/DoctorDashboardContent';
-import { DoctorSession } from './DoctorSession';
-export default function DoctorDashboard() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isSessionActive, setIsSessionActive] = useState(false); // <-- 2. Add session state
-=======
 import { Menu, X } from 'lucide-react';
 import { DoctorSidebar } from '../components/DoctorSidebar';
 import { DoctorDashboardContent } from '../components/DoctorDashboardContent';
+import { DoctorSession } from './DoctorSession';
 
 export default function DoctorDashboard() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar open by default
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSessionActive, setIsSessionActive] = useState(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-<<<<<<< HEAD
+
   // 3. Function to start the session, passed to DoctorDashboardContent
   const handleStartSession = () => {
     setIsSessionActive(true);
-    setIsSidebarOpen(false); // Automatically hide sidebar when session starts
+    setIsSidebarOpen(false); // hide sidebar when session starts
   };
 
   // 4. Function to end the session, passed to DoctorSession
   const handleEndSession = () => {
     setIsSessionActive(false);
-    setIsSidebarOpen(true); // Re-open sidebar when session ends
+    setIsSidebarOpen(true); // re-open sidebar when session ends
   };
 
-=======
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100">
       {/* Main Layout */}
       <div className="flex flex-1 mt-16 relative">
-<<<<<<< HEAD
-        
-        {/* Sidebar - Now conditionally rendered */}
+        {/* Sidebar */}
         {!isSessionActive && (
           <div
             className={`
@@ -55,7 +45,7 @@ export default function DoctorDashboard() {
         )}
 
         {/* 5. Removed the floating toggle button */}
-=======
+
         {/* Sidebar */}
         <div
           className={`
@@ -74,51 +64,44 @@ export default function DoctorDashboard() {
             bg-transparent border border-gray-200 shadow-md
             hover:shadow-lg focus:outline-none"
           style={{
-            background: 'linear-gradient(90deg, #10B981, #F472B6, #34D399)', // Matching gradient
+            background: 'linear-gradient(90deg, #10B981, #F472B6, #34D399)',
             WebkitBackgroundClip: 'text',
             color: 'transparent',
           }}
           aria-label="Toggle Sidebar"
         >
-          {isSidebarOpen ? (
-            <X className="w-6 h-6" /> // Close icon
-          ) : (
-            <Menu className="w-6 h-6" /> // Hamburger icon
-          )}
+          {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
 
-        {/* Main Content Container */}
+
+        {/* Main Content */}
         <main
           className={`
             flex-1 overflow-y-auto relative transition-margin duration-300
-<<<<<<< HEAD
-            {/* 6. Margin is now conditional on BOTH sidebar and session state */}
-            ${isSessionActive ? 'ml-0' : (isSidebarOpen ? 'ml-64' : 'ml-0')}
+            ${isSessionActive ? 'ml-0' : isSidebarOpen ? 'ml-64' : 'ml-0'}
           `}
         >
           {/* 7. Conditionally render session or dashboard */}
           {isSessionActive ? (
             <DoctorSession onEndSession={handleEndSession} />
           ) : (
-            <DoctorDashboardContent 
-              isSidebarOpen={isSidebarOpen} 
+            <DoctorDashboardContent
+              isSidebarOpen={isSidebarOpen}
               onToggleSidebar={toggleSidebar}
-              onStartSession={handleStartSession} // <-- Pass the start function
+              onStartSession={handleStartSession}
             />
           )}
-=======
+
             ${isSidebarOpen ? 'ml-64' : 'ml-0'}
-          `}
-        >
+          `'}'
+        '>'
           <DoctorDashboardContent isSidebarOpen={isSidebarOpen} />
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+
         </main>
       </div>
     </div>
   );
-<<<<<<< HEAD
+
 }
-=======
-}
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+
+

@@ -206,13 +206,13 @@ const Dashboard = () => {
                 <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center gap-2 mb-1">
                   <span className="text-3xl">🧠</span> Calmana AI Assistant
                 </h3>
-<<<<<<< HEAD
+
                 <p className="text-emerald-700 mb-4">"Hello! You're now chatting with your friendly AI companion. I'm always here to help, whether you have a complex question, need a creative spark, or just want to talk.
 
 Feel free to ask me anything. What can I help you with today?"</p>
-=======
+
                 <p className="text-emerald-700 mb-4">Chat with your AI companion, always here to help!</p>
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+
               </div>
               <button
                 onClick={() => navigate('/ai-chat')}
@@ -234,11 +234,11 @@ Feel free to ask me anything. What can I help you with today?"</p>
                   <span className="text-3xl mr-2">🌍</span> Community
                 </h3>
                 <p className="text-emerald-700 mb-4">
-<<<<<<< HEAD
+
                   "Welcome to the community. This is your space to connect with others who understand. Share your story, learn from shared experiences, and find strength in growing together. We're glad you're here."
-=======
+
                   Connect with others, share, learn and grow together.
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+
                 </p>
               </div>
               <button

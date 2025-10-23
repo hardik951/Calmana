@@ -101,7 +101,7 @@ export default function CommunityFeed() {
       };
       setPosts([newPost, ...posts]);
       setNewPostMessage('');
-=======
+
 // src/components/CommunityFeed.jsx
 import React, { useState, useEffect } from 'react';
 
@@ -138,12 +138,12 @@ export default function CommunityFeed() {
 
       setPosts([newPost, ...posts]);
       setNewMessage('');
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+
       setPosting(false);
     }, 1000);
   };
 
-<<<<<<< HEAD
+
   const handleLike = (postId) => {
     setPosts(posts.map(post => {
       if (post.id === postId) {
@@ -267,7 +267,7 @@ export default function CommunityFeed() {
           ))}
         </div>
 
-=======
+
   return (
     <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
       <h3 className="text-xl font-semibold text-green-800 mb-4">Community Feed</h3>
@@ -303,12 +303,12 @@ export default function CommunityFeed() {
             <p className="text-green-800">{message}</p>
           </div>
         ))}
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+
       </div>
     </div>
   );
 }
-<<<<<<< HEAD
+
 
 // --- Post Card Sub-Component (Theme-Neutral Colors) ---
 function PostCard({ post, onLike, onComment, currentUser }) {
@@ -415,5 +415,5 @@ function PostCard({ post, onLike, onComment, currentUser }) {
     </Card>
   );
 }
-=======
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+
+

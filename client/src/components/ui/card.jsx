@@ -71,7 +71,7 @@ export {
   CardDescription, 
   CardContent 
 }
-=======
+
 export const Card = ({ children, className }) => (
   <div
     className={`bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 bg-[length:300%_300%] animate-gradient-shift rounded-lg border border-white/20 shadow-md ${className}`}
@@ -91,4 +91,4 @@ export const CardHeader = ({ children, className }) => (
 export const CardTitle = ({ children, className }) => (
   <h3 className={`text-lg font-semibold ${className}`}>{children}</h3>
 );
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+

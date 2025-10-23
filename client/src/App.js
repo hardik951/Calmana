@@ -28,10 +28,10 @@ import VideoSession from './pages/VideoSession';
 import DoctorAppointment from "./pages/DoctorAppointment";
 
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 3111bb4a21d67378468795758aa84db8822eb8b4
+
+
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     const stored = localStorage.getItem('isAuthenticated');
