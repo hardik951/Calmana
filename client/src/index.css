@@ -89,3 +89,16 @@
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
+@keyframes scrollQuotes {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-quotes {
+  animation: scrollQuotes 20s linear infinite;
+}
+
