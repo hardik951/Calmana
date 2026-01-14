@@ -1,4 +1,20 @@
-// server.js
+// ================= MULTER =================
+const multer = require("multer");
+const path = require("path");
+
+// Multer config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+// ================= CORE IMPORTS =================
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -7,18 +23,18 @@ const jwt = require("jsonwebtoken");
 const axios = require("axios");
 require("dotenv").config();
 
-// App setup
+// ================= APP SETUP =================
 const app = express();
 const PORT = process.env.PORT || 5001;
 const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
 const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
-// Middleware
+// ================= MIDDLEWARE =================
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
+// ================= DB CONNECTION =================
 (async () => {
   try {
     await mongoose.connect(MONGO_URI);
@@ -29,146 +45,150 @@ app.use(express.json());
   }
 })();
 
-// User Schema & Model
+// ================= MODELS =================
+
+// Patient
 const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  email:    { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  username: String,
+  email: { type: String, unique: true },
+  password: String,
+  role: { type: String, default: "patient" },
 });
 const User = mongoose.model("User", userSchema);
 
-// Auth Middleware (can be moved to ./middleware/auth.js)
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (!token)
-    return res.status(401).json({ message: "Access denied. No token provided." });
+// Doctor
+const doctorSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+  specialization: String,
+  license: String,
+  aadhaar: String,
+  aadhaarImage: String,
+  licenseImage: String,
+  role: { type: String, default: "doctor" },
+  isVerified: { type: Boolean, default: false },
+});
+const Doctor = mongoose.model("Doctor", doctorSchema);
+
+// ================= AUTH MIDDLEWARE =================
+const authenticateToken = (roles = []) => (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "No token" });
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err)
-      return res.status(403).json({ message: "Invalid or expired token." });
-    req.user = decoded; // contains userId
+    if (err) return res.status(403).json({ message: "Invalid token" });
+    if (roles.length && !roles.includes(decoded.role))
+      return res.status(403).json({ message: "Access denied" });
+    req.user = decoded;
     next();
   });
 };
 
-// Default API Route
+// ================= DEFAULT =================
 app.get("/", (req, res) => {
-  res.send("✅ Calmana backend is running!");
+  res.send("✅ CALMANA backend running");
 });
 
-// ===== AUTH ROUTES =====
-
-// Signup
+// ================= PATIENT AUTH =================
 app.post("/api/signup", async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password)
-      return res.status(400).json({ message: "All fields are required." });
+  const { username, email, password } = req.body;
+  if (!username || !email || !password)
+    return res.status(400).json({ message: "All fields are required." });
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser)
-      return res.status(400).json({ message: "User already exists." });
+  const exists = await User.findOne({ email });
+  if (exists) return res.status(400).json({ message: "User exists." });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, email, password: hashedPassword });
-    await newUser.save();
+  const hashed = await bcrypt.hash(password, 10);
+  const user = await User.create({ username, email, password: hashed });
 
-    const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: "1h" });
-
-    res.status(201).json({
-      message: "User registered successfully",
-      token,
-      userId: newUser._id,
-      username: newUser.username,
-    });
-  } catch (err) {
-    console.error("Signup error:", err.message);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
+  const token = jwt.sign({ id: user._id, role: "patient" }, JWT_SECRET);
+  res.json({ token });
 });
 
-// Login
 app.post("/api/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password)
-      return res.status(400).json({ message: "All fields are required." });
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(400).json({ message: "Invalid credentials." });
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials." });
+  const ok = await bcrypt.compare(password, user.password);
+  if (!ok) return res.status(400).json({ message: "Invalid credentials." });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials." });
-
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "1h" });
-
-    res.json({
-      token,
-      userId: user._id,
-      username: user.username,
-    });
-  } catch (err) {
-    console.error("Login error:", err.message);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
+  const token = jwt.sign({ id: user._id, role: "patient" }, JWT_SECRET);
+  res.json({ token });
 });
 
-// Get Logged-In User
-app.get("/api/user", authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId).select("-password");
-    if (!user) return res.status(404).json({ message: "User not found" });
-    res.json(user);
-  } catch (err) {
-    console.error("User fetch error:", err.message);
-    res.status(500).json({ message: "Server error", error: err.message });
+// ================= 🔥 DOCTOR SIGNUP (FIXED) =================
+app.post(
+  "/api/doctor/signup",
+  upload.fields([
+    { name: "aadhaarImage", maxCount: 1 },
+    { name: "licenseImage", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      console.log("BODY:", req.body);
+      console.log("FILES:", req.files);
+
+      const { name, email, password, specialization, license, aadhaar } =
+        req.body;
+
+      if (
+        !name ||
+        !email ||
+        !password ||
+        !specialization ||
+        !license ||
+        !aadhaar
+      ) {
+        return res.status(400).json({ message: "All fields are required." });
+      }
+
+      if (!req.files?.aadhaarImage || !req.files?.licenseImage) {
+        return res
+          .status(400)
+          .json({ message: "Documents are required." });
+      }
+
+      const exists = await Doctor.findOne({ email });
+      if (exists)
+        return res.status(400).json({ message: "Doctor exists." });
+
+      const hashed = await bcrypt.hash(password, 10);
+
+      await Doctor.create({
+        name,
+        email,
+        password: hashed,
+        specialization,
+        license,
+        aadhaar,
+        aadhaarImage: req.files.aadhaarImage[0].path,
+        licenseImage: req.files.licenseImage[0].path,
+      });
+
+      res.status(201).json({ message: "Doctor registered successfully" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Server error" });
+    }
   }
+);
+
+// ================= DOCTOR LOGIN =================
+app.post("/api/doctor/login", async (req, res) => {
+  const { email, password } = req.body;
+  const doctor = await Doctor.findOne({ email });
+  if (!doctor) return res.status(400).json({ message: "Invalid credentials." });
+
+  const ok = await bcrypt.compare(password, doctor.password);
+  if (!ok) return res.status(400).json({ message: "Invalid credentials." });
+
+  const token = jwt.sign({ id: doctor._id, role: "doctor" }, JWT_SECRET);
+  res.json({ token });
 });
 
-// ===== ROUTES IMPORTS =====
-const moodRoutes = require("./routes/mood.routes");
-const diaryRoutes = require("./routes/diary.routes");
-
-// ===== USE ROUTES =====
-app.use("/api/moods", moodRoutes);
-app.use("/api/diary", diaryRoutes);
-
-// ===== DOCTOR SEARCH =====
-app.get("/api/doctors", async (req, res) => {
-  try {
-    const { lat, lng } = req.query;
-    if (!lat || !lng)
-      return res.status(400).json({ message: "Latitude and longitude are required." });
-
-    const url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
-    const params = {
-      location: `${lat},${lng}`,
-      radius: 5000,
-      type: "doctor",
-      keyword: "mental health",
-      key: GOOGLE_API_KEY,
-    };
-
-    const response = await axios.get(url, { params });
-    const doctors = response.data.results.map((result) => ({
-      name: result.name,
-      address: result.vicinity,
-      rating: result.rating || "N/A",
-      place_id: result.place_id,
-    }));
-
-    res.json(doctors);
-  } catch (error) {
-    console.error("Doctors search error:", error.response?.data || error.message);
-    res.status(500).json({
-      message: "Error fetching doctors",
-      error: error.response?.data || error.message,
-    });
-  }
-});
-
-// ===== START SERVER =====
+// ================= START =================
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
