@@ -1,15 +1,47 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DoctorSidebar } from "../components/DoctorSidebar";
 import { DoctorDashboardContent } from "../components/DoctorDashboardContent";
 import { DoctorSession } from "./DoctorSession";
 import { motion } from "framer-motion";
+import axios from "axios";
+
+const API_BASE = "http://localhost:5001";
 
 export default function DoctorDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // 🔥 NEW: appointments state
+  const [appointments, setAppointments] = useState([]);
+  const [appointmentsLoading, setAppointmentsLoading] = useState(true);
+
+  const token = localStorage.getItem("token");
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  // ================= FETCH DOCTOR APPOINTMENTS =================
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const res = await axios.get(
+          `${API_BASE}/api/doctor/appointments`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setAppointments(res.data);
+      } catch (err) {
+        console.error("Failed to fetch appointments", err);
+      } finally {
+        setAppointmentsLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [token]);
 
   const handleStartSession = () => {
     setIsLoading(true);
@@ -33,10 +65,8 @@ export default function DoctorDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-pink-50 to-green-100 pb-10">
-
       {/* ---- MAIN LAYOUT ---- */}
       <div className="flex flex-grow px-4 md:px-6 pt-6">
-
         {/* LEFT SIDEBAR */}
         {!isSessionActive && isSidebarOpen && (
           <motion.aside
@@ -57,9 +87,8 @@ export default function DoctorDashboard() {
 
         {/* MAIN CONTENT */}
         <main className="flex-1 transition-all duration-300">
-
           {/* LOADING SPINNER */}
-          {isLoading && (
+          {(isLoading || appointmentsLoading) && (
             <div className="flex items-center justify-center h-[60vh]">
               <motion.div
                 animate={{ rotate: 360 }}
@@ -71,6 +100,7 @@ export default function DoctorDashboard() {
 
           {/* CONTENT SWITCH */}
           {!isLoading &&
+            !appointmentsLoading &&
             (isSessionActive ? (
               <motion.div variants={fadeUp} initial="hidden" animate="visible">
                 <DoctorSession onEndSession={handleEndSession} />
@@ -81,6 +111,8 @@ export default function DoctorDashboard() {
                   isSidebarOpen={isSidebarOpen}
                   onToggleSidebar={toggleSidebar}
                   onStartSession={handleStartSession}
+                  appointments={appointments}
+                  setAppointments={setAppointments}
                 />
               </motion.div>
             ))}

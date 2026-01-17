@@ -34,9 +34,12 @@ const Dashboard = () => {
     fetchDiary();
   }, [token]);
 
+  // Optimized Timer Effect to prevent re-render glitches
   useEffect(() => {
     if (isRunning) {
-      timerRef.current = setInterval(() => setTimer(prev => prev + 1), 1000);
+      timerRef.current = setInterval(() => {
+        setTimer(prev => prev + 1);
+      }, 1000);
     } else {
       clearInterval(timerRef.current);
     }
@@ -46,16 +49,14 @@ const Dashboard = () => {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Card style for reusability
   const cardClasses =
     "bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 " +
     "rounded-2xl border border-white/20 p-6 shadow-md transition-all duration-300 " +
     "hover:shadow-2xl hover:scale-[1.02]";
 
-  // Animation variants
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
@@ -63,14 +64,16 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-8 font-inter flex flex-col">
-      {/* Main layout */}
       <div className="container mx-auto max-w-screen-xl grid grid-cols-1 lg:grid-cols-4 gap-10 flex-grow">
         
         {/* Sidebar + Timer Block */}
         <div className="col-span-1 flex flex-col gap-6">
-          <motion.div variants={fadeUp} initial="hidden" animate="visible">
+          {/* Sidebar is kept outside of motion.div here to ensure the 
+              Profile Icon stays persistent and doesn't re-animate on every timer tick.
+          */}
+          <div className="w-full">
             <Sidebar />
-          </motion.div>
+          </div>
 
           {/* Timer Block */}
           <motion.section
@@ -84,10 +87,9 @@ const Dashboard = () => {
               Use this timer to stay mindful during meditation, journaling, or focus sessions.
             </p>
 
-            {/* Pulsating circle around timer */}
             <motion.div
               className="relative flex items-center justify-center w-32 h-32 mb-4"
-              animate={{ scale: [1, 1.1, 1] }}
+              animate={isRunning ? { scale: [1, 1.05, 1] } : {}}
               transition={{ duration: 2, repeat: Infinity }}
             >
               <div className="absolute w-32 h-32 rounded-full bg-emerald-300 opacity-20"></div>
@@ -111,7 +113,7 @@ const Dashboard = () => {
               </button>
             </div>
           </motion.section>
-        </div> {/* ✅ properly closed left column */}
+        </div>
 
         {/* Main content */}
         <main className="lg:col-span-3 space-y-10">
@@ -130,12 +132,11 @@ const Dashboard = () => {
               </p>
               <button
                 onClick={() => navigate("/start-session")}
-                className="bg-emerald-600 text-white px-8 py-3 rounded-full shadow-md hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-400 transition-colors duration-300 font-semibold"
+                className="bg-emerald-600 text-white px-8 py-3 rounded-full shadow-md hover:bg-emerald-700 transition-colors duration-300 font-semibold"
               >
                 Start Session
               </button>
             </div>
-            {/* Yoga image */}
             <div className="flex-shrink-0 w-40 h-40 md:w-48 md:h-48 flex items-center justify-center">
               <img src={YogaImage} alt="Yoga Emote" className="w-full h-full object-contain" />
             </div>
@@ -143,6 +144,7 @@ const Dashboard = () => {
 
           {/* Cards grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
             {/* Mood Tracker */}
             <motion.section
               variants={fadeUp}
@@ -154,7 +156,7 @@ const Dashboard = () => {
                 <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center mb-1">
                   <span className="text-4xl mr-2">😊</span> Mood Tracker
                 </h3>
-                <p className="text-emerald-700 text-base font-medium mb-2 leading-relaxed">
+                <p className="text-emerald-700 text-base font-medium mb-2">
                   Track your moods and visualize your emotional journey.
                 </p>
               </div>
@@ -175,13 +177,13 @@ const Dashboard = () => {
                 <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center mb-1">
                   <span className="text-4xl mr-2">✍️</span> Personal Diary
                 </h3>
-                <p className="text-emerald-700 text-base mb-4 font-medium leading-relaxed">
+                <p className="text-emerald-700 text-base mb-4 font-medium">
                   Reflect on your thoughts and experiences. Your private sanctuary.
                 </p>
               </div>
-              <ul className="space-y-3 text-emerald-700 text-base font-medium pr-1">
+              <ul className="space-y-3 text-emerald-700 text-base font-medium">
                 {diaryEntries.length > 0 ? (
-                  diaryEntries.map((entry, index) => (
+                  diaryEntries.slice(0, 2).map((entry, index) => (
                     <li key={index} className="bg-white/20 p-3 rounded border-l-4 border-emerald-400">
                       <span className="font-semibold text-emerald-800">
                         {new Date(entry.date).toLocaleDateString()}:
@@ -195,6 +197,27 @@ const Dashboard = () => {
               </ul>
             </motion.section>
 
+            {/* ✅ My Appointments Card */}
+            <motion.section
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className={`${cardClasses} cursor-pointer min-h-[160px] flex flex-col justify-between`}
+              onClick={() => navigate("/patient/appointments")}
+            >
+              <div>
+                <h3 className="text-2xl font-extrabold text-emerald-800 mb-2">
+                  📅 My Appointments
+                </h3>
+                <p className="text-emerald-700">
+                  View your pending, accepted, or past appointments. Stay on top of your schedule.
+                </p>
+              </div>
+              <div className="mt-4">
+                <p className="text-emerald-600 text-sm font-bold">Click to view details →</p>
+              </div>
+            </motion.section>
+
             {/* AI Chat */}
             <motion.section
               variants={fadeUp}
@@ -206,17 +229,11 @@ const Dashboard = () => {
                 <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center gap-2 mb-1">
                   <span className="text-3xl">🧠</span> Calmana AI Assistant
                 </h3>
-
-                <p className="text-emerald-700 mb-4">"Hello! You're now chatting with your friendly AI companion. I'm always here to help, whether you have a complex question, need a creative spark, or just want to talk.
-
-Feel free to ask me anything. What can I help you with today?"</p>
-
                 <p className="text-emerald-700 mb-4">Chat with your AI companion, always here to help!</p>
-
               </div>
               <button
                 onClick={() => navigate('/ai-chat')}
-                className="w-full bg-emerald-600 text-white py-2.5 rounded-full shadow hover:bg-emerald-700 font-bold transition"
+                className="w-full bg-emerald-600 text-white py-2.5 rounded-full shadow hover:bg-emerald-700 font-bold"
               >
                 <span className="mr-1 text-xl">🚀</span> Start AI Chat
               </button>
@@ -233,17 +250,11 @@ Feel free to ask me anything. What can I help you with today?"</p>
                 <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center mb-1">
                   <span className="text-3xl mr-2">🌍</span> Community
                 </h3>
-                <p className="text-emerald-700 mb-4">
-
-                  "Welcome to the community. This is your space to connect with others who understand. Share your story, learn from shared experiences, and find strength in growing together. We're glad you're here."
-
-                  Connect with others, share, learn and grow together.
-
-                </p>
+                <p className="text-emerald-700 mb-4">Connect with others, share, learn and grow together.</p>
               </div>
               <button
                 onClick={() => navigate('/community')}
-                className="bg-emerald-600 text-white px-6 py-2 rounded-full shadow hover:bg-emerald-700 font-bold transition"
+                className="bg-emerald-600 text-white px-6 py-2 rounded-full shadow hover:bg-emerald-700 font-bold"
               >
                 Visit Community
               </button>
@@ -274,10 +285,9 @@ Feel free to ask me anything. What can I help you with today?"</p>
               <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center mb-1">
                 <span className="text-2xl mr-2">👩‍💻</span> Meet Developers
               </h3>
-              <p className="text-emerald-700">
-                Meet the team behind Calmana’s vision for well-being.
-              </p>
+              <p className="text-emerald-700">Meet the team behind Calmana’s vision for well-being.</p>
             </motion.section>
+
           </div>
         </main>
       </div>

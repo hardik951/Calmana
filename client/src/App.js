@@ -26,7 +26,7 @@ import DoctorDashboard from './pages/DoctorDashboard';
 import Plans from './pages/Plans';
 import VideoSession from './pages/VideoSession';
 import DoctorAppointment from "./pages/DoctorAppointment";
-
+import PatientAppointments from "./pages/PatientAppointments";
 
 
 
@@ -239,6 +239,17 @@ function App() {
             <LayoutWrapper><DoctorAppointment /></LayoutWrapper>
           ) : <Navigate to="/login" replace />}
         />
+
+        <Route
+        path="/patient/appointments"
+        element={isAuthenticated ? (
+        <LayoutWrapper> <PatientAppointments /> </LayoutWrapper>
+  ) : 
+  (
+    <Navigate to="/login" replace />
+  )}
+/>
+
 
         <Route
           path="*"
