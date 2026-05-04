@@ -7,7 +7,7 @@
 
 **Calmana** is an integrated AI-powered digital mental wellness platform designed to address the growing mental health crisis in India. It provides **affordable, anonymous, and accessible emotional support** for adolescents, young adults, and working professionals.
 
-Unlike platforms that offer only chatbots or only therapy booking, Calmana unifies **AI-driven emotional support, mood tracking, therapist access, community engagement, and immersive VR therapy** into one seamless ecosystem.
+Unlike platforms that offer only chatbots or only therapy booking, Calmana unifies **AI-driven emotional support, mood tracking, therapist access, and community engagement** into one seamless ecosystem.
 
 ---
 
@@ -30,7 +30,6 @@ Over **70% of individuals with mental health conditions do not receive adequate 
 - Enable **secure therapist booking & consultations**
 - Offer **self-reflection tools** (mood tracker, diary)
 - Support **anonymous community discussions**
-- Deliver **immersive VR-based relaxation and mindfulness**
 - Assist doctors with **AI-generated patient insights**
 
 ---
@@ -56,30 +55,6 @@ Over **70% of individuals with mental health conditions do not receive adequate 
 - Anonymous peer support community
 - SOS emergency support system
 
-### 🕶️ Calmana VR (Immersive Therapy)
-- Relaxation and mindfulness environments
-- Scenario-based emotional regulation
-- WebXR-powered immersive experience
-
----
-
-## 🕶️ Calmana VR – Immersive Therapy Module
-
-Calmana VR enhances emotional well-being using **immersive 3D environments** designed for relaxation, stress relief, and mindfulness.
-
-**Tech Stack (VR Module):**
-- Babylon.js (3D engine)
-- WebXR
-- Vite + TypeScript
-- Tailwind CSS (minimal in-scene UI)
-- Drizzle ORM (user preferences)
-
-**Features:**
-- Calming 3D spaces with ambient audio
-- Teleportation-based navigation
-- Controller-friendly interactions
-- Personalized therapy sessions (comfort modes, environment choices)
-
 ---
 
 ## 🛠️ Tech Stack
@@ -102,11 +77,6 @@ Calmana VR enhances emotional well-being using **immersive 3D environments** des
 ### Database
 - PostgreSQL / MySQL
 - Drizzle ORM
-
-### VR
-- Babylon.js
-- WebXR
-- Vite
 
 ---
 
