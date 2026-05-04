@@ -24,21 +24,27 @@ export default function SignupPage() {
     setLoading(true);
     try {
       const url = userType === "doctor" ? "http://localhost:5001/api/doctor/signup" : "http://localhost:5001/api/signup";
-      const formData = new FormData();
-      formData.append("email", email);
-      formData.append("password", password);
-      formData.append("aadhaar", aadhaar);
+      let options;
+      
       if (userType === "doctor") {
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("password", password);
+        formData.append("aadhaar", aadhaar);
         formData.append("name", fullName);
         formData.append("specialization", specialization);
         formData.append("license", license);
         formData.append("aadhaarImage", aadhaarImage);
         formData.append("licenseImage", licenseImage);
+        options = { method: "POST", body: formData };
       } else {
-        formData.append("username", fullName);
-        formData.append("dob", dob);
+        options = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: fullName, email, password })
+        };
       }
-      const response = await fetch(url, { method: "POST", body: formData });
+      const response = await fetch(url, options);
       const text = await response.text();
       let data;
       try { data = JSON.parse(text); } catch { throw new Error("Invalid response."); }

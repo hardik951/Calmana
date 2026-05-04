@@ -53,9 +53,8 @@ const Dashboard = () => {
   };
 
   const cardClasses =
-    "bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 " +
-    "rounded-2xl border border-white/20 p-6 shadow-md transition-all duration-300 " +
-    "hover:shadow-2xl hover:scale-[1.02]";
+    "bg-white/95 backdrop-blur-xl rounded-[2rem] border border-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500 ease-out " +
+    "hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1";
 
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -63,8 +62,8 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-8 font-inter flex flex-col">
-      <div className="container mx-auto max-w-screen-xl grid grid-cols-1 lg:grid-cols-4 gap-10 flex-grow">
+    <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-6 sm:p-10 font-inter flex flex-col relative overflow-hidden">
+      <div className="container mx-auto max-w-screen-xl grid grid-cols-1 lg:grid-cols-4 gap-8 flex-grow relative z-10">
         
         {/* Sidebar + Timer Block */}
         <div className="col-span-1 flex flex-col gap-6">
@@ -122,23 +121,25 @@ const Dashboard = () => {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className={`${cardClasses} flex flex-col md:flex-row items-center justify-between`}
+            className={`${cardClasses} flex flex-col md:flex-row items-center justify-between !p-10 relative overflow-hidden`}
             style={{ minHeight: '180px' }}
           >
-            <div className="flex-1 mb-6 md:mb-0 md:pr-8">
-              <h2 className="text-3xl font-extrabold text-emerald-800 mb-3">Your Calm Space Awaits</h2>
-              <p className="text-emerald-700 max-w-xl leading-relaxed mb-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent pointer-events-none rounded-[2rem]"></div>
+            <div className="flex-1 mb-6 md:mb-0 md:pr-8 relative z-10">
+              <h2 className="text-4xl font-extrabold tracking-tight text-emerald-800 mb-4">Your Calm Space Awaits</h2>
+              <p className="text-emerald-700 max-w-xl leading-relaxed mb-8 text-lg">
                 Calmana is here to help you relax, refocus, and renew. Start a calming session whenever you need a moment of peace.
               </p>
               <button
                 onClick={() => navigate("/start-session")}
-                className="bg-emerald-600 text-white px-8 py-3 rounded-full shadow-md hover:bg-emerald-700 transition-colors duration-300 font-semibold"
+                className="bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-[0_4px_14px_0_rgb(0,0,0,0.1)] hover:bg-emerald-700 transition-all duration-300 font-bold text-lg flex items-center gap-2 group"
               >
-                Start Session
+                Start Session <span className="transform group-hover:translate-x-1 transition-transform">&rarr;</span>
               </button>
             </div>
-            <div className="flex-shrink-0 w-40 h-40 md:w-48 md:h-48 flex items-center justify-center">
-              <img src={YogaImage} alt="Yoga Emote" className="w-full h-full object-contain" />
+            <div className="hidden md:flex flex-shrink-0 w-48 h-48 items-center justify-center relative z-10">
+              <div className="absolute inset-0 bg-emerald-100/30 rounded-full filter blur-2xl"></div>
+              <img src={YogaImage} alt="Yoga Emote" className="w-full h-full object-contain relative z-10 drop-shadow-xl" />
             </div>
           </motion.section>
 
@@ -153,10 +154,10 @@ const Dashboard = () => {
               className={`${cardClasses} min-h-[220px] flex flex-col justify-between`}
             >
               <div>
-                <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center mb-1">
-                  <span className="text-4xl mr-2">😊</span> Mood Tracker
+                <h3 className="text-2xl font-extrabold tracking-tight text-emerald-800 flex items-center mb-2">
+                  <span className="text-3xl mr-3">😊</span> Mood Tracker
                 </h3>
-                <p className="text-emerald-700 text-base font-medium mb-2">
+                <p className="text-emerald-700 text-sm font-medium mb-2">
                   Track your moods and visualize your emotional journey.
                 </p>
               </div>
@@ -174,21 +175,21 @@ const Dashboard = () => {
               onClick={() => navigate('/diary')}
             >
               <div>
-                <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center mb-1">
-                  <span className="text-4xl mr-2">✍️</span> Personal Diary
+                <h3 className="text-2xl font-extrabold tracking-tight text-emerald-800 flex items-center mb-2">
+                  <span className="text-3xl mr-3">✍️</span> Personal Diary
                 </h3>
-                <p className="text-emerald-700 text-base mb-4 font-medium">
+                <p className="text-emerald-700 text-sm mb-6 font-medium">
                   Reflect on your thoughts and experiences. Your private sanctuary.
                 </p>
               </div>
-              <ul className="space-y-3 text-emerald-700 text-base font-medium">
+              <ul className="space-y-4 text-emerald-800 text-sm font-medium">
                 {diaryEntries.length > 0 ? (
                   diaryEntries.slice(0, 2).map((entry, index) => (
-                    <li key={index} className="bg-white/20 p-3 rounded border-l-4 border-emerald-400">
-                      <span className="font-semibold text-emerald-800">
-                        {new Date(entry.date).toLocaleDateString()}:
-                      </span>{" "}
-                      {entry.content}
+                    <li key={index} className="bg-white/20 p-4 rounded-xl border border-white/30 flex flex-col gap-1">
+                      <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
+                        {new Date(entry.date).toLocaleDateString()}
+                      </span>
+                      <span className="leading-relaxed text-emerald-900">{entry.content}</span>
                     </li>
                   ))
                 ) : (
@@ -206,15 +207,17 @@ const Dashboard = () => {
               onClick={() => navigate("/patient/appointments")}
             >
               <div>
-                <h3 className="text-2xl font-extrabold text-emerald-800 mb-2">
+                <h3 className="text-2xl font-extrabold tracking-tight text-emerald-800 mb-2">
                   📅 My Appointments
                 </h3>
-                <p className="text-emerald-700">
+                <p className="text-emerald-700 text-sm leading-relaxed">
                   View your pending, accepted, or past appointments. Stay on top of your schedule.
                 </p>
               </div>
-              <div className="mt-4">
-                <p className="text-emerald-600 text-sm font-bold">Click to view details →</p>
+              <div className="mt-6">
+                <p className="text-emerald-600 text-sm font-bold flex items-center gap-1 group-hover:text-emerald-700 transition-colors">
+                  Click to view details <span className="transform transition-transform group-hover:translate-x-1">&rarr;</span>
+                </p>
               </div>
             </motion.section>
 
@@ -226,39 +229,20 @@ const Dashboard = () => {
               className={`${cardClasses} min-h-[160px] flex flex-col justify-between`}
             >
               <div>
-                <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center gap-2 mb-1">
-                  <span className="text-3xl">🧠</span> Calmana AI Assistant
+                <h3 className="text-2xl font-extrabold tracking-tight text-emerald-800 flex items-center gap-2 mb-2">
+                  <span className="text-3xl">🧠</span> AI Assistant
                 </h3>
-                <p className="text-emerald-700 mb-4">Chat with your AI companion, always here to help!</p>
+                <p className="text-emerald-700 text-sm leading-relaxed mb-6">Chat with your AI companion, always here to help!</p>
               </div>
               <button
                 onClick={() => navigate('/ai-chat')}
-                className="w-full bg-emerald-600 text-white py-2.5 rounded-full shadow hover:bg-emerald-700 font-bold"
+                className="w-full bg-emerald-600 text-white py-3 rounded-2xl shadow-[0_4px_14px_0_rgb(0,0,0,0.1)] hover:bg-emerald-700 transition-all font-bold flex items-center justify-center gap-2"
               >
-                <span className="mr-1 text-xl">🚀</span> Start AI Chat
+                <span className="text-xl">🚀</span> Start AI Chat
               </button>
             </motion.section>
 
-            {/* Community */}
-            <motion.section
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              className={`${cardClasses} min-h-[140px] flex flex-col justify-between`}
-            >
-              <div>
-                <h3 className="text-2xl font-extrabold text-emerald-800 flex items-center mb-1">
-                  <span className="text-3xl mr-2">🌍</span> Community
-                </h3>
-                <p className="text-emerald-700 mb-4">Connect with others, share, learn and grow together.</p>
-              </div>
-              <button
-                onClick={() => navigate('/community')}
-                className="bg-emerald-600 text-white px-6 py-2 rounded-full shadow hover:bg-emerald-700 font-bold"
-              >
-                Visit Community
-              </button>
-            </motion.section>
+
 
             {/* Feedback */}
             <motion.section

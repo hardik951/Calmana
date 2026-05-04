@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogIn, UserPlus, UserCircle, Calendar, MessageSquare, Heart } from "lucide-react";
+import { LogIn, UserPlus, UserCircle, Calendar, MessageSquare, Heart, Stethoscope } from "lucide-react";
 
-export default function AuthPage() {
+export default function AuthPage({ onLogin }) {
   const navigate = useNavigate();
 
   return (
@@ -55,15 +55,33 @@ export default function AuthPage() {
           </motion.button>
         </div>
 
-        {/* Guest Button */}
-        <motion.button
-          onClick={() => navigate("/dashboard")}
-          className="flex items-center gap-2 text-emerald-700 font-medium text-base transition-colors duration-300 mt-2"
-          whileHover={{ scale: 1.03, color: "#065f46" }}
-          whileTap={{ scale: 0.97 }}
-        >
-          <UserCircle size={20} /> Continue as Guest
-        </motion.button>
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 mt-2 items-center">
+          {/* Guest Button */}
+          <motion.button
+            onClick={() => {
+              if (onLogin) onLogin();
+              navigate("/dashboard");
+            }}
+            className="flex items-center gap-2 text-emerald-700 font-medium text-base transition-colors duration-300"
+            whileHover={{ scale: 1.03, color: "#065f46" }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <UserCircle size={20} /> Continue as Guest
+          </motion.button>
+
+          {/* Doctor Dashboard Link */}
+          <motion.button
+            onClick={() => {
+              if (onLogin) onLogin();
+              navigate("/doctor-dashboard");
+            }}
+            className="flex items-center gap-2 text-emerald-700 font-medium text-base transition-colors duration-300"
+            whileHover={{ scale: 1.03, color: "#065f46" }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <Stethoscope size={20} /> Access Doctor Dashboard
+          </motion.button>
+        </div>
       </motion.div>
 
       {/* Feature Highlights */}

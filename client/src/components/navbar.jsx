@@ -25,16 +25,15 @@ const Navbar = () => {
     <>
       <Announcement />
 
-      <nav className="bg-gradient-to-r from-green-100 via-green-200 to-green-300 shadow-md py-4 px-6 flex items-center justify-between font-inter z-50 relative">
+      <nav className="bg-gradient-to-r from-green-100/90 via-green-200/90 to-green-300/90 backdrop-blur-md border-b border-green-300 shadow-sm py-4 px-6 sm:px-10 flex items-center justify-between font-inter z-50 sticky top-0 transition-all duration-300">
 
         {/* Logo */}
         <div
-          className="text-3xl font-extrabold tracking-tight text-emerald-700 flex items-center gap-1 cursor-pointer"
+          className="text-2xl sm:text-3xl font-extrabold tracking-tight text-emerald-800 flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => navigate('/dashboard')}
         >
-          <span className="text-emerald-600">🌿</span>
-          <span>Cal</span>
-          <span className="text-green-800">mana</span>
+          <span className="text-emerald-600 drop-shadow-sm">🌿</span>
+          <span>Calmana</span>
         </div>
 
         {/* Mobile Menu Button */}
@@ -53,22 +52,16 @@ const Navbar = () => {
 
         <div className="flex items-center gap-6">
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-6 text-base font-medium text-gray-700">
+          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-emerald-800">
             {isLoggedIn && (
               <>
-                <Link to="/find-doctors" className="hover:text-emerald-700 transition duration-200">
+                <Link to="/find-doctors" className="hover:text-emerald-600 transition-colors duration-200">
                   Find Doctors
                 </Link>
-                <Link to="/ai-chat" className="hover:text-emerald-700 transition duration-200">
+                <Link to="/ai-chat" className="hover:text-emerald-600 transition-colors duration-200">
                   AI Therapy
                 </Link>
-                <Link to="/resources" className="hover:text-emerald-700 transition duration-200">
-                  Resources
-                </Link>
-                <Link to="/faq" className="hover:text-emerald-700 transition duration-200">
-                  FAQ's
-                </Link>
-                <Link to="/book-therapy" className="hover:text-emerald-700 transition duration-200">
+                <Link to="/book-therapy" className="hover:text-emerald-600 transition-colors duration-200">
                   Book an Appointment
                 </Link>
               </>
@@ -81,13 +74,13 @@ const Navbar = () => {
               <>
                 <button
                   onClick={() => navigate('/login')}
-                  className="bg-white text-emerald-600 font-semibold px-5 py-2 rounded-full border border-emerald-400 shadow-md hover:bg-emerald-50 hover:scale-105 transition-all duration-200"
+                  className="text-emerald-800 hover:text-emerald-900 font-bold px-4 py-2 transition-colors duration-200"
                 >
                   Log In
                 </button>
                 <button
                   onClick={() => navigate('/signup')}
-                  className="bg-emerald-500 text-white font-semibold px-5 py-2 rounded-full shadow-md hover:bg-emerald-600 hover:scale-105 transition-all duration-200"
+                  className="bg-emerald-600 text-white font-bold px-6 py-2.5 rounded-full shadow-[0_4px_14px_0_rgb(16,185,129,0.3)] hover:bg-emerald-700 transition-all duration-200 hover:-translate-y-0.5"
                 >
                   Sign Up
                 </button>
@@ -131,8 +124,6 @@ const Navbar = () => {
               <div className="flex flex-col p-2">
                 <Link to="/find-doctors" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Find Doctors</Link>
                 <Link to="/ai-chat" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">AI Chat</Link>
-                <Link to="/resources" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Resources</Link>
-                <Link to="/faq" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">FAQ</Link>
                 <Link to="/book-therapy" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Book Therapy</Link>
                 <div className="border-t border-gray-200 my-2 opacity-0 animate-fade-in" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}></div>
                 <Link to="/profile" onClick={toggleMobileMenu} className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">Profile</Link>

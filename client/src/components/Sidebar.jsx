@@ -37,71 +37,9 @@ export default function Sidebar() {
 
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
-  const sections = [
-    {
-      key: 'chatrooms',
-      title: 'CHATROOMS',
-      items: [
-        { to: '/chatroom/anxiety-support', label: 'Anxiety Support' },
-        { to: '/chatroom/mindfulness-practice', label: 'Mindfulness Practice' },
-      ],
-      icon: '#',
-    },
-    {
-      key: 'directMessages',
-      title: 'DIRECT MESSAGES',
-      items: [
-        { to: '/dm/karen', label: 'Karen', colorBg: 'bg-emerald-300', colorText: 'text-emerald-800', initial: 'K' },
-        { to: '/dm/alex', label: 'Alex', colorBg: 'bg-green-300', colorText: 'text-green-800', initial: 'A' },
-        { to: '/dm/jordan', label: 'Jordan', colorBg: 'bg-lime-300', colorText: 'text-lime-800', initial: 'J' },
-      ],
-    },
-    {
-      key: 'communitySnapshot',
-      title: 'COMMUNITY SNAPSHOT',
-      items: [
-        { to: '/community/fiona', label: 'Fiona', colorBg: 'bg-emerald-400', initial: 'F' },
-        { to: '/community/maya', label: 'Maya', colorBg: 'bg-green-400', initial: 'M' },
-      ],
-    },
-    {
-      key: 'notifications',
-      title: 'NOTIFICATIONS',
-      items: [
-        {
-          to: '/notifications/karen',
-          label: (
-            <>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 lg:h-5 lg:w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <div>
-                <p className="text-xs lg:text-sm font-semibold text-emerald-800">
-                  New Message from Karen <span className="text-xs text-emerald-600 ml-1">10 min ago</span>
-                </p>
-                <p className="text-emerald-700 text-xs mt-1">Hey, let’s catch up soon!</p>
-              </div>
-            </>
-          ),
-        },
-        {
-          to: '/notifications/community',
-          label: (
-            <>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 lg:h-5 lg:w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <div>
-                <p className="text-xs lg:text-sm font-semibold text-emerald-800">
-                  Community Update <span className="text-xs text-emerald-600 ml-1">1 hour ago</span>
-                </p>
-                <p className="text-emerald-700 text-xs mt-1">New mindfulness session added!</p>
-              </div>
-            </>
-          ),
-        },
-      ],
-    },
+  const items = [
+    { to: '/resources', label: 'Wellness Resources', icon: '📚' },
+    { to: '/faq', label: 'FAQ', icon: '❓' },
   ];
 
   return (
@@ -122,10 +60,10 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 h-full bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100
-          shadow-lg p-6 border border-white/20 font-inter z-50
+          fixed top-0 left-0 h-full bg-white/80 backdrop-blur-xl
+          shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 border border-emerald-50 font-inter z-50
           transform transition-transform duration-300 ease-in-out
-          ${isDesktop ? 'relative sticky top-6 w-full max-w-none rounded-xl shadow-none transform-none' : ''}
+          ${isDesktop ? 'relative sticky top-6 w-full max-w-none rounded-[2rem] transform-none' : ''}
           ${!isDesktop && (isMobileMenuOpen ? 'w-full translate-x-0' : '-translate-x-full w-0')}
         `}
       >
@@ -140,91 +78,31 @@ export default function Sidebar() {
           </button>
         )}
 
-        <div className="space-y-6 overflow-y-auto h-full pb-10">
-          {sections.map(({ key, title, items, icon }) => (
-            <div key={key} className="relative group">
-              <h3 className="text-base lg:text-lg font-bold text-emerald-800 mb-2 flex justify-between items-center cursor-pointer group-hover:text-emerald-700 transition-colors duration-200">
-                {title}
-              </h3>
+        <div className="space-y-2 overflow-y-auto h-full pb-10">
+          {items.map((item, idx) => {
+            const handleClick = () => {
+              navigate(item.to);
+              if (!isDesktop) setIsMobileMenuOpen(false);
+            };
+
+            return (
               <div
-                id={`${key}-dropdown`}
-                className={`overflow-hidden transition-all duration-300 ease-in-out
-                  ${isDesktop ? 'max-h-0 group-hover:max-h-[500px]' : 'max-h-[500px]'}
-                `}
+                key={idx}
+                tabIndex={0}
+                role="button"
+                onClick={handleClick}
+                onKeyPress={(e) => e.key === 'Enter' && handleClick()}
+                className="w-full bg-emerald-50/50 hover:bg-emerald-100/50 rounded-2xl p-4 cursor-pointer flex items-center transition-all duration-300 group"
               >
-                <div className="space-y-1">
-                  {items.map((item, idx) => {
-                    const labelContent = typeof item.label === 'string'
-                      ? <span className="text-emerald-700 text-sm lg:text-base font-medium">{item.label}</span>
-                      : item.label;
-
-                    const handleClick = () => {
-                      navigate(item.to);
-                      if (!isDesktop) setIsMobileMenuOpen(false);
-                    };
-
-                    if (key === 'directMessages') {
-                      return (
-                        <div
-                          key={idx}
-                          tabIndex={0}
-                          role="button"
-                          onClick={handleClick}
-                          onKeyPress={(e) => e.key === 'Enter' && handleClick()}
-                          className="w-full bg-white/10 rounded-lg p-2 lg:p-3 cursor-pointer hover:bg-white/20 flex items-center shadow-sm hover:shadow-md mb-1 border border-white/20"
-                        >
-                          <div
-                            className={`${item.colorBg} flex-shrink-0 rounded-full h-6 w-6 lg:h-7 lg:w-7 flex items-center justify-center font-semibold text-xs lg:text-sm ${item.colorText}`}
-                          >
-                            {item.initial}
-                          </div>
-                          <span className="ml-2 text-emerald-700 text-sm lg:text-base font-medium">{item.label}</span>
-                        </div>
-                      );
-                    } else if (key === 'communitySnapshot') {
-                      return (
-                        <div
-                          key={idx}
-                          tabIndex={0}
-                          role="button"
-                          onClick={handleClick}
-                          onKeyPress={(e) => e.key === 'Enter' && handleClick()}
-                          className="w-full bg-white/10 rounded-lg p-2 lg:p-3 cursor-pointer hover:bg-white/20 flex items-start shadow-sm hover:shadow-md mb-1 border border-white/20"
-                        >
-                          <div
-                            className={`${item.colorBg} flex-shrink-0 rounded-full h-8 w-8 lg:h-9 lg:w-9 flex items-center justify-center text-white font-bold text-sm lg:text-base`}
-                          >
-                            {item.initial}
-                          </div>
-                          <div className="ml-2">
-                            <p className="text-xs lg:text-sm font-semibold text-emerald-800 leading-snug">{item.label}</p>
-                          </div>
-                        </div>
-                      );
-                    } else {
-                      return (
-                        <div
-                          key={idx}
-                          tabIndex={0}
-                          role="button"
-                          onClick={handleClick}
-                          onKeyPress={(e) => e.key === 'Enter' && handleClick()}
-                          className="w-full bg-white/10 rounded-lg p-2 lg:p-3 cursor-pointer hover:bg-white/20 flex items-center shadow-sm hover:shadow-md mb-1 border border-white/20"
-                        >
-                          {icon && <span className="text-emerald-400 mr-2 lg:mr-3 text-lg lg:text-xl">{icon}</span>}
-                          {labelContent}
-                        </div>
-                      );
-                    }
-                  })}
-                </div>
+                {item.icon && <span className="mr-4 text-2xl group-hover:scale-110 transition-transform">{item.icon}</span>}
+                <span className="text-emerald-900 text-base font-bold tracking-tight">{item.label}</span>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Subscription */}
-          <div className="pt-4 border-t border-white/30">
-            <h3 className="text-base lg:text-lg font-bold text-emerald-800 mb-3">Subscribe</h3>
+          <div className="pt-6 mt-4 border-t border-emerald-50">
+            <h3 className="text-xs font-bold text-emerald-800 mb-3 tracking-widest uppercase">Stay Updated</h3>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -235,13 +113,13 @@ export default function Sidebar() {
             >
               <input
                 type="email"
-                placeholder="Your email"
+                placeholder="Your email address"
                 required
-                className="p-2 rounded border border-gray-300 focus:border-emerald-500 focus:outline-none"
+                className="p-3 rounded-xl border border-emerald-100 bg-white/50 focus:bg-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all text-sm shadow-inner"
               />
               <button
                 type="submit"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded transition"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-[0_4px_14px_0_rgb(16,185,129,0.39)] transition-all duration-300"
               >
                 Subscribe
               </button>
@@ -250,17 +128,17 @@ export default function Sidebar() {
 
           {/* View Plans Button */}
           <div className="mt-6 relative">
-            <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-300 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full shadow">
-              💎 Premium
+            <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-900 text-[10px] uppercase font-extrabold px-3 py-1 rounded-full shadow-sm border border-yellow-100 z-10 tracking-wider">
+              Premium
             </span>
             <button
               onClick={() => {
                 navigate('/plans');
                 if (!isDesktop) setIsMobileMenuOpen(false);
               }}
-              className="w-full bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:from-emerald-500 hover:to-green-700 transition-all duration-300"
+              className="w-full bg-slate-800 text-white font-bold py-4 px-4 rounded-2xl shadow-sm hover:shadow-lg hover:bg-slate-900 transition-all duration-300 flex items-center justify-center gap-2"
             >
-              💎 View Plans
+              <span className="text-xl">💎</span> View Plans
             </button>
           </div>
 
@@ -271,18 +149,21 @@ export default function Sidebar() {
                 navigate('/sos');
                 if (!isDesktop) setIsMobileMenuOpen(false);
               }}
-              className="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-red-600 transition-all duration-200"
+              className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold py-3 px-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2"
             >
-              🚨 SOS
+              <span className="text-xl">🚨</span> SOS Emergency
             </button>
           </div>
 
           {/* Rotating Daily Mantra Box */}
-          <div className="mt-6 p-4 bg-gradient-to-br from-emerald-50 via-pink-50 to-green-50 border border-emerald-200 rounded-xl shadow flex flex-col items-center text-center">
-            <span className="text-3xl mb-2">🧘‍♂️</span>
-            <h4 className="text-lg font-semibold text-emerald-700 mb-2">Calmana Mantra</h4>
-            <p className="text-sm italic text-emerald-800">
-              {mantras[mantraIndex]}
+          <div className="mt-6 p-5 bg-emerald-50/50 border border-emerald-100 rounded-3xl flex flex-col items-center text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/40 rounded-full blur-xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+            <div className="bg-white w-12 h-12 rounded-full flex items-center justify-center shadow-sm mb-3 z-10 border border-emerald-50">
+              <span className="text-2xl">🧘‍♂️</span>
+            </div>
+            <h4 className="text-xs font-bold text-emerald-800 mb-2 uppercase tracking-widest z-10">Daily Mantra</h4>
+            <p className="text-sm italic text-emerald-700 leading-relaxed font-medium z-10">
+              "{mantras[mantraIndex]}"
             </p>
           </div>
         </div>

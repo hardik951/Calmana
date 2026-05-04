@@ -7,7 +7,7 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true };
+    return { hasError: true, error };
   }
 
   componentDidCatch(error, errorInfo) {
@@ -20,7 +20,10 @@ class ErrorBoundary extends React.Component {
         <div className="min-h-screen bg-gradient-to-r from-emerald-100 via-pink-100 to-green-100 p-6 flex items-center justify-center">
           <div className="bg-white p-8 rounded-xl shadow-lg max-w-md text-center">
             <h2 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h2>
-            <p className="text-gray-700 mb-6">We're sorry, but there was an error loading your dashboard.</p>
+            <p className="text-gray-700 mb-2">We're sorry, but there was an error loading your dashboard.</p>
+            <div className="bg-red-50 text-red-800 p-3 rounded text-sm text-left font-mono overflow-auto mb-6 h-32">
+              {this.state.error?.toString()}
+            </div>
             <button 
               onClick={() => window.location.reload()} 
               className="bg-emerald-600 text-white px-6 py-2 rounded-full hover:bg-emerald-700 transition-colors"

@@ -6,12 +6,12 @@ import Dashboard from './components/Dashboard';
 import Feedback from './components/Feedback';
 import MoodTracker from './components/MoodTracker';
 import MoodSender from './components/MoodSender';
-import CommunityFeed from './components/CommunityFeed';
-import Community from './pages/community';
+
 import AuthPage from './pages/AuthPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AIChatPage from './pages/AIChatPage';
+import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/navbar';
 import BookTherapy from './pages/booktherapy';
 import FindDoctors from './pages/finddoctors';
@@ -93,9 +93,10 @@ function App() {
 
   return (
     <Router>
+      <ErrorBoundary>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/auth" element={<AuthPage onLogin={handleLogin} />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/signup" element={<SignupPage onLogin={handleLogin} />} />
 
@@ -139,20 +140,6 @@ function App() {
           path="/feedback"
           element={isAuthenticated ? (
             <LayoutWrapper><Feedback /></LayoutWrapper>
-          ) : <Navigate to="/login" replace />}
-        />
-
-        <Route
-          path="/community-feed"
-          element={isAuthenticated ? (
-            <LayoutWrapper><CommunityFeed /></LayoutWrapper>
-          ) : <Navigate to="/login" replace />}
-        />
-
-        <Route
-          path="/community"
-          element={isAuthenticated ? (
-            <LayoutWrapper><Community /></LayoutWrapper>
           ) : <Navigate to="/login" replace />}
         />
 
@@ -250,12 +237,12 @@ function App() {
   )}
 />
 
-
         <Route
           path="*"
           element={<Navigate to={isAuthenticated ? '/dashboard' : '/'} replace />}
         />
       </Routes>
+      </ErrorBoundary>
     </Router>
   );
 }
